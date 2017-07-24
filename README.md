@@ -1,7 +1,7 @@
 
 ## Overview
 
-[](/pictures/mainpicture.jpg)
+![](pictures/mainpicture.jpg)
 
 uGameCore is a powerful framework for Unity game engine that contains core components of what every game should have. It takes care of everything 'under the hood', allowing you to focus on main parts of the game, like game logic and design. It greatly increases the speed and productivity of development.
 
