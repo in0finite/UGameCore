@@ -1,6 +1,8 @@
 
 ## Overview
 
+[](pictures/mainpicture.jpg)
+
 uGameCore is a powerful framework for Unity game engine that contains core components of what every game should have. It takes care of everything 'under the hood', allowing you to focus on main parts of the game, like game logic and design. It greatly increases the speed and productivity of development.
 
 Don't ever again start from scratch, or waste your time on creating menus, settings, multiplayer... It is all done for you. You are 10 minutes away from finishing all background stuff, and finally focusing on the game itself.
@@ -68,6 +70,16 @@ setup doesn't work):
 - populate map cycle from build settings
 
 - save scene
+
+
+## Documentation
+
+Documentation, which explains how things work and contains tutorials, can be found [here](docs/documentation.txt)
+
+
+## Screenshots
+
+Click [here](screenshots.md) to see screenshots.
 
 
 ## Feedback
