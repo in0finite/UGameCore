@@ -77,6 +77,11 @@ setup doesn't work):
 Documentation, which explains how things work and contains tutorials, can be found [here](docs/documentation.txt)
 
 
+## Examples
+
+[here](examples/) are examples that show how some scripts work, and how to implement things yourself.
+
+
 ## Screenshots
 
 Click [here](screenshots.md) to see screenshots.
