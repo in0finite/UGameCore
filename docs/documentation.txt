@@ -110,11 +110,20 @@ Adding commands to console
 Check any of command scripts, such as DefaultCommands, for how to do this.
 
 ------------------
-Customizing scoreboard
+Scoreboard
 ------------------
+
+To show/hide scoreboard press Tab.
 
 Currently, the only way to customize scoreboard is to inherit ScoreDrawer and override it's
 virtual methods.
+
+------------------
+Console
+------------------
+
+To show/hide console press ` key.
+
 
 
 ---------------------

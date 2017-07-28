@@ -1,0 +1,124 @@
+
+
+[28.06.2017]
+- fixed some menu windows not filling whole screen space
+- fixed scroll views for: kill events, chat, settings menu
+
+[29.06.2017]
+- damage now works - a script was not attached to game objects
+- fixed score drawer bug
+
+[30.06.2017]
+- chat can be sent with enter
+
+[01.07.2017]
+- chat is displayed inside of in game menu
+- menu manager changed - event system is no longer disabled ; focus is removed when menu is switched
+- in game menu is opened always while non-startup scene is opened - this allows for it to be visible even when other menus are opened (pause menu, settings menu, etc)
+
+[03.07.2017]
+- fixed displaying map image in start server menu
+- changed a couple of stuff to make it possible to have no teams (but did not finish)
+- round end condition - added condition for FFA mode ; if all players are members of 1 team, and none of the players is spawned, round ends
+- added option to enable/disable automatic map changing
+- added option to enable/disable round system
+- score's syncvar variables are not public
+- Damagable checks for team
+- added ability to control friendly fire, FFA
+- added command line processing
+
+[04.07.2017]
+- FFA & team choosing & spectating works
+- console adapted to new UI system
+
+[05.07.2017]
+- score display adapted to new UI
+- score display - added spectators 'team' ; added sorting functionality
+
+[06.07.2017]
+- score display - improved sorting
+- batch mode - auto exit on disconnect/server shutdown
+
+[07.07.2017]
+- batch mode - auto choose team
+- adapted spectator to new UI
+
+[09.07.2017]
+- score display - sorting is finished
+- windows adapted to new UI
+- console is scrolling to the end
+- settings menu - fixed scroll view ; made it look better
+
+[10.07.2017]
+- CVarManager - no longer uses reflection ; cvars are added manually via function ; adapted GeneralSettings ; added support for int and bool ;
+- settings menu - all interaction with entries (creation, updating, iteration) is done with one function ; added support for : float text box, integer text box, integer slider, bool ;
+- added cvars : FFA, friendly fire
+- fixed anchors for chat area and kill events area
+
+[14.07.2017]
+- renamed namespace to uGameCore
+- renamed assembly
+- replaced all scripts from old assembly with the scripts from new assembly
+
+[15.07.2017]
+- moved all assets to one folder
+- built dll in release mode
+- changed way of how SceneManagerEventsForwarder and RoundSystem dispatch messages - they send them to all monobehaviours
+- changed declaration of BroadcastMessageNoExceptions() - now it receives arguments as 'params'
+
+[16.07.2017]
+- reorganized prefabs
+- change way of forbidding input and gui drawing
+- SettingsMenu & Console & WindowManager & ScoreDrawer & PopulateDropdownWithMapCycle find UI elements by themself
+- added LocalNetworkEventsDispatcher for local broadcasting ; NetworkEventsDispatcher now only invokes events
+- grouped all module parts
+- created editor window for setup
+- added setup step: create prefabs
+
+[17.07.2017]
+- finished scenes setup step
+- finished demo scenes setup step
+- removed empty folders from project
+- exported package
+
+[19.07.2017]
+- one click setup finished
+
+[20.07.2017]
+- renamed some scripts
+- improved menu manager
+- added logo to main menu
+- replaced button image
+
+[21.07.2017]
+- removed unneccesery assets
+- updated description.txt
+- changed variable names
+- improved menu look
+
+[22.07.2017]
+- messages documented
+- added button hover and click sounds
+- updated documentation
+
+[23.07.2017]
+- created images for asset store
+- created main image for asset store
+- updated description for asset store
+
+[24.07.2017]
+- added installation section in readme
+
+[25.07.2017]
+- posted on github
+- changed asset serialization mode to binary
+
+[27.07.2017]
+- setup fixed and fully tested
+- built for android and tested
+
+[28.07.2017]
+- submitted on asset store
+- updated readme - added link to github page, removed redundant information (which is available on github)
+- removed documentation
+
