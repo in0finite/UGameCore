@@ -121,4 +121,24 @@
 - submitted on asset store
 - updated readme - added link to github page, removed redundant information (which is available on github)
 - removed documentation
+- game manager detects multiple instances of singleton, logs error and quits the application
+- exiting game works in editor
+- removed text from kill events UI
+- console scroll view position fixed
+- added instructions how to: create/adapt scenes, shoot bullets in demo scene
+- console & scoreboard - can be opened/closed programmatically, key for opening/closing can be changed
+- choose team window is closed when client disconnects
+- introduced on-screen messages
+- inflicted damage is displayed using on-screen messages, and is no longer done in Player script
+- damage system - InflictedDamageReporter sends OnInflictedDamage and OnEarnedKill - adapted other scripts
+
+[29.07.2017]
+- changed anchors for scroll view and map image in start game menu
+- fixed input field throwing null reference exception when console canvas is disabled
+- changed look of console's submit input field and button
+- added more cubes and spawn positions in demo scene
+
+[30.07.2017]
+- removed unneccesery gameplay scripts
+- added DisableWhenInputOrDrawingIsForbidden script
 

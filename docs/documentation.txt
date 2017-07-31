@@ -52,10 +52,19 @@ There is FFA (free for all) mode, in which each player plays for himself.
 
 ----------------------------------------------------------------------------------
 
+--------------------------------------
+Input controls in demo scene
+--------------------------------------
 
-----------------
+Space - shoot bullets
+
+
+----------------------------------------------------------------------------------
+
+
+--------------------------------------
 Creating your own playing object
-----------------
+--------------------------------------
 
 What is the playing object ? It's simply a game object which the player controls (it can be character, car, etc).
 
@@ -80,9 +89,9 @@ Script which catches these messages is InflictedDamageReporter, which in turn, n
 It's important that you notify owning player about damage and kill, or otherwise some things will not work.
 So, if you have your own damaging system, you should see how the things are done in above scripts, and adapt it.
 
---------------------
+--------------------------------------
 Creating menu
---------------------
+--------------------------------------
 
 - Create a copy of existing menu, such as main menu.
 
@@ -97,38 +106,54 @@ then you should check how it's done in other buttons (it's all in UI system, no 
 
 - That's it. Now you can create a prefab out of your menu, and distribute it as a module :D .
 
-------------------
+--------------------------------------
+Creating/Adapting scenes
+--------------------------------------
+
+Every scene should have at least 1 spawn position.
+This is necessary so that NetworkManager could create player (from Player.prefab), and also for 
+framework to spawn playing objects.
+Spawn position can be created in the scene from SpawnPosition.prefab .
+
+To set specific playing object for the scene, use PlayingObjectSetter.prefab .
+
+And don't forget to add new scenes to map cycle.
+
+If you find something unclear, then just see how it's done in demo scene.
+
+
+--------------------------------------
 Adding cvars for settings menu
-------------------
+--------------------------------------
 
 Check TeamSettings script for how to do this.
 
-------------------
+--------------------------------------
 Adding commands to console
-------------------
+--------------------------------------
 
 Check any of command scripts, such as DefaultCommands, for how to do this.
 
-------------------
+--------------------------------------
 Scoreboard
-------------------
+--------------------------------------
 
 To show/hide scoreboard press Tab.
 
 Currently, the only way to customize scoreboard is to inherit ScoreDrawer and override it's
 virtual methods.
 
-------------------
+--------------------------------------
 Console
-------------------
+--------------------------------------
 
 To show/hide console press ` key.
 
 
 
----------------------
+--------------------------------------
 Messages
----------------------
+--------------------------------------
 
 Here is a list of messages sent:
 
@@ -159,7 +184,9 @@ OnDamaged (InflictedDamageInfo)
 OnKilled (InflictedDamageInfo)
 
 sender - InflictedDamageReporter:
+OnEarnedKill (InflictedDamageInfo)
 OnDied (Player)
+OnInflictedDamage (InflictedDamageInfo)
 
 sender - Bullet:
 OnProjectileHit (ProjectileHitInfo)
