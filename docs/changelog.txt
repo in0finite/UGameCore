@@ -142,3 +142,30 @@
 - removed unneccesery gameplay scripts
 - added DisableWhenInputOrDrawingIsForbidden script
 
+[02.08.2017]
+- console - added limit on number of characters => fixed bug with text generator ; improved buffering ; UI is updated in Update(), not in log callback function
+
+[13.08.2017]
+- submitted updated version on asset store
+
+[14.08.2017]
+- score drawer - now provides delegates for customization : get column widths, get column names,
+get row values, get compare value for sorting ; it doesn't show only players, it can show anything - added delegate: get rows per team
+
+[15.08.2017]
+- added profiling sections in Console.Update()
+- fixed console performance bug
+- introduced "Module Scripts" and ModuleScriptsLoader - module scripts (singleton scripts) can now be 
+attached automatically to singleton game object, from editor window - now there is no need to create separate prefab for every feature
+- introduced tooltips
+
+[04 sep 2017]
+- console : display text is updated only if console is opened ; log string is no longer cached, it's only stored in a string builder ; Canvas.SendWillRenderCanvases() no longer makes CPU spikes while console is closed ;
+
+[13 sep 2017]
+- fixed tooltips
+
+[04 oct 2017]
+- created SpawnPlayerWhenSceneChanges script
+
+

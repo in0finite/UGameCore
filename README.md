@@ -39,14 +39,20 @@ To mention again, the framework is fully extendable. Scripts are communicating u
 
 
 
-## Installation
+## Download
+
+Download it from the [asset store](https://www.assetstore.unity3d.com/#!/content/96542).
+
+## One click installation
 
 There is an editor menu which allows you to setup the project in one click (located at uGameCore => Setup => One click setup).
 
 So, go ahead and press that menu. If everything went fine (there are no errors or warnings in the console),
 then you are good to go => hit the Play button.
 
-If you encounter any errors or warnings during this setup, you should try to fix them.
+## Manual installation
+
+If you encounter any errors or warnings during one-click setup, you should try to fix them.
 It's not that difficult, all possible errors and warnings are logged to console, so you can quickly see
 what is the problem.
 
@@ -79,7 +85,7 @@ Documentation, which explains how things work and contains tutorials, can be fou
 
 ## Examples
 
-[here](examples/) are examples that show how some scripts work, and how to implement things yourself.
+[here](scripts/examples/) are examples that show how some scripts work, and how to implement things yourself.
 
 
 ## Screenshots
