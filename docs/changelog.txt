@@ -168,4 +168,11 @@ attached automatically to singleton game object, from editor window - now there 
 [04 oct 2017]
 - created SpawnPlayerWhenSceneChanges script
 
+[25 nov 2017]
+- FPS is measured using Stopwatch
+
+[08 dec 2017]
+- tooltips are finally fixed - did not work with different canvas scale values
+
+
 
