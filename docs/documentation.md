@@ -4,28 +4,35 @@ This will make possible to extend the framework easily, to integrate other toolk
 them at all.
 
 
--------------------
+***
+
+
+--------------------------------------
 Singleton objects
+--------------------------------------
 
 Most of the manager objects are singleton objects. These objects are preserved across scenes.
 
 All singleton objects should be placed in startup scene. This scene should be loaded only on startup, and never again, otherwise you may get
 unwanted behaviour. This way, singleton objects will be created only once during application lifetime.
 
---------------
+--------------------------------------
 Scenes
+--------------------------------------
 
 First scene in the project should be the startup scene with singleton objects. This scene should, generally, 
 contain only singleton objects. Next scene should be the offline scene in NetworkManager.
 
---------------------
+--------------------------------------
 Scene changing
+--------------------------------------
 
 If you ever need to change map, use SceneChanger. Why ? Well, because some features require to know if any
 scene is being loaded, and SceneChanger provides this information.
 
---------------
+--------------------------------------
 Players
+--------------------------------------
 
 Every player has a dedicated game object which represents that player. It is used to, for example, log in to server, send commands,
 send rpcs, and in general interact with the player. You can attach any component to this game object to sync information between client
@@ -41,8 +48,9 @@ a player can control multiple objects, even up to several hundreds of them, like
 assign a dummy object to act as a player's controlling object, and you keep him alive as long as all player's objects are alive.
 
 
---------------
+--------------------------------------
 Teams
+--------------------------------------
 
 Each player can choose a team upon connecting.
 Round will end when there is only 1 team left standing.
@@ -140,8 +148,7 @@ Scoreboard
 
 To show/hide scoreboard press Tab.
 
-Currently, the only way to customize scoreboard is to inherit ScoreDrawer and override it's
-virtual methods.
+You can customize the scoreboard by assigning delegates.
 
 --------------------------------------
 Console

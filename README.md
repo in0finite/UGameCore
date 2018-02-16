@@ -3,13 +3,15 @@
 
 ![](pictures/mainpicture.jpg)
 
-uGameCore is a powerful framework for Unity game engine that contains core components of what every game should have. It takes care of everything 'under the hood', allowing you to focus on main parts of the game, like game logic and design. It greatly increases the speed and productivity of development.
+uGameCore is a powerful framework for Unity game engine that contains core components of what every game should have. It takes care of everything 'under the hood', allowing you to focus on main parts of the game, like game logic and design.
 
 Don't ever again start from scratch, or waste your time on creating menus, settings, multiplayer... It is all done for you. You are 10 minutes away from finishing all background stuff, and finally focusing on the game itself.
 
 
 All features are built on top of Unity, which means it is very easy to extend them, and to adapt them to any existing project.
 
+
+Repository for library which is used in the project (uGameCore.dll) is [here](https://github.com/in0finite/uGameCoreLib).
 
 ## Features
 
@@ -78,19 +80,15 @@ setup doesn't work):
 - save scene
 
 
-## Documentation
+## Links
 
-Documentation, which explains how things work and contains tutorials, can be found [here](docs/documentation.txt)
+- [documentation](docs/documentation.md)
 
+- [examples](docs/examples/)
 
-## Examples
+- [screenshots](screenshots.md)
 
-[here](scripts/examples/) are examples that show how some scripts work, and how to implement things yourself.
-
-
-## Screenshots
-
-Click [here](screenshots.md) to see screenshots.
+- [todo list](docs/todo.md)
 
 
 ## Feedback
