@@ -1,0 +1,1 @@
+fps.exe -batchmode -nographics -port:5555 -startserver
