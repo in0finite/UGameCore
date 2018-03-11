@@ -56,9 +56,13 @@
 
 - Player class - it’s work should be splitted – commands ; damage and health should be synced using controllable objects ;
 
-- **UI problems** – console should be always on top ; **when window is opened, bring it to front, and also when some menu is opened, bring it to back ;**
+- **UI problems** – console should be always on top ; **when some menu is opened, bring windows to back ? ;**
 
 - editor tool for changing theme – check online
+
+- add tooltip prefabs
+
+- scoreboard color and transparency
 
 - when player changes nick, there is no error checking (whether that nick already exists)
 
