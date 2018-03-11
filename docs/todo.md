@@ -13,7 +13,7 @@
 
 - auto team balance
 
-- console commands – clear, history (prints all entered commands so far), view log (prints whole log), 
+- console commands – view log (prints whole log), 
 
 - window manager – create window from existing canvas or panel
 
@@ -22,8 +22,6 @@
 - add more information for teams : description, color, num wins, is visible in scoreboard, - teams should be GameObjects - that way you can add features to them
 
 - server should be able to create windows with options on client (it doesn’t have to be windows, it can be on-screen text) – allows for : team choosing, votemap, votekick, choose weapon, etc
-
-- message box looks ugly
 
 - cvar registration order
 
@@ -61,6 +59,8 @@
 - **UI problems** – console should be always on top ; **when window is opened, bring it to front, and also when some menu is opened, bring it to back ;**
 
 - editor tool for changing theme – check online
+
+- when player changes nick, there is no error checking (whether that nick already exists)
 
 - when FFA is on, don’t send choose team message
 
