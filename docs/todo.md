@@ -29,6 +29,8 @@
 
 - disable *end round* button when round system is disabled
 
+- while client is connecting, display the status somehow - e.g. disable join button, change text of join button
+
 
 ### BUGS:
 
@@ -69,6 +71,8 @@
 - when FFA is on, don’t send choose team message
 
 - scoreboard – should we bother with adapting to UI table ? ; add option to override entry creation (for example, to add buttons)
+
+- format date for: uptime, map time, round time
 
 - **disable UI navigation** - disable checkbox in EventSystem
 
