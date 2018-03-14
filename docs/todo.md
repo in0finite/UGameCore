@@ -29,8 +29,6 @@
 
 - disable *end round* button when round system is disabled
 
-- while client is connecting, display the status somehow - e.g. disable join button, change text of join button
-
 
 ### BUGS:
 
@@ -73,6 +71,10 @@
 - scoreboard – should we bother with adapting to UI table ? ; add option to override entry creation (for example, to add buttons)
 
 - format date for: uptime, map time, round time
+
+- add commands: stopnet, msgboxclient, msgboxallclients, connect, startserver, 
+
+- **while client is connecting, display the status somehow** - e.g. disable join button, change text of join button
 
 - **disable UI navigation** - disable checkbox in EventSystem
 
