@@ -64,9 +64,7 @@
 
 - when FFA is on, don’t send choose team message
 
-- scoreboard – should we bother with adapting to UI table ? ; add option to override entry creation (for example, to add buttons)
-
-- **while client is connecting, display the status somehow** - e.g. disable join button, change text of join button
+- scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
 - **editor tool for setting map cycle from build settings**
 
