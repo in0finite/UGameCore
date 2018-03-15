@@ -68,8 +68,6 @@
 
 - **while client is connecting, display the status somehow** - e.g. disable join button, change text of join button
 
-- **disable UI navigation** - disable checkbox in EventSystem
-
 - **editor tool for setting map cycle from build settings**
 
 - **add builds on github – for linux, windows and android**
