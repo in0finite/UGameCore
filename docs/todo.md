@@ -72,7 +72,9 @@
 
 - format date for: uptime, map time, round time
 
-- add commands: stopnet, msgboxclient, msgboxallclients, connect, startserver, 
+- don't save empty commands in history
+
+- add commands: players, 
 
 - **while client is connecting, display the status somehow** - e.g. disable join button, change text of join button
 
