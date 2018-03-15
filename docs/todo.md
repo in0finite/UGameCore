@@ -56,25 +56,19 @@
 
 - Player class - it’s work should be splitted – commands ; damage and health should be synced using controllable objects ;
 
-- **UI problems** – console should be always on top ; **when some menu is opened, bring windows to back ? ;**
+- UI problems – console should be always on top ; when some menu is opened, bring windows to back ? ;
 
 - editor tool for changing theme – check online
 
 - add tooltip prefabs
 
-- scoreboard color and transparency
+- change scoreboard color and transparency
 
 - when player changes nick, there is no error checking (whether that nick already exists)
 
 - when FFA is on, don’t send choose team message
 
 - scoreboard – should we bother with adapting to UI table ? ; add option to override entry creation (for example, to add buttons)
-
-- format date for: uptime, map time, round time
-
-- don't save empty commands in history
-
-- add commands: players, 
 
 - **while client is connecting, display the status somehow** - e.g. disable join button, change text of join button
 
