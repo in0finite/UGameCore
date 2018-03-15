@@ -62,10 +62,6 @@
 
 - add tooltip prefabs
 
-- change scoreboard color and transparency
-
-- when player changes nick, there is no error checking (whether that nick already exists)
-
 - when FFA is on, don’t send choose team message
 
 - scoreboard – should we bother with adapting to UI table ? ; add option to override entry creation (for example, to add buttons)
