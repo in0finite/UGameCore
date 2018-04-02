@@ -62,7 +62,13 @@
 
 - add tooltip prefabs
 
-- when FFA is on, don’t send choose team message
+- when cvar is modified, and it's new value is invalid, color of text field is set to red - but it is never restored - it should be done when settings menu is opened
+
+- if FFA is on, spawn player when he logs in, and when scene changes - add separate script FFASpawnPlayer
+
+- ignore network log message : host id {0} has been already deleted
+
+- when starting server, check if online scene is assigned ; when starting client, check if ip address is valid
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
@@ -71,7 +77,7 @@
 - **add builds on github – for linux, windows and android**
 
 
-
-
+<br>
+<br>
 
 
