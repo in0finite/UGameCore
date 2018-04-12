@@ -29,6 +29,8 @@
 
 - disable *end round* button when round system is disabled
 
+- events in NetworkEventsDispatcher should be invoked exception safe
+
 
 ### BUGS:
 
@@ -71,6 +73,8 @@
 - when starting server, check if online scene is assigned ; when starting client, check if ip address is valid
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
+
+- change project name
 
 - **editor tool for setting map cycle from build settings**
 
