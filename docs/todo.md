@@ -29,14 +29,16 @@
 
 - disable *end round* button when round system is disabled
 
-- events in NetworkEventsDispatcher should be invoked exception safe
+- score canvas should be scaled with screen size (too small letters and too large scoreboard on full HD)
+
+- choose-team window is too large on full HD
+
+- fix flash which happens when exiting settings menu - possible cause for it is random execution order of scripts - Menu.Update() of the menu which should be opened, is executed 1 frame later, and hence the flash - menus should be enabled/disabled by MenuManager
 
 
 ### BUGS:
 
 - player prefs are not working on linux – randomly saves configuration to disk or adds new cvars
-
-- teams are not correct in clients’ scoreboard ?
 
 
 ### TIPS:
@@ -68,13 +70,17 @@
 
 - if FFA is on, spawn player when he logs in, and when scene changes - add separate script FFASpawnPlayer
 
+- teams are not correct in clients’ scoreboard
+
 - ignore network log message : host id {0} has been already deleted
 
 - when starting server, check if online scene is assigned ; when starting client, check if ip address is valid
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
-- change project name
+- events in NetworkEventsDispatcher should be invoked exception safe
+
+- LAN : test broadcasting on windows ;
 
 - **editor tool for setting map cycle from build settings**
 
