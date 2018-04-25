@@ -5,7 +5,7 @@
 
 - Scoreboard : add num of players for each team ? ; highlight local player ;
 
-- console - add option to disable logging stack trace ; filter info, debug, error messages (from gui) ;
+- console - add option to disable logging stack trace ; filter info, debug, error messages ; stack trace depth level ; collapse ; ignore specific messages ;
 
 - settings menu – restore all settings to default ; 
 
@@ -19,7 +19,11 @@
 
 - organize Bullet script
 
-- add more information for teams : description, color, num wins, is visible in scoreboard, - teams should be GameObjects - that way you can add features to them
+- add all scripts to the project, and replace them with the ones from dll ; switch asset serialization mode to text - it will be more git-friendly, and you will be able to see what exactly was changed ;
+
+- build for android
+
+- add more information for teams : description, color, num wins, is visible in scoreboard, - teams should be GameObjects (or not - use dictionary as attributes) - that way you can add features to them
 
 - server should be able to create windows with options on client (it doesn’t have to be windows, it can be on-screen text) – allows for : team choosing, votemap, votekick, choose weapon, etc
 
@@ -74,11 +78,7 @@
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
-- LAN : test broadcasting on windows ;
-
 - **editor tool for setting map cycle from build settings**
-
-- **add builds on github – for linux, windows and android**
 
 
 <br>

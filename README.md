@@ -43,7 +43,7 @@ To mention again, the framework is fully extendable. Scripts are communicating u
 
 ## Download
 
-Download it from the [asset store](https://www.assetstore.unity3d.com/#!/content/96542).
+Download project as [zip archive](https://github.com/in0finite/uGameCore/archive/master.zip). Demo builds are available [here](https://drive.google.com/open?id=1cUicZgCwRhTL6TZtftThvQsAOY2oUJpR).
 
 ## One click installation
 
