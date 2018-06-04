@@ -5,7 +5,7 @@
 
 - Scoreboard : add num of players for each team ? ; highlight local player ;
 
-- console - add option to disable logging stack trace ; filter info, debug, error messages ; stack trace depth level ; collapse ; ignore specific messages ;
+- console - add option to disable logging stack trace ; filter info, debug, error messages ; stack trace depth level ; collapse ; ignore specific messages ; currently, console does not catch messages logged from Awake() of scripts executed before console ;
 
 - settings menu – restore all settings to default ; 
 
@@ -71,6 +71,8 @@
 - when cvar is modified, and it's new value is invalid, color of text field is set to red - but it is never restored - it should be done when settings menu is opened
 
 - if FFA is on, spawn player when he logs in, and when scene changes - add separate script FFASpawnPlayer
+
+- LAN : when there are mutliple interfaces, client on the same machine receives data through all of them - try to set MulticastLoopback to false ; set id in broadcast data ;
 
 - teams are not correct in clients’ scoreboard
 
