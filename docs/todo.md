@@ -5,7 +5,7 @@
 
 - Scoreboard : add num of players for each team ? ; highlight local player ;
 
-- console - add option to disable logging stack trace ; filter info, debug, error messages ; stack trace depth level ; collapse ; ignore specific messages ; currently, console does not catch messages logged from Awake() of scripts executed before console ;
+- console - add option to disable logging stack trace ; filter info, debug, error messages ; stack trace depth level ; collapse ; currently, console does not catch messages logged from Awake() of scripts executed before console ;
 
 - settings menu – restore all settings to default ; 
 
@@ -75,8 +75,6 @@
 - LAN : when there are mutliple interfaces, client on the same machine receives data through all of them - try to set MulticastLoopback to false ; set id in broadcast data ;
 
 - teams are not correct in clients’ scoreboard
-
-- ignore network log message : host id {0} has been already deleted
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
