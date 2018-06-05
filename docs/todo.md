@@ -68,10 +68,6 @@
 
 - add tooltip prefabs
 
-- when cvar is modified, and it's new value is invalid, color of text field is set to red - but it is never restored - it should be done when settings menu is opened
-
-- if FFA is on, spawn player when he logs in, and when scene changes - add separate script FFASpawnPlayer
-
 - LAN : when there are mutliple interfaces, client on the same machine receives data through all of them - try to set MulticastLoopback to false ; set id in broadcast data ;
 
 - teams are not correct in clients’ scoreboard
