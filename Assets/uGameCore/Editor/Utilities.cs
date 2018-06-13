@@ -76,6 +76,16 @@ namespace uGameCore.Editor {
 
 		}
 
+
+		public	static	T	FindSingletonOrThrow<T>() where T : MonoBehaviour {
+
+			var obj = Object.FindObjectOfType<T> ();
+			if (null == obj)
+				throw new ObjectNotFoundException ("Failed to find singleton of type " + typeof(T));
+
+			return obj;
+		}
+
 	}
 
 }

@@ -25,6 +25,8 @@
 
 - add more information for teams : description, color, num wins, is visible in scoreboard, - teams should be GameObjects (or not - use dictionary as attributes) - that way you can add features to them
 
+- MapCycle - it should have a list of map infos (info will contain map, picture, description, etc), not separate lists ; it should not store map name, but map path ; these modifications will require to change setup, among other things ;
+
 - server should be able to create windows with options on client (it doesn’t have to be windows, it can be on-screen text) – allows for : team choosing, votemap, votekick, choose weapon, etc
 
 - cvar registration order
@@ -74,7 +76,7 @@
 
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
-- **editor tool for setting map cycle from build settings**
+- editor tool for setting map cycle from build settings - needs testing
 
 
 <br>
