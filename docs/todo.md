@@ -72,8 +72,6 @@
 
 - LAN : when there are mutliple interfaces, client on the same machine receives data through all of them - try to set MulticastLoopback to false ; set id in broadcast data ;
 
-- player stats are not visible in spectator canvas, but only for the first time when spectator UI is shown
-
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
 - editor tool for setting map cycle from build settings - needs testing
