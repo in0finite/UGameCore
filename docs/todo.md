@@ -51,12 +51,14 @@
 
 - too many stuffs depend on teams : score drawing, spawn points, round system, player, damage system - it should be part of core
 
+- for now on, use imGUI instead of new UI system
+
 
 ### ACTIVE:
 
 - chat display scroll view should not have scrollbars and should not receive input ?
 
-- generalize settings menu => allows to create menu with parameters anywhere (for example, start game/join game parameters) - ParametersView
+- generalize settings menu => allows to create menu with parameters anywhere (for example, start game/join game parameters) - **ParametersView**
 
 - settings menu - add tabs (group settings by tabs)
 
