@@ -21,7 +21,9 @@
 
 - add all scripts to the project, and replace them with the ones from dll ; switch asset serialization mode to text - it will be more git-friendly, and you will be able to see what exactly was changed ;
 
-- build for android
+- upgrade project to unity 2017.2 - it will no longer be deprecated, and people can start using it
+
+- build for : android ; WebGL (put a web page on github) ;
 
 - add more information for teams : description, color, num wins, is visible in scoreboard, - teams should be GameObjects (or not - use dictionary as attributes) - that way you can add features to them
 
