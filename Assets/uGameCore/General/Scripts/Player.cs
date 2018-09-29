@@ -387,9 +387,7 @@ namespace uGameCore {
 
 		[Command]
 		private	void	CmdLoggingIn( int[] clientVersion, string name ) {
-
-			#if SERVER
-
+			
 			Player p = this ;
 
 
@@ -445,8 +443,6 @@ namespace uGameCore {
 			Debug.Log (p.playerName + " logged in");
 
 			this.gameObject.BroadcastMessageNoExceptions( "OnLoggedIn" );
-
-			#endif
 
 		}
 
@@ -594,9 +590,7 @@ namespace uGameCore {
 
 		[Command]
 		public	void	CmdListMaps() {
-
-			#if SERVER
-
+			
 			// Client wants to see all available maps.
 
 			string response = "";
@@ -612,8 +606,6 @@ namespace uGameCore {
 			}
 
 			RpcLog (response);
-
-			#endif
 
 		}
 
