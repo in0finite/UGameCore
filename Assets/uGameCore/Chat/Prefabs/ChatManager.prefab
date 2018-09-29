@@ -50,7 +50,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1006592566158524}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1061507338, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114852545460674258
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1006592566158524}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1579969834, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114933720473238440
@@ -72,7 +72,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1006592566158524}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 615414755, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: cd0877b8437af41bba505c03c8adf75d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serverChatNick: <color=green>Server</color>

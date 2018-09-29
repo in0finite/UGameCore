@@ -114,7 +114,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 109418}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 786370900, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ebb01e3f4bbb40b4904d913b5351a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   velocity: 700
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 109418}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -275609841, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: badbc90840765432ebba59be4e9e34dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   audioObjectPrefab: {fileID: 133450, guid: 91f7a047f83cb5b4ba01c0c3fd4cd43a, type: 2}

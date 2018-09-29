@@ -50,7 +50,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1163484863510140}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 129664981, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: d52a37a7046c04b8795a36df0646279e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   inputFieldPrefab: {fileID: 1319134029983374, guid: 7501f35a050ee44fb93ce04c39c63ccf,
@@ -71,7 +71,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1163484863510140}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1579969834, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114983880242144944
@@ -82,6 +82,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1163484863510140}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1061507338, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -89,7 +89,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1577111117, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: e6d6f19760cef4878b3bd5eb1d711ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114336821531681758
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -523576351, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 7690cb9885e964c85afc4c86a996d9d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114409847264802162
@@ -111,7 +111,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -241328456, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: d497d5e4160a3452789aa496039b1e03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   timeToDisplay: 2
@@ -126,7 +126,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 92222012, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 2bfa950e6e191408fbea09b786126e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cancelButtonNormalizedRect:
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1004995821, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: e116ffb9974294dff80a286c6cd50a83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114724337564416534
@@ -154,7 +154,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -281327213, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 992e015ef65dc4ae69d3cd0e3bc32a07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114776718622959196
@@ -165,7 +165,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1613947421, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: d7d228529d3ce45f1907eb7cb6424bd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxRoundTimeToSpawnImmediately: 10
@@ -177,7 +177,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -618855810, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 16944d04a15e44ea894326601609e47a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   resetOnSceneChange: 1
@@ -189,7 +189,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 165522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 2101587853, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 7df8fe274f52a40aebbdd7a32e4c93b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   resetTeamOnSceneChange: 1

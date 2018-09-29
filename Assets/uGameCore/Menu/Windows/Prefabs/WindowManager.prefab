@@ -53,7 +53,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -188789400, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e6c1670c4458436f87f018f1a464854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   title: Failed to start server
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1061507338, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114257916812501816
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1185661802, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: c4bc77247926847818af7ad28483aa08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   windowPrefab: {fileID: 1008656201797430, guid: fc4a690eca98b43edbda8d93a3d4a265,
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1710472099, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 860ae8803add94094a01a3ab87681ce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   title: Failed to join game
@@ -111,7 +111,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1075643004, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: d6f082b3a4044484aa776bc654ea9f29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   exactErrors:
@@ -129,6 +129,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1579969834, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

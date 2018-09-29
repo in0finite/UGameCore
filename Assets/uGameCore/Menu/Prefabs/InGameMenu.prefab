@@ -688,7 +688,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1717141881082324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 205853730, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 088547e8435d347c29f85a1e99e536df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   timeToRemoveEvent: 5
@@ -731,7 +731,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1614415512891626}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -2062122748, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 794de57c8e0e14f9183712bf72fdc692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   populator: {fileID: 114613087155786774}
@@ -743,7 +743,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1614415512891626}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 205853730, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 088547e8435d347c29f85a1e99e536df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   timeToRemoveEvent: 8
@@ -863,7 +863,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1463183903250786}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1579969834, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114815556207220704
@@ -966,7 +966,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1717141881082324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1069433886, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: adaa41e4dfca74a9f8133dea8b86ec12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   populator: {fileID: 114411807088982658}
@@ -978,7 +978,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1463183903250786}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1243714993, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 825b42200babe42b0bc4ac8dcbed5ffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   menuName: InGameMenu

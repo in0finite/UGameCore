@@ -90,7 +90,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 175828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -511214556, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: bb3e0f01ae54f4999bd84cb97c7e2c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   teamIndex: -1
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 175828}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 224774951, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: c36621f4cf297454ab8af917d9b6a01d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000

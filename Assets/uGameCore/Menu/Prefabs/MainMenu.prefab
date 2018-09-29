@@ -857,7 +857,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1800198113567852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -212524213, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 9754aca7b5e6e4a9c99503fb39072d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   modifyFontSize: 1
@@ -944,7 +944,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1308467504737242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -212524213, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 9754aca7b5e6e4a9c99503fb39072d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   modifyFontSize: 1
@@ -1051,7 +1051,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1206122534693806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1579969834, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114746113893275712
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1793214330618400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -212524213, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 9754aca7b5e6e4a9c99503fb39072d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   modifyFontSize: 1
@@ -1247,7 +1247,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1296894396679308}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -212524213, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 9754aca7b5e6e4a9c99503fb39072d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   modifyFontSize: 1
@@ -1268,7 +1268,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1206122534693806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -922691945, guid: aa3ace7f3a6f644039cd774032da7775, type: 3}
+  m_Script: {fileID: 11500000, guid: 4953133f33c094ff3b6078e3acffffbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   menuName: MainMenu
