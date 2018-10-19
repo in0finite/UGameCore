@@ -19,9 +19,9 @@
 
 - organize Bullet script
 
-- add all scripts to the project, and replace them with the ones from dll ; switch asset serialization mode to text - it will be more git-friendly, and you will be able to see what exactly was changed ;
+- **upgrade project to unity 2018.1.3** - it will no longer be deprecated, and people can start using it
 
-- upgrade project to unity 2017.2 - it will no longer be deprecated, and people can start using it
+- **replace UNET with Mirror**
 
 - build for : android ; WebGL (put a web page on github) ;
 
@@ -79,6 +79,8 @@
 - scoreboard – should we bother with adapting to UI table ? no ; add option to override entry creation (for example, to add buttons)
 
 - editor tool for setting map cycle from build settings - needs testing
+
+- elements from settings menu are not mapped correctly to mouse coordinates - it seems that it's related to script execution order of MaintainRectTransform script - when "SetX" field is disabled, it works correctly, but then again, it may not work when order changes again - better to first update to newer version of Unity
 
 
 <br>
