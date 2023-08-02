@@ -1,0 +1,4 @@
+./batch_client &
+./batch_client &
+./batch_client &
+wait

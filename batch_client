@@ -1,0 +1,1 @@
+./test_headless.x86_64 -batchmode -nographics -ip:localhost -port:7777 -connect -autochooseteam: -autoexit:
