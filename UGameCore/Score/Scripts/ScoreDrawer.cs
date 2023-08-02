@@ -4,7 +4,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Linq;
 
-namespace uGameCore.Score {
+namespace UGameCore.Score {
 	
 	public class ScoreDrawer : MonoBehaviour {
 

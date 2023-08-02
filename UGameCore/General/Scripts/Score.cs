@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.Score {
+namespace UGameCore.Score {
 	
 	public class Score : NetworkBehaviour {
 		

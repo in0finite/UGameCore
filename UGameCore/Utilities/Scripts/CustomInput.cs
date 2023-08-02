@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 
 	public static class CustomInput {

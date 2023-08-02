@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Detects network status change, and invokes appropriate events.

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 
 
-namespace uGameCore {
+namespace UGameCore {
 
 
 	public	class ProjectileHitInfo {

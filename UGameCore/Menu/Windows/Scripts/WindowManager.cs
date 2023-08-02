@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-namespace uGameCore.Menu.Windows {
+namespace UGameCore.Menu.Windows {
 	
 	public class WindowManager : MonoBehaviour {
 		

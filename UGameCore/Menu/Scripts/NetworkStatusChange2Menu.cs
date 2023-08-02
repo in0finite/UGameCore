@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Menu {
+namespace UGameCore.Menu {
 	
 	public class NetworkStatusChange2Menu : MonoBehaviour {
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 	/// <summary>
 	/// Message that can be broadcasted when failed to join a game.

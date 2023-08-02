@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 	/// <summary>
 	/// Used to identify game object with module scripts.

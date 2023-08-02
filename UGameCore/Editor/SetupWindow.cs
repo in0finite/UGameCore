@@ -5,9 +5,9 @@ using UnityEditor;
 using System.Linq;
 using UnityEditor.SceneManagement;
 
-namespace uGameCore.Editor
+namespace UGameCore.Editor
 {
-	using Utilities2 = uGameCore.Utilities.Utilities ;
+	using Utilities2 = UGameCore.Utilities.Utilities ;
 
 
 	public class SetupWindow : StepByStepWindow

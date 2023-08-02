@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore
+namespace UGameCore
 {
 	/// <summary>
 	/// Used only for detection.

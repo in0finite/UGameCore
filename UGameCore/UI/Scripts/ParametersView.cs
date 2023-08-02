@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 
-namespace uGameCore.UI {
+namespace UGameCore.UI {
 	
 	public class ParametersView : MonoBehaviour {
 

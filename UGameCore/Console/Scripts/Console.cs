@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.Profiling;
 
-namespace uGameCore.Menu {
+namespace UGameCore.Menu {
 	
 	public class Console : MonoBehaviour {
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Menu.Windows
+namespace UGameCore.Menu.Windows
 {
 	/// <summary>
 	/// Used only for detection.

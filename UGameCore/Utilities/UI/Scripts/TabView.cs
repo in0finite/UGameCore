@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 
-namespace uGameCore.Utilities.UI {
+namespace UGameCore.Utilities.UI {
 	
 	public class TabView : MonoBehaviour {
 		

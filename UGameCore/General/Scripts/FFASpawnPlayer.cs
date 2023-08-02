@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Can be used to handle player spawning when FFA is turned on and round system is turned off.

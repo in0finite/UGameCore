@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
-using uGameCore;
+using UGameCore;
 
-namespace uGameCore.Menu {
+namespace UGameCore.Menu {
 
 	public class MenuManager : MonoBehaviour 
 	{

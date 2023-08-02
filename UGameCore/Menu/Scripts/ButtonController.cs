@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace uGameCore.Menu {
+namespace UGameCore.Menu {
 
 	/// <summary>
 	/// Controls button text component for better visual effects. It detects when button is hovered or clicked,

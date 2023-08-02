@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Networking;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class PlayerManager : MonoBehaviour {
 

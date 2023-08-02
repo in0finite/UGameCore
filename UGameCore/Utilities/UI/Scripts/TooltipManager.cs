@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.Utilities.UI {
+namespace UGameCore.Utilities.UI {
 	
 	public class TooltipManager : MonoBehaviour, IModuleScript
 	{

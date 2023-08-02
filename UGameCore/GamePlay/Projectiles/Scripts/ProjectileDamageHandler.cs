@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Catches OnProjectileHit message and inflicts damage to Damagable which is attached to the same game object.

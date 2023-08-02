@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.GamePlay.Projectiles {
+namespace UGameCore.GamePlay.Projectiles {
 
 	public class FireBulletOnKeyPress : NetworkBehaviour {
 

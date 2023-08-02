@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.GamePlay
+namespace UGameCore.GamePlay
 {
 	public class RotateObjectWithMouse : MonoBehaviour
 	{

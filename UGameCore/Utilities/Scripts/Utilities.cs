@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Linq;
 
-namespace uGameCore.Utilities
+namespace UGameCore.Utilities
 {
 	public static class Utilities
 	{

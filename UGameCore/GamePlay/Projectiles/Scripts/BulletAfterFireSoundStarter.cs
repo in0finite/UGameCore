@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace uGameCore.GamePlay.Projectiles {
+namespace UGameCore.GamePlay.Projectiles {
 	
 	public class BulletAfterFireSoundStarter : MonoBehaviour {
 

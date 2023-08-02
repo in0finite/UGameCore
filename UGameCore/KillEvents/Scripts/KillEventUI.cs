@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.KillEvents {
+namespace UGameCore.KillEvents {
 
 	/// <summary>
 	/// Used to populate scroll view content with kill events.

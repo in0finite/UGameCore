@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Networking;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	public	enum NetworkClientStatus
 	{

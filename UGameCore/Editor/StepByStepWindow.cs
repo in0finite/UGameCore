@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 
-	using Utilities2 = uGameCore.Utilities.Utilities ;
+	using Utilities2 = UGameCore.Utilities.Utilities ;
 
 
 	public class StepByStepWindow : EditorWindow {

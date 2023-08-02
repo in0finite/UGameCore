@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
-using uGameCore.Utilities;
+using UGameCore.Utilities;
 using System.Reflection;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 	
 	public class ModuleScriptsWindow : EditorWindow
 	{

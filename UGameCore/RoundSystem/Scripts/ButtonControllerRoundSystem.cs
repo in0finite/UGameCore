@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.RoundManagement {
+namespace UGameCore.RoundManagement {
 
 	public class ButtonControllerRoundSystem : MonoBehaviour {
 

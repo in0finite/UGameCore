@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Detects OnDamaged and OnKilled messages, and informs players about inflicted damage, kill and death.

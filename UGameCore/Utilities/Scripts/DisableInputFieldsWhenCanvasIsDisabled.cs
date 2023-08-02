@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Linq;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 	
 	public class DisableInputFieldsWhenCanvasIsDisabled : MonoBehaviour
 	{

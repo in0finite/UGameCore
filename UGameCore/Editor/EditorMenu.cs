@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 	
 	public class EditorMenu {
 

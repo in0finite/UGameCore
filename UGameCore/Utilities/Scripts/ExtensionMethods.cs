@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using System.Reflection;
 using System.Linq;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public static	class ExtensionMethods {
 

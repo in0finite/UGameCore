@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using uGameCore.MapManagement;
+using UGameCore.MapManagement;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class MapCycle2Console : MonoBehaviour {
 

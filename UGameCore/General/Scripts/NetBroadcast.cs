@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Profiling;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Handles broadcasting and listening for games on LAN.

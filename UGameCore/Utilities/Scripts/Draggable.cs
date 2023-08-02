@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace uGameCore.Utilities
+namespace UGameCore.Utilities
 {
 	public class Draggable : MonoBehaviour, IDragHandler
 	{

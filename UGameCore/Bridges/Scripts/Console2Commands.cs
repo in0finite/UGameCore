@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class Console2Commands : MonoBehaviour {
 
 		// Use this for initialization
 		void Start () {
 
-			uGameCore.Menu.Console.onTextSubmitted += TextSubmitted;
+			UGameCore.Menu.Console.onTextSubmitted += TextSubmitted;
 
 		}
 

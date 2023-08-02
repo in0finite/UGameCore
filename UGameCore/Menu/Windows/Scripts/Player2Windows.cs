@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.Menu.Windows {
+namespace UGameCore.Menu.Windows {
 	
 	public class Player2Windows : NetworkBehaviour {
 

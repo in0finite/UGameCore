@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.Utilities
+namespace UGameCore.Utilities
 {
 	public class RedirectedLayoutElement : MonoBehaviour, ILayoutElement
 	{

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace uGameCore.GamePlay {
+namespace UGameCore.GamePlay {
 	
 	public class SoundDetach : MonoBehaviour {
 

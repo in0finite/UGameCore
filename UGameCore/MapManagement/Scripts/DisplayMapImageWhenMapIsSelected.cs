@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.MapManagement {
+namespace UGameCore.MapManagement {
 	
 	public class DisplayMapImageWhenMapIsSelected : MonoBehaviour {
 

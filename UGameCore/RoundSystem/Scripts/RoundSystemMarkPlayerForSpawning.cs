@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.RoundManagement {
+namespace UGameCore.RoundManagement {
 	
 	public class RoundSystemMarkPlayerForSpawning : NetworkBehaviour {
 

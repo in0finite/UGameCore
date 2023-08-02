@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using uGameCore.Utilities.UI;
+using UGameCore.Utilities.UI;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 	
 	[CustomEditor(typeof(TabView))]
 	[CanEditMultipleObjects]
@@ -28,7 +28,7 @@ namespace uGameCore.Editor {
 					list.Clear ();
 					list.AddRange( tabView.TabsInChildren );
 				//	tabView.ApplyTabsFromList ();
-					uGameCore.Utilities.Utilities.MarkObjectAsDirty( tabView );
+					UGameCore.Utilities.Utilities.MarkObjectAsDirty( tabView );
 				}
 
 			}

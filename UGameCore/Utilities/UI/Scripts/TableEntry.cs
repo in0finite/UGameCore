@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.Utilities.UI {
+namespace UGameCore.Utilities.UI {
 
 	/// <summary>
 	/// Entry in a table.

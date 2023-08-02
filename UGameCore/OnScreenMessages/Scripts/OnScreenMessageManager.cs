@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace uGameCore.OnScreenMessages {
+namespace UGameCore.OnScreenMessages {
 
 	public class OnScreenMessage {
 		

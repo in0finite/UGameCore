@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class SceneChanger : MonoBehaviour {
 

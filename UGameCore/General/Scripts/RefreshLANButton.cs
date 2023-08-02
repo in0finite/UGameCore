@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using uGameCore.Utilities.UI;
+using UGameCore.Utilities.UI;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Starts LAN scan when attached button is clicked, and clears table.

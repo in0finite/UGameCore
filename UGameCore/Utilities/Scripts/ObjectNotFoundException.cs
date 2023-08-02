@@ -1,5 +1,5 @@
 ﻿
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 	/// <summary>
 	/// Thrown when an object can not be found.

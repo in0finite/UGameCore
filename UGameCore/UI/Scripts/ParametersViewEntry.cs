@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.UI {
+namespace UGameCore.UI {
 
 	/// <summary>
 	/// Entry in a parameters view.

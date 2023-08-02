@@ -4,7 +4,7 @@ using UnityEngine.Networking;
 using System.Collections.Generic;
 
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 	
 	public class NetworkTransformServerAuthority : NetworkBehaviour {
 

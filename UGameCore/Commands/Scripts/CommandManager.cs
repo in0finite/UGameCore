@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace uGameCore.Commands {
+namespace UGameCore.Commands {
 
 	using CommandCallback = System.Func<string, string> ;
 

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class ChangeStartupScene : MonoBehaviour {
 

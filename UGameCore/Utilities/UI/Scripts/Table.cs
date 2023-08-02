@@ -2,10 +2,10 @@
 using UnityEngine;
 using System;
 using UnityEngine.UI;
-using uGameCore;
+using UGameCore;
 using System.Linq;
 
-namespace uGameCore.Utilities.UI {
+namespace UGameCore.Utilities.UI {
 	
 	public class Table : MonoBehaviour, ILayoutElement {
 

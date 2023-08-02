@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore.Menu {
+namespace UGameCore.Menu {
 
 	public class ButtonControllerSettingsMenu : MonoBehaviour {
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	public class NetworkEventsProcessExample : MonoBehaviour {
 

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Collections;
 
-namespace uGameCore.Menu.Windows {
+namespace UGameCore.Menu.Windows {
 	
 	public class TeamChoose2Windows : MonoBehaviour {
 		

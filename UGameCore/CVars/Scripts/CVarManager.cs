@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	public	enum CVarDisplayType
 	{

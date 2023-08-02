@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace uGameCore.Commands {
+namespace UGameCore.Commands {
 
 	public class ChatCommands : MonoBehaviour {
 

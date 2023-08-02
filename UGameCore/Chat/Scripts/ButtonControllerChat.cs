@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Chat {
+namespace UGameCore.Chat {
 
 	public class ButtonControllerChat : MonoBehaviour {
 

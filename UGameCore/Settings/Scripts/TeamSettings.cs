@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Settings {
+namespace UGameCore.Settings {
 
 	public class TeamSettings : MonoBehaviour
 	{

@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Linq;
 using System.IO;
 
-namespace uGameCore.Editor.Maps {
+namespace UGameCore.Editor.Maps {
 	
 	public class MapManagement {
 
@@ -46,7 +46,7 @@ namespace uGameCore.Editor.Maps {
 		public static void BuildSettingsToMapCycle()
 		{
 			
-			var singleton = Utilities.FindSingletonOrThrow<uGameCore.MapManagement.MapCycle> ();
+			var singleton = Utilities.FindSingletonOrThrow<UGameCore.MapManagement.MapCycle> ();
 
 			var oldMapList = singleton.mapCycleList.ToList();
 			var oldTextureList = singleton.mapTextures.ToList();

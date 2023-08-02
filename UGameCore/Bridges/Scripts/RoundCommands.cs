@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using uGameCore.RoundManagement;
+using UGameCore.RoundManagement;
 
-namespace uGameCore.Commands {
+namespace UGameCore.Commands {
 
 	public class RoundCommands : MonoBehaviour {
 

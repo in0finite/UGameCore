@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace uGameCore
+namespace UGameCore
 {
 	public class SpectatorUI : MonoBehaviour
 	{

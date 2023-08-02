@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 using System.Linq;
 
 
-namespace uGameCore {
+namespace UGameCore {
 
 
 	public class Spectator : MonoBehaviour {

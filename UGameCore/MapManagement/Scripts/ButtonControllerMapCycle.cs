@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.MapManagement {
+namespace UGameCore.MapManagement {
 	
 	public class ButtonControllerMapCycle : MonoBehaviour {
 

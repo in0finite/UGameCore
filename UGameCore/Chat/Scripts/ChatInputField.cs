@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace uGameCore.Chat
+namespace UGameCore.Chat
 {
 	public class ChatInputField : MonoBehaviour
 	{

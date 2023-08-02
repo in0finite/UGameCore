@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.MapManagement {
+namespace UGameCore.MapManagement {
 
 	public class MapCycle : MonoBehaviour {
 

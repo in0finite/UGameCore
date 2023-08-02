@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-using uGameCore.Menu;
+using UGameCore.Menu;
 using System.Linq;
-using uGameCore.Utilities;
+using UGameCore.Utilities;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 
 	public static class Utilities {
 

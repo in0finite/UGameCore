@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 
 
-namespace uGameCore.GamePlay {
+namespace UGameCore.GamePlay {
 	
 	public class Explosion : NetworkBehaviour {
 

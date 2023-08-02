@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Linq;
 
-namespace uGameCore.RoundManagement {
+namespace UGameCore.RoundManagement {
 
 	public class RoundSystem : MonoBehaviour {
 

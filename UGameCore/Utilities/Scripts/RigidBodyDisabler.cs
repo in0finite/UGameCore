@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.Networking;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 	
 	public class RigidBodyDisabler : NetworkBehaviour {
 

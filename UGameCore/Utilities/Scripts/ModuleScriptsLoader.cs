@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 	
 	public class ModuleScriptsLoader
 	{

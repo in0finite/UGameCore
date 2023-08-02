@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class DisableWhenInputOrDrawingIsForbidden : MonoBehaviour
 	{

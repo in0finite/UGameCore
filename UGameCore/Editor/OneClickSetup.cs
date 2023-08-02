@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using System.Linq;
 using System.IO;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 
 
 	// make it a class to prevent scripts to inherit it, and cause potential problems - but it can't be

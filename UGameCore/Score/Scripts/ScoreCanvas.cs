@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Score
+namespace UGameCore.Score
 {
 	/// <summary>
 	/// Used only for detection.

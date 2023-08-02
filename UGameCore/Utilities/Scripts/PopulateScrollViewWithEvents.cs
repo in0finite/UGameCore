@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 
 	public class PopulateScrollViewWithEvents : MonoBehaviour {

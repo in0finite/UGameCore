@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.Chat {
+namespace UGameCore.Chat {
 
 
 	public	class ChatMessage

@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 
 
-namespace uGameCore {
+namespace UGameCore {
 
 	public class SceneChangedInfo {
 		public SceneChangedInfo(Scene scene1, Scene scene2) { s1 = scene1; s2 = scene2; }

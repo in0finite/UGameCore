@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace uGameCore
+namespace UGameCore
 {
 	/// <summary>
 	/// Used to identify module.

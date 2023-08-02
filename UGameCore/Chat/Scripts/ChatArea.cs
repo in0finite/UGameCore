@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace uGameCore.Chat {
+namespace UGameCore.Chat {
 
 	/// <summary>
 	/// Used to populate scroll view content with chat messages.

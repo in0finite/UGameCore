@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-using uGameCore.Utilities.UI;
+using UGameCore.Utilities.UI;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace uGameCore {
+namespace UGameCore {
 
 	/// <summary>
 	/// Starts listening on LAN when specified tab in a TabView is activated, and populates table with found servers.

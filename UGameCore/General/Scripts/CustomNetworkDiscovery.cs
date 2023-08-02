@@ -1,5 +1,5 @@
 ﻿
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class CustomNetworkDiscovery : UnityEngine.Networking.NetworkDiscovery
 	{

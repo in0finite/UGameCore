@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace uGameCore.Utilities.UI {
+namespace UGameCore.Utilities.UI {
 	
 	public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{

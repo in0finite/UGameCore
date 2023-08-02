@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.OnScreenMessages {
+namespace UGameCore.OnScreenMessages {
 	
 	public class DisplayInflictedDamage : NetworkBehaviour
 	{

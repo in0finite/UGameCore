@@ -1,5 +1,5 @@
 ﻿
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 
 	public interface IModuleScript
 	{

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using uGameCore.Utilities.UI;
+using UGameCore.Utilities.UI;
 using UnityEngine.UI;
 
-namespace uGameCore.Editor {
+namespace UGameCore.Editor {
 
 	[CustomEditor(typeof(Table))]
 	[CanEditMultipleObjects]

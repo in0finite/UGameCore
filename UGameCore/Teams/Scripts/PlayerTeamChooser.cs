@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Linq;
 
-namespace uGameCore {
+namespace UGameCore {
 	
 	public class PlayerTeamChooser : NetworkBehaviour {
 

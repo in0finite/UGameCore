@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-namespace uGameCore.KillEvents {
+namespace UGameCore.KillEvents {
 
 
 	public class KillEvent {

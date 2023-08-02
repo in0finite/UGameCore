@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 
 
-namespace uGameCore {
+namespace UGameCore {
 
 
 	public	enum PlayerStatus

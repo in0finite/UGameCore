@@ -1,6 +1,6 @@
 ﻿
 
-namespace uGameCore.Utilities {
+namespace UGameCore.Utilities {
 		
 	[System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
 	public class ClientSyncVarAttribute : System.Attribute
