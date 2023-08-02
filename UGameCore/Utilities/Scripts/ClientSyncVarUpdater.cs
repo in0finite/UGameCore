@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿#if MIRROR
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.Networking;
-
+using UGameCore;
 
 namespace uGameCore.Utilities {
 
@@ -204,4 +205,4 @@ namespace uGameCore.Utilities {
 
 
 }
-
+#endif
