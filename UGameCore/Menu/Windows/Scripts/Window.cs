@@ -144,18 +144,12 @@ namespace UGameCore.Menu.Windows {
 
 		public	void	BringToTop() {
 
-			if (null == WindowManager.WindowsCanvas)
-				return;
-
 			// when object is last in the hierarchy, it will be rendered last, and thus it will be on top
 			this.transform.SetAsLastSibling ();
 
 		}
 
 		public	void	SendToBack() {
-
-			if (null == WindowManager.WindowsCanvas)
-				return;
 
 			this.transform.SetAsFirstSibling ();
 

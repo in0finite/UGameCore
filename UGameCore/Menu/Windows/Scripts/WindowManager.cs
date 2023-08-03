@@ -14,8 +14,8 @@ namespace UGameCore.Menu.Windows {
 		static	List<Window>	m_openedWindows = new List<Window> ();
 		public	static	IEnumerable<Window>	OpenedWindows { get { return m_openedWindows.WhereAlive (); } }
 
-		private	static	Canvas	m_windowsCanvas = null;
-		public	static	Canvas	WindowsCanvas { get { return m_windowsCanvas; } }
+		[Tooltip("Canvas where all windows will be placed")]
+		public Canvas windowsCanvas;
 
 		public	GameObject	windowPrefab = null;
 		public	GameObject	displayStringPrefab = null;
@@ -29,87 +29,25 @@ namespace UGameCore.Menu.Windows {
 
 		void Awake () {
 			
-			singleton = this;
-
-			// find canvas
-			m_windowsCanvas = Utilities.Utilities.FindObjectOfTypeOrLogError<WindowsCanvas>().GetComponent<Canvas>();
+			if (null == singleton)
+				singleton = this;
 
 		}
 
-		void Update () {
+        private void Start()
+        {
+			if (null == this.windowsCanvas)
+				Debug.LogError($"{nameof(windowsCanvas)} not assigned", this);
+        }
+
+        void Update () {
 
 			// remove closed windows from list
 			m_openedWindows.RemoveAll( wi => null == wi || wi.isClosed );
 
-
 		}
 
-		void OnGUI() {
-
-
-//			// display modal windows
-//			bool alreadyShownModalWindow = false;
-//			foreach (WindowInfo wi in openedWindows) {
-//
-//				if (wi.isClosed)
-//					continue;
-//
-//				if( wi.isModal ) {
-//					if( ! alreadyShownModalWindow ) {
-//						GUI.ModalWindow( wi.id, wi.rect, WindowFunction, wi.title );
-//						GUI.FocusWindow( wi.id );
-//						alreadyShownModalWindow = true ;
-//					} else {
-//						// display it as regular window
-//						GUI.Window( wi.id, wi.rect, WindowFunction, wi.title );
-//					}
-//				}
-//
-//			}
-//
-//			// display non modal windows
-//			foreach (WindowInfo wi in openedWindows) {
-//
-//				if (wi.isClosed)
-//					continue;
-//
-//				if( ! wi.isModal ) {
-//					GUI.Window( wi.id, wi.rect, WindowFunction, wi.title );
-//				}
-//
-//			}
-
-
-		}
-
-
-		static	void	WindowFunction (int windowID) {
-
-			// find window info by it's id
-			Window wi = null ;
-			foreach( Window windowInfo in m_openedWindows ) {
-				if (windowInfo.id == windowID) {
-					wi = windowInfo;
-					break;
-				}
-			}
-
-			if( null == wi )
-				return ;
-
-			//	GUILayout.BeginArea (wi.rect);
-
-			// call window procedure
-			if (wi.procedure != null) {
-				wi.procedure.Invoke (wi);
-			}
-
-			//	GUILayout.EndArea ();
-
-			GUI.DragWindow();
-
-		}
-
+		// could be used in edit-mode
 		private	static	void	MessageBoxProcedure( Window wi ) {
 
 			// message box with close button
@@ -292,7 +230,7 @@ namespace UGameCore.Menu.Windows {
 //			}
 
 			// create window game object
-			var go = singleton.windowPrefab.InstantiateAsUIElement( m_windowsCanvas.transform );
+			var go = singleton.windowPrefab.InstantiateAsUIElement( singleton.windowsCanvas.transform );
 			Window window = go.AddComponentIfDoesntExist<Window>();
 
 			// assign parameters for old GUI system
