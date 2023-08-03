@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UGameCore.Utilities;
 using UnityEngine;
@@ -10,6 +11,13 @@ namespace UGameCore.Menu.Windows
     public class WindowUserInteraction : MonoBehaviour, IUserInteraction
     {
         public bool SupportsConfirm => false;
+
+
+        void Awake()
+        {
+            var provider = this.gameObject.GetSingleComponentOrThrow<IServiceProvider>();
+            provider.GetRequiredService<WindowManager>(); // make sure it exists
+        }
 
         public IEnumerator ConfirmAsync(Ref<bool> bResultRef, string title, string message, string ok, string cancel)
         {
