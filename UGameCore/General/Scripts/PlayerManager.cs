@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.Networking;
+using UGameCore.Utilities;
 
-namespace UGameCore {
-	
-	public class PlayerManager : MonoBehaviour {
+namespace UGameCore
+{
+
+    public class PlayerManager : MonoBehaviour {
 
 		private	static	List<Player>	m_players = new List<Player> ();
 
@@ -31,21 +31,9 @@ namespace UGameCore {
 
 
 
-		// Use this for initialization
-		void Start () {
-			
-		}
-
-		// Update is called once per frame
 		void Update () {
 
-			m_players.RemoveAll (delegate(Player p) {
-
-				if(null == p)
-					return true ;
-
-				return false ;
-			});
+			m_players.RemoveDeadObjects();
 
 		}
 
@@ -53,7 +41,7 @@ namespace UGameCore {
 		/// <summary>
 		/// Called when new player is created.
 		/// </summary>
-		public	static	void	AddNewPlayer( Player player ) {
+		internal	static	void	AddNewPlayer( Player player ) {
 
 			if (!m_players.Contains (player)) {
 				m_players.Add (player);

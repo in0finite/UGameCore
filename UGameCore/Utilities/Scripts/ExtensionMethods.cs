@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using UGameCore.Net;
+using UGameCore.Utilities;
 
 namespace UGameCore
 {
@@ -14,33 +15,10 @@ namespace UGameCore
 
 
 
-
-		// TODO: T should inherit UnityEngine.Object
-		public	static	IEnumerable<T>	WhereNotNull<T>( this IEnumerable<T> enumerable ) where T : class {
-
-			foreach (var el in enumerable) {
-				if (el != null)
-					yield return el;
-			}
-
-		}
-
-		/// <summary>
-		/// Returns alive objects in a collection.
-		/// </summary>
-		public	static	IEnumerable<T>	WhereAlive<T>( this IEnumerable<T> enumerable ) where T : UnityEngine.Object {
-
-			foreach (var el in enumerable) {
-				if (el)
-					yield return el;
-			}
-
-		}
-
-		public	static	int	RemoveAllDeadObjects<T>( this List<T> list ) where T : UnityEngine.Object {
-
-			return list.RemoveAll (obj => (! obj) );
-
+		public	static	int	RemoveAllDeadObjects<T>( this List<T> list )
+			where T : UnityEngine.Object
+		{
+			return list.RemoveDeadObjects();
 		}
 
 		/// <summary>
@@ -98,15 +76,6 @@ namespace UGameCore
 			return false;
 		}
 
-		public	static	void	AddOrSet<TKey, TValue>( this Dictionary<TKey, TValue> dictionary, TKey key, TValue value ) {
-			
-			if (dictionary.ContainsKey (key))
-				dictionary [key] = value;
-			else
-				dictionary.Add (key, value);
-			
-		}
-
 
 		public	static	long	GetElapsedMicroSeconds( this System.Diagnostics.Stopwatch stopwatch ) {
 
@@ -122,96 +91,8 @@ namespace UGameCore
 		}
 
 
-		public	static	bool	IsControllingPhysics( this NetworkBehaviour networkBehaviour ) {
-
-			return networkBehaviour.isServer;
-
-		}
-
-		public	static	bool	IsInputting(this NetworkBehaviour networkBehaviour) {
-
-		//	if (networkBehaviour.isLocalPlayer)	// we can't check only this, because netControl may be null
-		//		return true;
-
-			if (!networkBehaviour.isLocalPlayer)	// commands can not be sent if isLocalPlayer is not true
-				return false;
-
-			ControllableObject ncp = networkBehaviour.GetComponent<ControllableObject> ();
-			if (null == ncp)
-				return false;
-
-			if (null == ncp.playerOwner)
-				return false;
-
-			return ncp.playerOwner == Player.local;
-
-		}
-
-		public	static	bool	IsServer(this MonoBehaviour monoBehaviour) {
-			return monoBehaviour.GetComponent<NetworkIdentity> ().isServer;
-		}
-
-		public	static	bool	IsClient(this MonoBehaviour monoBehaviour) {
-			return monoBehaviour.GetComponent<NetworkIdentity> ().isClient;
-		}
-
 		public	static	bool	IsLocalPlayer(this MonoBehaviour monoBehaviour) {
 			return monoBehaviour.GetComponent<NetworkIdentity> ().isLocalPlayer;
-		}
-
-
-		[System.Obsolete]
-		public	static	void	CopyTo(this Component component, Component targetComponent) {
-
-			System.Type type = component.GetType ();
-			System.Type targetType = targetComponent.GetType ();
-			if (targetType != type)
-				return;
-
-			MemberInfo[] members = type.GetMembers (BindingFlags.Instance
-				| BindingFlags.Public | BindingFlags.DeclaredOnly);
-			if (null == members || 0 == members.Length)
-				return;
-		//	MemberInfo[] targetMembers = targetType.GetMembers (BindingFlags.Instance
-		//		| BindingFlags.Public);
-		//	if (null == targetMembers || 0 == targetMembers.Length)
-		//		return;
-
-			foreach (MemberInfo memberInfo in members) {
-				if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
-					continue;
-
-				if( memberInfo.GetCustomAttributes ( typeof(HideInInspector), true).Length > 0 ) {
-					continue;
-				}
-
-				object value = null;
-				if (memberInfo.MemberType == MemberTypes.Field)
-					value = ((FieldInfo)memberInfo).GetValue (component);
-				else if (memberInfo.MemberType == MemberTypes.Property) {
-					if (((PropertyInfo)memberInfo).CanRead) {
-						value = ((PropertyInfo)memberInfo).GetValue (component, null);
-					}
-				}
-
-			//	MemberInfo targetMember = System.Array.Find<MemberInfo> (targetMembers, m => m.Name == memberInfo.Name &&
-			//	                          m.MemberType == memberInfo.MemberType && m.DeclaringType == memberInfo.DeclaringType);
-			//	if (targetMember != null) {
-					// set member value
-				if (memberInfo.MemberType == MemberTypes.Field)
-					((FieldInfo)memberInfo).SetValue (targetComponent, value);
-				else if (memberInfo.MemberType == MemberTypes.Property) {
-					if (((PropertyInfo)memberInfo).CanWrite) {
-						try {
-							((PropertyInfo)memberInfo).SetValue (targetComponent, value, null);
-						} catch {
-
-						}
-					}
-				}
-			//	}
-			}
-
 		}
 
 
@@ -236,35 +117,6 @@ namespace UGameCore
 			}
 
 		}
-
-		/// <summary>
-		/// Invokes the specified method, but catches any exception that may be thrown, and logs it.
-		/// </summary>
-		public	static	void	InvokeExceptionSafe( this Component component, string methodName, params object[] args ) {
-
-			try {
-				component.Invoke( methodName, args );
-			} catch (System.Exception ex) {
-				Debug.LogException (ex);
-			}
-
-		}
-
-	//	public	static	void	InvokeExceptionSafe( this Component component, string methodName, object arg ) {
-	//		component.InvokeExceptionSafe( methodName, new object[] {arg} );
-	//	}
-
-//		public	static	void	BroadcastMessageNoExceptions( this GameObject go, string msg ) {
-//
-//			BroadcastMessageNoExceptions (go, msg, new object[] { });
-//
-//		}
-//
-//		public	static	void	BroadcastMessageNoExceptions( this GameObject go, string msg, object arg ) {
-//
-//			BroadcastMessageNoExceptions (go, msg, new object[] { arg });
-//
-//		}
 
 		public	static	void	BroadcastMessageNoExceptions( this GameObject go, string msg, params object[] args ) {
 
@@ -306,7 +158,7 @@ namespace UGameCore
 
 		public	static	Transform	FindChildRecursivelyOrLogError( this Transform transform, string childName ) {
 
-			var child = transform.GetComponentsInChildren<Transform> ().FirstOrDefault (c => childName == c.name);
+			var child = transform.GetComponentsInChildren<Transform>().FirstOrDefault(c => childName.Equals(c.name, System.StringComparison.Ordinal));
 
 			if (null == child) {
 				Debug.LogError ("Failed to find child with name " + childName);

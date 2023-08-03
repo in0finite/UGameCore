@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using UGameCore.Utilities;
 
 namespace UGameCore.UI {
 	
