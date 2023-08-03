@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Linq;
 using System.Collections;
+using UGameCore.Utilities;
 
 namespace UGameCore.Menu.Windows {
 	
@@ -89,7 +90,7 @@ namespace UGameCore.Menu.Windows {
 
 			foreach (string s in wi.displayStrings) {
 
-				if (GameManager.DrawButtonWithCalculatedSize (s)) {
+				if (GUIUtils.ButtonWithCalculatedSize(s)) {
 					// team choosed
 					Player.local.GetComponent<PlayerTeamChooser>().TeamChoosed (s);
 
@@ -101,7 +102,7 @@ namespace UGameCore.Menu.Windows {
 
 			GUILayout.FlexibleSpace ();
 
-			if (GameManager.DrawButtonWithCalculatedSize("Cancel")) {
+			if (GUIUtils.ButtonWithCalculatedSize("Cancel")) {
 				WindowManager.CloseWindow (wi);
 			}
 

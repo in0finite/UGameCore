@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UGameCore.Utilities;
 
 namespace UGameCore.Menu.Windows {
 	
@@ -121,7 +122,7 @@ namespace UGameCore.Menu.Windows {
 
 			GUILayout.BeginHorizontal ();
 			GUILayout.FlexibleSpace ();
-			if (GameManager.DrawButtonWithCalculatedSize("Close")) {
+			if (GUIUtils.ButtonWithCalculatedSize("Close")) {
 				CloseWindow (wi);
 			}
 			GUILayout.EndHorizontal ();

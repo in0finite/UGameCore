@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -425,13 +426,13 @@ namespace UGameCore.Menu {
 
 			// OK button
 			//	if (GUILayout.Button ("Save", GUILayout.Width (50), GUILayout.Height (20))) {
-			if (GameManager.DrawButtonWithCalculatedSize("Save")) {
+			if (GUIUtils.ButtonWithCalculatedSize("Save")) {
 				
 			}
 
 			// Cancel button
 			//	if (GUILayout.Button ("Cancel", GUILayout.Width (60), GUILayout.Height (20))) {
-			if (GameManager.DrawButtonWithCalculatedSize ("Cancel")) {
+			if (GUIUtils.ButtonWithCalculatedSize("Cancel")) {
 				// populate options window with current settings, and exit options menu.
 
 			//	CVarManager.ReadCVarsFromPlayerPrefs ();
@@ -442,7 +443,7 @@ namespace UGameCore.Menu {
 			GUILayout.FlexibleSpace ();
 
 			//	if (GUILayout.Button ("Reset to defaults", GUILayout.Width (100), GUILayout.Height (20))) {
-			if (GameManager.DrawButtonWithCalculatedSize ("Reset to defaults")) {
+			if (GUIUtils.ButtonWithCalculatedSize("Reset to defaults")) {
 
 			//	CVarManager.ResetAllCVarsToDefaultValues ();
 

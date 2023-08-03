@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.Profiling;
 
-namespace UGameCore.Menu {
-	
-	public class Console : MonoBehaviour {
+namespace UGameCore.Menu
+{
+
+    public class Console : MonoBehaviour {
 
 		public class LogMessage
 		{
@@ -605,7 +604,7 @@ namespace UGameCore.Menu {
 
 			// submit button
 			//	bool submited = GUILayout.Button( "Submit", GUILayout.Width(60), GUILayout.Height(40) );
-			bool submited = GameManager.DrawButtonWithCalculatedSize("Submit");
+			bool submited = Utilities.GUIUtils.ButtonWithCalculatedSize("Submit");
 			if (submited) {
 				textToProcess = m_consoleCommandText;
 			}

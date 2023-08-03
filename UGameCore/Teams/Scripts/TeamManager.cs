@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-namespace UGameCore {
-	
-	public class TeamManager : MonoBehaviour {
+namespace UGameCore
+{
+
+    public class TeamManager : MonoBehaviour {
 
 		public	List<string>	teams = new List<string> ();
 		public	static	string[]	teamNames { get { return singleton.teams.ToArray (); } }
