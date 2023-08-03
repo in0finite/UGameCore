@@ -26,7 +26,7 @@ namespace UGameCore {
 		// Update is called once per frame
 		void Update () {
 		
-			if (!NetworkStatus.IsServerStarted() && !NetworkStatus.IsClientConnected()) {
+			if (!NetworkStatus.IsServerStarted && !NetworkStatus.IsClientConnected()) {
 				m_currentlySpectatedObject = null;
 				return;
 			}
@@ -53,7 +53,7 @@ namespace UGameCore {
 					// we are on client, and there is no local player
 					m_currentlySpectatedObject = null;
 				}
-			} else if (NetworkStatus.IsServer ()) {
+			} else if (NetworkStatus.IsServer) {
 				// we are on dedicated server
 
 				if (null == m_currentlySpectatedObject || null == m_currentlySpectatedObject.GetControllingGameObject()) {

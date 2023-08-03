@@ -42,7 +42,7 @@ namespace UGameCore.Chat {
 
 		void	OnSceneChanged( SceneChangedInfo info ) {
 
-			if (UnityEngine.Networking.NetworkServer.active) {
+			if (NetworkStatus.IsServerStarted) {
 				SendChatMessageToAllPlayersAsServer ("Map changed to " + info.s2.name + ".");
 			}
 
@@ -51,7 +51,7 @@ namespace UGameCore.Chat {
 
 		public	static	void	SendChatMessageToAllPlayersAsServer( string msg ) {
 
-			if (NetworkStatus.IsServerStarted ()) {
+			if (NetworkStatus.IsServerStarted) {
 				SendChatMessageToAllPlayers (msg, singleton.serverChatNick);
 			}
 
@@ -73,7 +73,7 @@ namespace UGameCore.Chat {
 		/// <summary> Use only on server. </summary>
 		public	static	void	SendChatMessageToAllPlayers( string msg, string sender ) {
 
-			if (!NetworkStatus.IsServerStarted ())
+			if (!NetworkStatus.IsServerStarted)
 				return;
 
 			foreach (var player in PlayerManager.GetLoggedInNonBotPlayers()) {
@@ -91,7 +91,7 @@ namespace UGameCore.Chat {
 		/// <summary> Use only on server. </summary>
 		public	static	void	SendChatMessageToPlayer( Player player, string msg ) {
 
-			if (!NetworkStatus.IsServerStarted ())
+			if (!NetworkStatus.IsServerStarted)
 				return;
 
 			SendChatMessageToPlayer (player, msg, singleton.serverChatNick);
@@ -100,7 +100,7 @@ namespace UGameCore.Chat {
 
 		private	static	void	SendChatMessageToPlayer( Player player, string msg, string sender ) {
 
-			if (!NetworkStatus.IsServerStarted ())
+			if (!NetworkStatus.IsServerStarted)
 				return;
 
 			var chatSync = player.GetComponent<ChatSync> ();

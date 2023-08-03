@@ -21,7 +21,7 @@ namespace UGameCore.OnScreenMessages {
 
 		}
 
-		[TargetRpc]
+		[ClientTargetRpc]
 		void	TargetInflictedDamage( NetworkConnection conn, float damage, float timeToDisplay, float velocity ) {
 
 			if (!this.isLocalPlayer)

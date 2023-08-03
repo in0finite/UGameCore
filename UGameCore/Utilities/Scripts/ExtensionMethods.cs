@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using System.Reflection;
 using System.Linq;
+using UGameCore.Net;
 
 namespace UGameCore {
 	
@@ -221,52 +222,10 @@ namespace UGameCore {
 		public	static	GameObject	InstantiateWithNetwork(this GameObject go, Vector3 pos, Quaternion rot) {
 
 			var clone = Object.Instantiate (go, pos, rot);
-			if (UnityEngine.Networking.NetworkServer.active) {
-				UnityEngine.Networking.NetworkServer.Spawn (clone);
+			if (NetworkStatus.IsServer) {
+				NetManager.Spawn (clone);
 			}
 			return clone;
-		}
-
-		// NetworkManager extensions
-
-		[System.Obsolete("", true)]
-		public	static	void	StartClient( this NetworkManager netMgr, string serverIp, int serverPort ) {
-
-			netMgr.networkAddress = serverIp;
-			netMgr.networkPort = serverPort;
-			netMgr.StartClient ();
-
-		}
-
-		[System.Obsolete("", true)]
-		public	static	void	StopServerAndHost( this NetworkManager netMgr ) {
-
-			netMgr.StopServer ();
-			netMgr.StopHost ();
-
-		}
-
-		[System.Obsolete("", true)]
-		public	static	bool	IsServer( this NetworkManager netMgr ) {
-
-			return NetworkStatus.IsServerStarted ();
-
-		}
-
-		[System.Obsolete("", true)]
-		public	static	bool	IsClient( this NetworkManager netMgr ) {
-
-			return NetworkStatus.IsClientConnected ();
-
-		}
-
-		[System.Obsolete("", true)]
-		public	static	bool	IsHost( this NetworkManager netMgr ) {
-
-			if (!netMgr.IsServer ())
-				return false;
-
-			return NetworkServer.localClientActive;
 		}
 
 

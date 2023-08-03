@@ -35,7 +35,7 @@ namespace UGameCore.Commands {
 			if (2 == numWords && words [0] == "change_scene") {
 
 				string newSceneName = words [1];
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					if (newSceneName.Length < 1) {
 						response += "Invalid scene name.";
 					} else {
@@ -52,7 +52,7 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "list_maps") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					var maps = MapCycle.singleton.mapCycleList;
 					foreach (string mapName in maps) {
 						response += mapName + "\n";
@@ -66,13 +66,13 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "timeleft") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					response += MapCycle.singleton.GetTimeLeftAsString ();
 				}
 
 			} else if (words [0] == "nextmap") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					response += MapCycle.singleton.GetNextMap ();	
 				}
 

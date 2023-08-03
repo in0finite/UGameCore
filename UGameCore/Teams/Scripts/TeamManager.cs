@@ -37,23 +37,6 @@ namespace UGameCore {
 
 		}
 
-		// Use this for initialization
-		void Start () {
-			
-		}
-		
-		// Update is called once per frame
-		void Update () {
-
-			if (!NetworkServer.active)
-				return;
-
-
-
-
-
-		}
-
 		public	static	bool	HasAnyTeamToChooseFrom() {
 			return TeamCount > 1;
 		}

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using UGameCore.Net;
 
 namespace UGameCore {
 	
@@ -31,9 +32,7 @@ namespace UGameCore {
 			isLoadingScene = true;
 
 			try {
-				
-				NetworkManager.singleton.ServerChangeScene (newScene);
-
+				NetManager.ChangeScene(newScene);
 			} catch( System.Exception e ) {
 
 				isLoadingScene = false;

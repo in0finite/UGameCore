@@ -54,7 +54,7 @@ namespace UGameCore.KillEvents {
 
 		}
 
-		[TargetRpc]
+		[ClientTargetRpc]
 		void	TargetKillEvent( NetworkConnection conn, string killer, string dier) {
 
 			if (!this.isLocalPlayer) {

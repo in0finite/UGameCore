@@ -11,7 +11,7 @@ namespace UGameCore {
 		void Start () {
 			
 			Menu.Console.onDrawStats += () => {
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					GUILayout.Label (GetTextForConsole1());
 					GUILayout.Label (GetTextForConsole2());
 				}
@@ -19,13 +19,13 @@ namespace UGameCore {
 
 
 			Menu.Console.RegisterStats( () => {
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole1();
 				}
 				return "" ;
 			});
 			Menu.Console.RegisterStats( () => {
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole2();
 				}
 				return "" ;

@@ -134,7 +134,7 @@ namespace UGameCore.Commands {
 		/// </summary>
 		public	static	void	EnsureServerIsStarted() {
 
-			if (!NetworkStatus.IsServerStarted ()) {
+			if (!NetworkStatus.IsServerStarted) {
 				throw new System.Exception ("Only server can use this command");
 			}
 

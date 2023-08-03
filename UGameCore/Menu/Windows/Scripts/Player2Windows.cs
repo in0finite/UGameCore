@@ -21,7 +21,7 @@ namespace UGameCore.Menu.Windows {
 
 		}
 
-		[TargetRpc]
+		[ClientTargetRpc]
 		private	void	TargetDisplayMsgBox( NetworkConnection netConn, string title, string text ) {
 
 			var msgBox = WindowManager.OpenMessageBox (text, false);

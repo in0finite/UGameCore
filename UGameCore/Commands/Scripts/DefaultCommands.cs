@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UGameCore.Net;
 using UnityEngine;
 
 namespace UGameCore.Commands {
@@ -59,7 +60,7 @@ namespace UGameCore.Commands {
 //			}
 			else if (words [0] == "client_cmd") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					if (numWords < 2)
 						response += CommandManager.invalidSyntaxText;
 					else
@@ -71,20 +72,20 @@ namespace UGameCore.Commands {
 				// list all players
 
 				response += "name | net id";
-				if (NetworkStatus.IsServerStarted ())
+				if (NetworkStatus.IsServerStarted)
 					response += " | ip";
 				response += "\n";
 
 				foreach (var player in PlayerManager.players) {
-					response += player.playerName + " | " + player.netId.Value;
-					if (NetworkStatus.IsServerStarted ())
-						response += " | " + player.connectionToClient.address;
+					response += player.playerName + " | " + player.NetworkId;
+					if (NetworkStatus.IsServerStarted)
+						response += " | " + player.clientAddress;
 					response += "\n";
 				}
 
 			} else if (words [0] == "kick") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					var p = PlayerManager.GetPlayerByName (restOfTheCommand);
 					if (null == p) {
 						response += "There is no such player connected.";
@@ -98,7 +99,7 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "kick_instantly") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					var p = PlayerManager.GetPlayerByName (restOfTheCommand);
 					if (null == p) {
 						response += "There is no such player connected.";
@@ -112,7 +113,7 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "bot_add") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 
 					//					Player player = this.networkManager.AddBot ();
 					//					if (player != null)
@@ -189,7 +190,7 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "remove_all_bots") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					int count = 0;
 					foreach (var p in PlayerManager.players) {
 						if (p.IsBot ()) {

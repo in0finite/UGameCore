@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UGameCore.Net;
+using UnityEngine;
 
 namespace UGameCore.MapManagement {
 	
@@ -27,7 +28,7 @@ namespace UGameCore.MapManagement {
 				if (index < 0)
 					throw new System.Exception ("Selected map not found in map cycle list");
 
-				UnityEngine.Networking.NetworkManager.singleton.onlineScene = sceneName;
+				NetManager.onlineScene = sceneName;
 
 				MapCycle.singleton.SetCurrentMapIndex (index);
 

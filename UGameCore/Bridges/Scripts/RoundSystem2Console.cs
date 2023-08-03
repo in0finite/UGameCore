@@ -10,13 +10,13 @@ namespace UGameCore {
 
 		void Start () {
 			Menu.Console.onDrawStats += () => {
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					GUILayout.Label (GetTextForConsole());
 				}
 			};
 
 			Menu.Console.RegisterStats( () => {
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole();
 				}
 				return "" ;

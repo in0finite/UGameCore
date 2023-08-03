@@ -8,11 +8,6 @@ namespace UGameCore {
 
 		void	OnClientDisconnected() {
 
-			ClientScene.DestroyAllClientObjects ();
-			if (ClientScene.localPlayers != null) {
-				ClientScene.localPlayers.Clear();
-			}
-
 			// Maybe we don't have to do this, because ClientScene.DestroyAllClientObjects() already done it ?
 			if (Player.local != null) {
 				// Sometimes (when simulating network latency) player object will not be destroyed, when we

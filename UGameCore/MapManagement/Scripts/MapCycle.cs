@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UGameCore.Net;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace UGameCore.MapManagement {
 
@@ -36,7 +38,7 @@ namespace UGameCore.MapManagement {
 			if(this.mapCycleList.Count > 0) {
 				// set the online scene in network manager, so that when server is started, it automatically loads
 				// the first scene from map cycle list
-				NetworkManager.singleton.onlineScene = this.mapCycleList [0];
+				NetManager.onlineScene = this.mapCycleList [0];
 			}
 
 		}
@@ -59,13 +61,13 @@ namespace UGameCore.MapManagement {
 		// Update is called once per frame
 		void Update () {
 
-			if (!NetworkServer.active)
+			if (!NetworkStatus.IsServer)
 				return;
 
 			if (0 == this.mapCycleList.Count)
 				return;
 			
-			if (NetworkStatus.IsServerStarted () && ! SceneChanger.isLoadingScene) {
+			if (NetworkStatus.IsServerStarted && ! SceneChanger.isLoadingScene) {
 
 				m_timePassedSinceStartedMap += Time.deltaTime;
 
@@ -124,7 +126,7 @@ namespace UGameCore.MapManagement {
 
 		public	string	GetCurrentMapName() {
 
-			return NetworkManager.networkSceneName;
+			return SceneManager.GetActiveScene().name;
 
 		}
 

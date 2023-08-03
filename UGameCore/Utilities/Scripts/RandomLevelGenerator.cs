@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
+using UGameCore.Net;
 
 namespace UGameCore.Utilities {
 	
@@ -65,8 +66,8 @@ namespace UGameCore.Utilities {
 						//	go.transform.localScale = Vector3.Scale (go.transform.localScale, Vector3.one / 2.0f + Random3ValuesAsVector3() );
 							go.transform.localScale = scaleLength * Random3ValuesAsVector3() ;
 
-						if (NetworkServer.active && go.GetComponentInChildren<NetworkIdentity>() != null)
-							NetworkServer.Spawn (go);
+						if (NetworkStatus.IsServer && go.GetComponentInChildren<NetworkIdentity>() != null)
+							NetManager.Spawn (go);
 
 						generatedObjects.Add (go);
 
@@ -98,10 +99,7 @@ namespace UGameCore.Utilities {
 				if (null == go)
 					continue;
 				
-				if (NetworkServer.active)
-					NetworkServer.Destroy (go);
-				else
-					Destroy (go);
+				Destroy (go);
 			}
 
 			generatedObjects.Clear ();

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UGameCore;
+using UGameCore.Net;
 
 namespace UGameCore.Menu {
 
@@ -291,9 +292,11 @@ namespace UGameCore.Menu {
 					if(null == table.SelectedRow)
 						throw new System.Exception("Select a server first");
 
-					var serverData = LANScan2UI.GetBroadcastDataFromRow( table.SelectedRow );
-					ip = serverData.FromAddress ;
-					port = int.Parse( serverData.KeyValuePairs["Port"] );
+					//var serverData = LANScan2UI.GetBroadcastDataFromRow( table.SelectedRow );
+					//ip = serverData.FromAddress ;
+					//port = int.Parse( serverData.KeyValuePairs["Port"] );
+
+					throw new System.NotSupportedException("LAN is not supported");
 
 				} else {
 					throw new System.Exception("Unknown tab opened");

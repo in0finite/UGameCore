@@ -40,8 +40,7 @@ namespace UGameCore {
 
 			string sceneName = "";
 			if (this.useSceneFromNetworkManager) {
-				var nm = Utilities.Utilities.FindObjectOfTypeOrLogError<NetworkManager> ();
-				sceneName = nm.offlineScene;
+				throw new System.NotSupportedException("Can't use scene from network manager");
 			} else {
 				sceneName = this.sceneToChangeTo;
 			}

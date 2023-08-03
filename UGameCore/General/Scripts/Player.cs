@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
-
+using UGameCore.Net;
 
 namespace UGameCore {
 
@@ -60,7 +60,7 @@ namespace UGameCore {
 			//	p.status = PlayerStatus.ShouldLogin;
 				p.m_shouldLogin = true ;
 
-				Debug.Log ("New connection from " + p.conn.address);
+				Debug.Log ("New connection from " + p.clientAddress);
 			}
 
 
@@ -111,16 +111,6 @@ namespace UGameCore {
 
 			}
 
-			// update player ping
-			if (p.conn != null) {
-				if( p.conn.hostId >= 0 ) {	// this is not host
-					byte error = 0 ;
-					p.ping = (short) NetworkTransport.GetCurrentRtt (p.conn.hostId, p.conn.connectionId,
-						out error);
-				}
-			}
-
-
 		}
 
 
@@ -169,31 +159,20 @@ namespace UGameCore {
 			if (!this.isServer)
 				return;
 
-			if (this.IsBot ()) {
+			if (0.0f >= timeout) {
+                // disconnect him immediately
 
-				this.DestroyPlayingObject ();
+                this.DestroyPlayingObject();
 
-				Destroy (this.gameObject);
+                // Close the connection
+                this.conn.Disconnect ();
 
 			} else {
-				
-				if (0.0f >= timeout) {
-					// disconnect him immediately
-
-					NetworkServer.DestroyPlayersForConnection (this.conn);
-
-					// Close the connection
-					this.conn.Disconnect ();
-
-				} else {
-					// Send disconnection message to client, and disconnect him after 'timeout' seconds.
-				//	this.status = PlayerStatus.ShouldDisconnect;
-					this.timeUntilDisconnect = timeout;
-					this.RpcDisconnect (reason);
-				}
-
+				// Send disconnection message to client, and disconnect him after 'timeout' seconds.
+			//	this.status = PlayerStatus.ShouldDisconnect;
+				this.timeUntilDisconnect = timeout;
+				this.RpcDisconnect (reason);
 			}
-
 
 		}
 
@@ -201,7 +180,7 @@ namespace UGameCore {
 		public	void	DestroyPlayingObject() {
 
 			if (this.controllingObject != null) {
-				NetworkServer.Destroy (this.controllingObject);
+				Object.Destroy (this.controllingObject);
 			}
 
 			this.RemoveAuthorityObjectForPlayer ();
@@ -268,37 +247,20 @@ namespace UGameCore {
 
 		public	GameObject	CreateGameObjectForPlayer( Vector3 pos, Quaternion q ) {
 
-			Player player = this;
+			this.DestroyPlayingObject();
 
-
-			var go = PlayingObjectSpawner.CreateGameObjectForPlayer (player, pos, q);
+			var go = PlayingObjectSpawner.CreateGameObjectForPlayer (this, pos, q);
 			if (null == go)
 				return null;
 
-			NetworkServer.Spawn( go );
+            NetManager.Spawn( go );
 
-			// this must be set AFTER the object is spawned, because 'playerGameObject' is a syncvar
-			player.PlayerGameObject = go;
+            // this must be set AFTER the object is spawned, because 'playerGameObject' is a syncvar
+            this.PlayerGameObject = go;
 
 			this.PreparePlayerObject ();
 
-			// do specific stuff for bots
-			if (this.IsBot ()) {
-
-				// Bot's object needs to be spawned explicitly, because he has no connection to
-				// add player to.
-				NetworkServer.Spawn( go );
-			}
-
-			if (player.conn != null) {
-
-				// check if object already exists for this connection...
-
-				NetworkServer.ReplacePlayerForConnection (player.conn, player.controllingObject, 1);
-			}
-
-
-			return player.controllingObject;
+			return this.controllingObject;
 		}
 
 		private	void	PreparePlayerObject() {
@@ -312,52 +274,6 @@ namespace UGameCore {
 			}
 
 		}
-
-		public	void	ReplacePlayerObject( GameObject newGameObject ) {
-
-			Player player = this ;
-
-			player.controllingObject = newGameObject;
-
-			this.PreparePlayerObject ();
-
-			if (player.conn != null) {
-				NetworkServer.ReplacePlayerForConnection (player.conn, newGameObject, 1);
-			}
-
-			// this must be set AFTER the object is spawned, because 'playerGameObject' is a syncvar
-			player.PlayerGameObject = newGameObject;
-
-		}
-
-	//	public	void	RemovePlayerObject() {
-
-
-	//	}
-
-		public	void	AssignAuthorityObjectForPlayer( GameObject go ) {
-
-			Player player = this ;
-
-			this.RemoveAuthorityObjectForPlayer ();
-
-			ControllableObject ncp = go.GetComponent<ControllableObject> ();
-			if (ncp != null) {
-				ncp.playerOwnerGameObject = null;
-				ncp.playerOwner = null;
-			}
-
-			player.m_authorityObject = go;
-
-			if (ncp != null) {
-				ncp.playerOwnerGameObject = player.gameObject;
-				ncp.playerOwner = player;
-			}
-
-			NetworkServer.ReplacePlayerForConnection (player.conn, go, 1);
-
-		}
-
 
 		private	void	OnDied( Player playerWhoKilledYou ) {
 
@@ -385,7 +301,7 @@ namespace UGameCore {
 		}
 
 
-		[Command]
+		[ServerRpc]
 		private	void	CmdLoggingIn( int[] clientVersion, string name ) {
 			
 			Player p = this ;
@@ -424,7 +340,7 @@ namespace UGameCore {
 
 		//	string name = reader.ReadString ();
 			if (!PlayerManager.IsValidPlayerName (name)) {
-				Debug.Log ("Invalid name '" + name + "' from " + this.connectionToClient.address);
+				Debug.Log ("Invalid name '" + name + "' from " + this.clientAddress);
 				RpcDisconnect ("Invalid nick.");
 			//	p.status = PlayerStatus.ShouldDisconnect;
 				p.timeUntilDisconnect = 3;
@@ -488,8 +404,10 @@ namespace UGameCore {
 			if (!isLocalPlayer) {
 				return;
 			}
-			
+
+#if MIRROR
 			ClientScene.AddPlayer (5);
+#endif
 
 		}
 
@@ -501,7 +419,7 @@ namespace UGameCore {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		private	void	CmdChangeNick( string newNick ) {
 
 
@@ -525,7 +443,7 @@ namespace UGameCore {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		private	void	CmdExecuteCommandOnServer( string cmd ) {
 
 			// this feature should be disabled, since it is a potential security issue
@@ -572,7 +490,7 @@ namespace UGameCore {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		private	void	CmdSendingCommandResponse( string response ) {
 			
 			Debug.Log (this.playerName + ": " + response);
@@ -588,7 +506,7 @@ namespace UGameCore {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		public	void	CmdListMaps() {
 			
 			// Client wants to see all available maps.

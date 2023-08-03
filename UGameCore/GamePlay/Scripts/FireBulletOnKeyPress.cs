@@ -60,7 +60,7 @@ namespace UGameCore.GamePlay.Projectiles {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		void CmdFire( Vector3 position, Quaternion rotation ) {
 
 			this.Fire ( position, rotation );

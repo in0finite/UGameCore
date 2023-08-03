@@ -112,7 +112,7 @@ namespace UGameCore {
 
 		void OnSceneChanged( SceneChangedInfo info ) {
 
-			if (!NetworkStatus.IsServer ())
+			if (!NetworkStatus.IsServer)
 				return;
 
 			if (this.resetTeamOnSceneChange) {
@@ -128,7 +128,7 @@ namespace UGameCore {
 
 		public	bool	OfferPlayerToChooseTeam() {
 
-			if (!NetworkStatus.IsServer ())
+			if (!NetworkStatus.IsServer)
 				return false;
 
 			if (TeamManager.FFA && !this.sendChooseTeamMessageIfFFAIsOn)
@@ -172,7 +172,7 @@ namespace UGameCore {
 
 		}
 
-		[Command]
+		[ServerRpc]
 		private	void	CmdTeamChoosed( string teamName ) {
 
 

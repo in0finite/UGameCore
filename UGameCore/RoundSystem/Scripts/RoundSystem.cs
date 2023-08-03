@@ -50,7 +50,7 @@ namespace UGameCore.RoundManagement {
 		// Update is called once per frame
 		void Update () {
 
-			if (!NetworkStatus.IsServerStarted ()) {
+			if (!NetworkStatus.IsServerStarted) {
 				return;
 			}
 

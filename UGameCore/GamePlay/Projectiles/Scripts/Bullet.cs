@@ -129,7 +129,7 @@ namespace UGameCore {
 		private	void	MyDestroy() {
 
 			if (this.isServer) {
-				NetworkServer.Destroy (this.gameObject);
+				Object.Destroy (this.gameObject);
 			} else {
 			//	Destroy (this.gameObject);
 			}

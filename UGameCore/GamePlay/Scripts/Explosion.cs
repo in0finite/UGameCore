@@ -21,7 +21,7 @@ namespace UGameCore.GamePlay {
 			this.timeLived += Time.deltaTime;
 			if( this.timeLived > this.lifeTime ) {
 				if (this.isServer) {
-					NetworkServer.Destroy (this.gameObject);
+					Object.Destroy (this.gameObject);
 				} else if (this.isClient) {
 					//	Destroy (this.gameObject);
 				}

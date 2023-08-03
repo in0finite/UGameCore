@@ -32,7 +32,7 @@ namespace UGameCore.Commands {
 
 			if (words [0] == "endround") {
 
-				if (NetworkStatus.IsServerStarted ()) {
+				if (NetworkStatus.IsServerStarted) {
 
 					RoundSystem.singleton.EndRound ("");
 

@@ -524,7 +524,7 @@ namespace UGameCore.Menu {
 			GUILayout.Label( "FPS: " + GameManager.GetAverageFps() );
 
 			// display uptime
-			if (NetworkStatus.IsServerStarted ()) {
+			if (NetworkStatus.IsServerStarted) {
 				GUILayout.Label (" uptime: " + Utilities.Utilities.FormatElapsedTime( Time.realtimeSinceStartup ) );
 			}
 
@@ -533,16 +533,6 @@ namespace UGameCore.Menu {
 				onDrawStats();
 			} catch (System.Exception ex) {
 				Debug.LogException (ex);
-			}
-
-			// Display network statistics for client
-			if( NetworkStatus.IsClientConnected () && !NetworkStatus.IsHost() ) {
-				NetworkConnection conn = NetManager.GetClient ().connection;
-				byte error = 0;
-				GUILayout.Label( " ping: " + NetworkTransport.GetCurrentRtt (conn.hostId, conn.connectionId, out error) + " ms" );
-				GUILayout.Label( " lost_packets: " + NetworkTransport.GetNetworkLostPacketNum (conn.hostId, conn.connectionId, out error) );
-				GUILayout.Label( " received_rate: " + NetworkTransport.GetPacketReceivedRate (conn.hostId, conn.connectionId, out error) );
-				GUILayout.Label( " sent_rate: " + NetworkTransport.GetPacketSentRate (conn.hostId, conn.connectionId, out error) );
 			}
 
 			GUILayout.EndHorizontal ();

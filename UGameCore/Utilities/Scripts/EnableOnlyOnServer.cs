@@ -13,7 +13,7 @@ namespace UGameCore.Utilities {
 
 		void EnableDisable () {
 			
-			this.gameObject.SetActive (NetworkStatus.IsServerStarted ());
+			this.gameObject.SetActive (NetworkStatus.IsServerStarted);
 
 		}
 

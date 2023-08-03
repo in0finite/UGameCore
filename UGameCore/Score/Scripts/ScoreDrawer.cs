@@ -92,7 +92,7 @@ namespace UGameCore.Score {
 			// open/close score view
 			if(Input.GetKeyDown(singleton.toggleKey)) {
 				if (GameManager.CanGameObjectsReadUserInput () && (NetworkStatus.IsClientConnected ()
-					|| NetworkStatus.IsServerStarted ()) ) {
+					|| NetworkStatus.IsServerStarted) ) {
 					// toggle score view
 					m_isScoreDrawingToggled = ! m_isScoreDrawingToggled ;
 				}
@@ -643,7 +643,7 @@ namespace UGameCore.Score {
 
 			if (NetworkStatus.IsClient ())
 				widthPercentages = new List<float>(){ 0.4f, 0.15f, 0.15f, 0.3f };
-			else if (NetworkStatus.IsServer ())
+			else if (NetworkStatus.IsServer)
 				widthPercentages = new List<float>(){ 0.25f, 0.05f, 0.05f, 0.05f, 0.05f, 0.05f, 0.05f, 0.225f, 0.225f };
 
 			return widthPercentages;
@@ -653,7 +653,7 @@ namespace UGameCore.Score {
 
 			if (NetworkStatus.IsClient ()) {
 				return new List<string>(){ "name", "kills", "deaths", "ping" };
-			} else if (NetworkStatus.IsServer ()) {
+			} else if (NetworkStatus.IsServer) {
 				return new List<string>() {"name", "kills", "deaths", "ping", "health", "net id",
 					"obj id", "status", "ip"
 				};
@@ -668,16 +668,16 @@ namespace UGameCore.Score {
 
 			uint playingObjectId = 0;
 			if (player.PlayerGameObject != null)
-				playingObjectId = player.PlayerGameObject.GetComponent<NetworkIdentity> ().netId.Value ;
+				playingObjectId = player.PlayerGameObject.GetComponent<NetworkIdentity> ().NetworkId ;
 
 			var values = new List<object> () { player.playerName, player.GetComponent<Score> ().NumKills,
 				player.GetComponent<Score> ().NumDeaths, player.Ping
 			};
 
-			if (NetworkStatus.IsServer ()) {
+			if (NetworkStatus.IsServer) {
 				// add stuff for dedicated server
 				values.AddRange( new object[] {
-					player.health, player.netId.Value, playingObjectId, "", player.conn.address
+					player.health, player.NetworkId, playingObjectId, "", player.clientAddress
 				});
 			}
 

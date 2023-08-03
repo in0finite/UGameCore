@@ -14,7 +14,7 @@ namespace UGameCore.Chat {
 		}
 
 
-		[Command]
+		[ServerRpc]
 		public	void	CmdChatMsg( string msg ) {
 			
 			Player p = GetComponent<Player>() ;
@@ -36,7 +36,7 @@ namespace UGameCore.Chat {
 
 		}
 
-		[TargetRpc]
+		[ClientTargetRpc]
 		public	void	TargetChatMsg( NetworkConnection conn, string msg, string sender ) {
 
 			if (!this.isLocalPlayer) {

@@ -44,7 +44,7 @@ namespace UGameCore {
 		// Update is called once per frame
 		void Update () {
 
-			if (!NetworkStatus.IsServerStarted ()) {
+			if (!NetworkStatus.IsServerStarted) {
 				return;
 			}
 
@@ -84,7 +84,7 @@ namespace UGameCore {
 
 		public	static	void	MarkPlayerForSpawning( Player p ) {
 
-			if (!NetworkStatus.IsServerStarted ()) {
+			if (!NetworkStatus.IsServerStarted) {
 				return;
 			}
 
@@ -121,12 +121,12 @@ namespace UGameCore {
 			
 			int	playerTeamIndex = TeamManager.singleton.teams.IndexOf (player.Team);
 
-			var spawnPositions = NetworkManager.singleton.startPositions;
+			var spawnPositions = FindObjectsOfType<SpawnPoint>();
 
-			for (int count = 0, i = Random.Range (0, spawnPositions.Count);
-				count < spawnPositions.Count; count++, i = (i + 1) % spawnPositions.Count) {
+			for (int count = 0, i = Random.Range (0, spawnPositions.Length);
+				count < spawnPositions.Length; count++, i = (i + 1) % spawnPositions.Length) {
 
-				SpawnPoint spawnPoint = spawnPositions [i].GetComponent<SpawnPoint> ();
+				SpawnPoint spawnPoint = spawnPositions [i];
 				if (null == spawnPoint)
 					continue;
 				
@@ -136,8 +136,8 @@ namespace UGameCore {
 					}
 				}
 
-				Vector3 spawnPos = spawnPositions [i].position;
-				Quaternion spawnRotation = spawnPositions [i].rotation;
+				Vector3 spawnPos = spawnPositions [i].transform.position;
+				Quaternion spawnRotation = spawnPositions [i].transform.rotation;
 
 				if (!CanPlayerBeSpawnedAt (player, spawnPos, spawnRotation))
 					continue;

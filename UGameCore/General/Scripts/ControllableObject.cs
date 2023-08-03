@@ -78,7 +78,7 @@ namespace UGameCore {
 
 			base.OnStartClient ();
 
-			if (!NetworkStatus.IsServer ()) {
+			if (!NetworkStatus.IsServer) {
 				if (this.playerOwnerGameObject)
 					this.playerOwner = this.playerOwnerGameObject.GetComponent<Player> ();
 				else
