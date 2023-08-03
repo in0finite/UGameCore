@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.Networking;
-using UGameCore;
 using UGameCore.Net;
 
-namespace UGameCore.Menu {
+namespace UGameCore.Menu
+{
 
-	public class MenuManager : MonoBehaviour 
+    public class MenuManager : MonoBehaviour 
 	{
 
 		public string goBackButton = "Cancel";
@@ -146,7 +143,7 @@ namespace UGameCore.Menu {
 
 			Menu menu = FindMenuByName( singleton.gameOverMenuName );
 			if (menu) {
-				var descriptionTransform = menu.transform.FindChild ("GameSummary");
+				var descriptionTransform = menu.transform.Find("GameSummary");
 				if (descriptionTransform) {
 					var textComponent = descriptionTransform.GetComponentInChildren<Text> ();
 					if (textComponent)

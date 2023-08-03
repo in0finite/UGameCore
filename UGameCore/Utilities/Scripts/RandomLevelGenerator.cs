@@ -41,7 +41,7 @@ namespace UGameCore.Utilities {
 			if (null == singleton.objectPrefab)
 				return;
 
-			Random.seed = (int) (Time.realtimeSinceStartup * 1000);
+			Random.InitState((int) (Time.realtimeSinceStartup * 1000));
 
 			int numObjectsToCreate = singleton.numberOfObjectsPerAxis [0] * singleton.numberOfObjectsPerAxis [1]
 			                         * singleton.numberOfObjectsPerAxis [2];

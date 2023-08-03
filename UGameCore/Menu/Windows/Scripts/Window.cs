@@ -59,7 +59,7 @@ namespace UGameCore.Menu.Windows {
 			}
 		}
 
-		public	Transform	titleTransform { get { return this.gameObject.transform.FindChild ("Title"); } }
+		public	Transform	titleTransform { get { return this.gameObject.transform.Find("Title"); } }
 		public	Text	titleTextComponent {
 			get {
 				if (this.titleTransform)

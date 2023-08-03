@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Linq;
 
@@ -71,7 +70,7 @@ namespace UGameCore.Score {
 
 			// find UI elements
 			this.scoreCanvas = Utilities.Utilities.FindObjectOfTypeOrLogError<ScoreCanvas>().GetComponent<Canvas>();
-			this.scorePanel = this.scoreCanvas.transform.FindChild ("ScorePanel").GetComponent<RectTransform> ();
+			this.scorePanel = this.scoreCanvas.transform.Find("ScorePanel").GetComponent<RectTransform> ();
 
 		}
 

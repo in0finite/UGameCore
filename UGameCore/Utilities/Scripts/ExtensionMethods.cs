@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using System.Reflection;
 using System.Linq;
 using UGameCore.Net;
 
-namespace UGameCore {
-	
-	public static	class ExtensionMethods {
+namespace UGameCore
+{
+
+    public static	class ExtensionMethods {
 
 
 		private	static	Vector3[]	m_fourCornersArray = new Vector3[4];
@@ -299,7 +298,7 @@ namespace UGameCore {
 
 		public	static	Transform	FindChildOrLogError( this Transform transform, string childName ) {
 
-			var child = transform.FindChild (childName);
+			var child = transform.Find(childName);
 
 			if (null == child) {
 				Debug.LogError ("Failed to find child with name " + childName);

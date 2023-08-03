@@ -18,8 +18,6 @@ namespace UGameCore.UI {
 
 		private	List<ParametersViewEntry>	m_entries = new List<ParametersViewEntry>();
 
-		[SerializeField]	private	TextAlignment	m_alignment = TextAlignment.Center;
-
 		public	float	paddingTop = 8f;
 
 
