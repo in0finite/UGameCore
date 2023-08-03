@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using System.Linq;
 
 
-namespace UGameCore {
+namespace UGameCore
+{
 
 
-	public class Spectator : MonoBehaviour {
+    public class Spectator : MonoBehaviour {
 
 		private	static	List<Player>	m_spectatableObjects = new List<Player> ();
 		private	static	Player	m_currentlySpectatedObject = null;
@@ -72,51 +71,6 @@ namespace UGameCore {
 					m_currentlySpectatedObject = null;
 				}
 			}
-
-		}
-
-
-		void	OnGUI() {
-
-//			if (!IsSpectating ())
-//				return;
-//
-//			// draw spectator gui
-//
-//			int height = 50;
-//			GUILayout.BeginArea (new Rect (0, Screen.height - height, Screen.width, height));
-//
-//			/*		GUILayout.BeginVertical ();
-//			//	GUILayout.Label (" ");
-//				GUILayout.FlexibleSpace ();
-//			//	GUILayout.Label (" ");
-//				GUILayout.EndVertical ();
-//		*/
-//
-//			GUILayout.BeginHorizontal ();
-//			GUILayout.Label (" ");
-//			GUILayout.FlexibleSpace ();
-//
-//			if (GUILayout.Button ("< Prev", GUILayout.Width (80))) {
-//				FindObjectForSpectating (-1);
-//			}
-//
-//			string s = m_currentlySpectatedObject.playerName + " ";
-//			if( m_currentlySpectatedObject.Team != "")
-//				s += "(" + m_currentlySpectatedObject.Team + ") ";
-//			s += "<color=orange>[" + m_currentlySpectatedObject.health + "]</color>" ;
-//			GUILayout.Button ( s, GUILayout.Width(200) );
-//
-//			if (GUILayout.Button ("Next >", GUILayout.Width (80))) {
-//				FindObjectForSpectating (1);
-//			}
-//
-//			GUILayout.FlexibleSpace ();
-//			GUILayout.Label (" ");
-//			GUILayout.EndHorizontal ();
-//
-//			GUILayout.EndArea ();
-
 
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using UGameCore.Utilities;
 using UnityEngine;
 
 namespace UGameCore
@@ -9,8 +10,7 @@ namespace UGameCore
 
 		void Start() {
 
-			string s = "";
-			if(CmdLineArgumentsProcessor.GetArgument( "autochooseteam", ref s )) {
+			if(CmdLineUtils.HasArgument( "autochooseteam")) {
 				// automatically choose team
 				PlayerTeamChooser.onReceivedChooseTeamMessage += (string[] teams) => {
 					// choose random team
@@ -23,8 +23,7 @@ namespace UGameCore
 
 		private	void	OnServerStopped() {
 
-			string s = "";
-			if (CmdLineArgumentsProcessor.GetArgument ("autoexit", ref s)) {
+			if (CmdLineUtils.HasArgument("autoexit")) {
 				GameManager.singleton.ExitApplication ();
 			}
 
@@ -32,8 +31,7 @@ namespace UGameCore
 
 		private	void	OnClientDisconnected() {
 
-			string s = "";
-			if (CmdLineArgumentsProcessor.GetArgument ("autoexit", ref s)) {
+			if (CmdLineUtils.HasArgument("autoexit")) {
 				GameManager.singleton.ExitApplication ();
 			}
 
