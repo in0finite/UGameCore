@@ -1,22 +1,12 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &100100000
-Prefab:
-  m_ObjectHideFlags: 1
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications: []
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1119426007358918}
-  m_IsPrefabParent: 1
 --- !u!1 &1119426007358918
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4991415585733034}
   - component: {fileID: 114257916812501816}
@@ -34,80 +24,66 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &4991415585733034
 Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119426007358918}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 559.0882, y: 425.4873, z: -42.783447}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114047853839133050
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1119426007358918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e6c1670c4458436f87f018f1a464854, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  title: Failed to start server
-  width: 400
-  height: 300
---- !u!114 &114207605534734034
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1119426007358918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114257916812501816
 MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4bc77247926847818af7ad28483aa08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  windowPrefab: {fileID: 1008656201797430, guid: fc4a690eca98b43edbda8d93a3d4a265,
-    type: 2}
-  displayStringPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615,
-    type: 2}
-  textPrefab: {fileID: 1550407687378548, guid: c7cb7ab0161cd4e3c86dd2bf9e1471a4, type: 2}
-  buttonPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615,
-    type: 2}
+  windowPrefab: {fileID: 1008656201797430, guid: fc4a690eca98b43edbda8d93a3d4a265, type: 3}
+  displayStringPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
+  textPrefab: {fileID: 1550407687378548, guid: c7cb7ab0161cd4e3c86dd2bf9e1471a4, type: 3}
+  buttonPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
   msgBoxSize: {x: 0.25, y: 0.2}
---- !u!114 &114316581644850606
+--- !u!114 &114207605534734034
 MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 860ae8803add94094a01a3ab87681ce5, type: 3}
+  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  title: Failed to join game
-  width: 400
-  height: 300
+--- !u!114 &114709284219549974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119426007358918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114412462827172158
 MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -121,14 +97,33 @@ MonoBehaviour:
   - 'DNS resolution failed:'
   - 'UNet Client Error Connect Error:'
   msgBoxTitle: Network error
---- !u!114 &114709284219549974
+--- !u!114 &114047853839133050
 MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119426007358918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e6c1670c4458436f87f018f1a464854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  title: Failed to start server
+  width: 400
+  height: 300
+--- !u!114 &114316581644850606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119426007358918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860ae8803add94094a01a3ab87681ce5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Failed to join game
+  width: 400
+  height: 300
