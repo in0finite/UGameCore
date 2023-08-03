@@ -272,11 +272,8 @@ namespace UGameCore
 			foreach (var c in components) {
 				try {
 
-				//	var method = c.GetType().GetMethod( msg, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public );
-				//	if(method != null) {
-				//		method.Invoke( c, args );
-				//	}
-					c.Invoke( msg, args );
+					if (c != null )
+						c.Invoke( msg, args );
 
 				} catch( System.Exception ex ) {
 					Debug.LogException (ex);
