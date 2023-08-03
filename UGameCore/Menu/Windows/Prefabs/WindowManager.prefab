@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4991415585733034}
   - component: {fileID: 114257916812501816}
-  - component: {fileID: 114207605534734034}
-  - component: {fileID: 114709284219549974}
   - component: {fileID: 114412462827172158}
   - component: {fileID: 114047853839133050}
   - component: {fileID: 114316581644850606}
@@ -54,30 +52,6 @@ MonoBehaviour:
   textPrefab: {fileID: 1550407687378548, guid: c7cb7ab0161cd4e3c86dd2bf9e1471a4, type: 3}
   buttonPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
   msgBoxSize: {x: 0.25, y: 0.2}
---- !u!114 &114207605534734034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1119426007358918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efa2f059f116741cd855c6df55ca671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114709284219549974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1119426007358918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26834ed3b6e0a44818a5d7265cc69811, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114412462827172158
 MonoBehaviour:
   m_ObjectHideFlags: 0
