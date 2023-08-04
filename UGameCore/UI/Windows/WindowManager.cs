@@ -23,8 +23,7 @@ namespace UGameCore.Menu.Windows {
 		public	GameObject	textPrefab = null;
 		public	GameObject	buttonPrefab = null;
 
-		// TODO: msgbox size should be in absolute coordinates ?
-		public	Vector2	msgBoxSize = new Vector2( 0.25f, 0.2f );
+		public	Vector2	msgBoxSize = new Vector2( 400, 300 );
 
 
 
@@ -127,8 +126,8 @@ namespace UGameCore.Menu.Windows {
 
 		public	static	Window	OpenMessageBox( string text, bool isModal ) {
 
-			int width = (int) (singleton.msgBoxSize.x * Screen.width);
-			int height = (int) (singleton.msgBoxSize.y * Screen.height);
+			int width = (int) singleton.msgBoxSize.x;
+			int height = (int) singleton.msgBoxSize.y;
 			return OpenMessageBox ( width, height, text, isModal);
 
 		}

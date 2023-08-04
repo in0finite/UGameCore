@@ -53,7 +53,7 @@ MonoBehaviour:
   displayStringPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
   textPrefab: {fileID: 1550407687378548, guid: c7cb7ab0161cd4e3c86dd2bf9e1471a4, type: 3}
   buttonPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
-  msgBoxSize: {x: 0.25, y: 0.2}
+  msgBoxSize: {x: 500, y: 350}
 --- !u!114 &114412462827172158
 MonoBehaviour:
   m_ObjectHideFlags: 0
