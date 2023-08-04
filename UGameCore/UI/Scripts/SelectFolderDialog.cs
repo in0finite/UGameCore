@@ -28,8 +28,8 @@ namespace UGameCore.UI
 
         public bool destroyOnSelect = true;
 
-        public Color selectedColor = Color.gray;
-        public Color nonSelectedColor = Color.white;
+        public Color selectedColor;
+        Color m_nonSelectedColor;
 
         public string SelectedItemText { get; private set; }
         public Text SelectedTextComponent { get; private set; }
@@ -40,6 +40,10 @@ namespace UGameCore.UI
 
         private void Start()
         {
+            this.EnsureSerializableReferencesAssigned();
+
+            m_nonSelectedColor = this.folderListItemPrefab.GetComponentInChildrenOrThrow<Text>().color;
+
             this.goUpButton.onClick.AddListener(this.GoUp);
             this.selectButton.onClick.AddListener(this.OnSelectPressed);
             this.cancelButton.onClick.AddListener(this.OnCancelPressed);
@@ -64,7 +68,7 @@ namespace UGameCore.UI
         {
             if (this.destroyOnSelect)
                 F.DestroyEvenInEditMode(this.gameObject);
-            this.onSelect.Invoke(this.SelectedItemText);
+            this.onSelect.Invoke(this.CurrentFolder);
         }
 
         void OnCancelPressed()
@@ -77,7 +81,7 @@ namespace UGameCore.UI
         {
             var go = this.headerItemPrefab.InstantiateAsUIElement(this.headerContainer);
             go.name = item;
-            var text = go.GetComponentOrThrow<Text>();
+            var text = go.GetComponentInChildrenOrThrow<Text>();
             text.text = item;
             text.gameObject.GetOrAddComponent<UIEventsPickup>().onPointerClick += _ => this.ChangeCurrentFolder(directory);
         }
@@ -86,9 +90,9 @@ namespace UGameCore.UI
         {
             var go = this.folderListItemPrefab.InstantiateAsUIElement(this.folderListContainer);
             go.name = item;
-            var text = go.GetComponentOrThrow<Text>();
+            var text = go.GetComponentInChildrenOrThrow<Text>();
             text.text = item;
-            text.gameObject.GetOrAddComponent<UIEventsPickup>().onPointerClick += _ => this.ChangeSelectedItem(text);
+            text.gameObject.GetOrAddComponent<UIEventsPickup>().onPointerClick += _ => this.OnItemClicked(text);
         }
 
         public void ChangeCurrentFolder(string folder)
@@ -97,7 +101,7 @@ namespace UGameCore.UI
                 return;
 
             if (this.SelectedTextComponent != null)
-                this.SelectedTextComponent.color = this.nonSelectedColor;
+                this.SelectedTextComponent.color = m_nonSelectedColor;
 
             this.CurrentFolder = folder;
             this.SelectedItemText = null;
@@ -111,11 +115,17 @@ namespace UGameCore.UI
         void ChangeSelectedItem(Text text)
         {
             if (this.SelectedTextComponent != null)
-                this.SelectedTextComponent.color = this.nonSelectedColor;
+                this.SelectedTextComponent.color = m_nonSelectedColor;
 
             this.SelectedTextComponent = text;
             this.SelectedItemText = Path.Combine(this.CurrentFolder, text.text);
             text.color = this.selectedColor;
+        }
+
+        void OnItemClicked(Text text)
+        {
+            string newFolder = Path.Combine(this.CurrentFolder, text.text);
+            this.ChangeCurrentFolder(newFolder);
         }
 
         void PopulateFolderList()

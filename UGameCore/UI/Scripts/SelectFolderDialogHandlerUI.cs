@@ -14,6 +14,7 @@ namespace UGameCore.UI
 
         void Awake()
         {
+            this.EnsureSerializableReferencesAssigned();
             var provider = this.GetSingleComponentOrThrow<IServiceProvider>();
             m_windowManager = provider.GetRequiredService<WindowManager>();
         }
