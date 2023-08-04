@@ -32,7 +32,7 @@ namespace UGameCore.Menu.Windows
         public IEnumerator ShowMessageAsync(string title, string message)
         {
             var window = WindowManager.OpenMessageBox(title, message);
-            while (window != null || !window.isClosed)
+            while (window != null)
                 yield return null;
         }
     }

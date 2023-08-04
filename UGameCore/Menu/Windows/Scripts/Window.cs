@@ -15,7 +15,6 @@ namespace UGameCore.Menu.Windows {
 		internal	string	title = "" ;
 		internal	Rect	rect = new Rect ();
 		internal	List<string>	displayStrings = new List<string> ();
-		internal	bool	isClosed = false ;
 		internal	System.Action<Window>	procedure = null;
 	//	public	GameObject	gameObject { get ; internal set ; }
 

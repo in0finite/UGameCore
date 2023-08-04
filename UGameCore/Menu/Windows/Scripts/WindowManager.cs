@@ -43,7 +43,7 @@ namespace UGameCore.Menu.Windows {
         void Update () {
 
 			// remove closed windows from list
-			m_openedWindows.RemoveAll( wi => null == wi || wi.isClosed );
+			m_openedWindows.RemoveDeadObjects();
 
 		}
 
@@ -68,8 +68,6 @@ namespace UGameCore.Menu.Windows {
 		}
 
 		public	static	void	CloseWindow( Window wi ) {
-
-			wi.isClosed = true;
 
 			if (wi.gameObject != null) {
 				Destroy (wi.gameObject);
