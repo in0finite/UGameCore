@@ -20,7 +20,7 @@ namespace UGameCore.Menu.Windows {
 			Rect rect = WindowManager.GetCenteredRect( 0.5f, 0.5f );
 
 			var array = new Window[1];
-			array[0] = WindowManager.OpenWindow (rect, messageInfo.Title, messageInfo.Teams, false, (s, go) => {
+			array[0] = WindowManager.OpenWindow (WindowManager.singleton.windowPrefab, rect, messageInfo.Title, messageInfo.Teams, false, (s, go) => {
 					go.GetComponent<Button>().onClick.AddListener( () => {
 					// team choosed
 					Player.local.GetComponent<PlayerTeamChooser>().TeamChoosed (s);

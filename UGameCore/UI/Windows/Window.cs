@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UGameCore.Utilities;
 
 namespace UGameCore.Menu.Windows {
 
@@ -141,6 +142,11 @@ namespace UGameCore.Menu.Windows {
 		}
 
 
+		public void DestroyWindow()
+		{
+			F.DestroyEvenInEditMode(this.gameObject);
+		}
+
 		public	void	BringToTop() {
 
 			// when object is last in the hierarchy, it will be rendered last, and thus it will be on top
@@ -182,24 +188,15 @@ namespace UGameCore.Menu.Windows {
 			return buttonGameObject;
 		}
 
-
-		// TODO: add buttons, texts to content ; add multiple buttons below content ;
-
-
-
 		void Start ()
 		{
-		
-			this.gameObject.AddComponent<Utilities.UIEventsPickup>().onPointerDown += (UnityEngine.EventSystems.PointerEventData obj) => {
+			this.gameObject.AddComponent<UIEventsPickup>().onPointerDown += (obj) =>
+			{
 				// mouse is pressed over window (well, actually only over this game object, not any of it's children)
 				// bring window to top
 				this.BringToTop();
 			};
-
 		}
-
-
-
 	}
 
 }

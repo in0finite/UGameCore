@@ -47,7 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4bc77247926847818af7ad28483aa08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  windowsCanvas: {fileID: 0}
   windowPrefab: {fileID: 1008656201797430, guid: fc4a690eca98b43edbda8d93a3d4a265, type: 3}
+  messageBoxPrefab: {fileID: 1008656201797430, guid: ad6a0cfb622d9b24c9066bd4834d4cd4, type: 3}
   displayStringPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}
   textPrefab: {fileID: 1550407687378548, guid: c7cb7ab0161cd4e3c86dd2bf9e1471a4, type: 3}
   buttonPrefab: {fileID: 1698136536247150, guid: 23b900203044a43a1a1832f6cc3f4615, type: 3}

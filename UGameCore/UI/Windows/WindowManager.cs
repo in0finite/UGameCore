@@ -18,7 +18,8 @@ namespace UGameCore.Menu.Windows {
 		public Canvas windowsCanvas;
 
 		public	GameObject	windowPrefab = null;
-		public	GameObject	displayStringPrefab = null;
+        public GameObject messageBoxPrefab = null;
+        public	GameObject	displayStringPrefab = null;
 		public	GameObject	textPrefab = null;
 		public	GameObject	buttonPrefab = null;
 
@@ -36,8 +37,7 @@ namespace UGameCore.Menu.Windows {
 
         private void Start()
         {
-			if (null == this.windowsCanvas)
-				Debug.LogError($"{nameof(windowsCanvas)} not assigned", this);
+			this.EnsureSerializableReferencesAssigned();
         }
 
         void Update () {
@@ -162,7 +162,7 @@ namespace UGameCore.Menu.Windows {
 				el.stretchElement = button.GetComponentInParent<ScrollRect>().GetRectTransform () ;
 			};
 
-			var window = OpenWindow( rect, "", new string[] {}, isModal, processButton, MessageBoxProcedure );
+			var window = OpenWindow( singleton.messageBoxPrefab, rect, "", new string[] {}, isModal, processButton, MessageBoxProcedure );
 
 			window.gameObject.name = "MessageBox";
 
@@ -202,23 +202,19 @@ namespace UGameCore.Menu.Windows {
 				}
 			}
 
-			// add close button
-			float closeButtonWidth = 0.3f * 320;
-			float closeButtonHeight = 0.15f * 144;
-			var closeButton = window.AddButtonBelowContent( closeButtonWidth, closeButtonHeight, "Close");
-			closeButton.name = "CloseButton";
-			closeButton.GetComponentInChildren<Button> ().onClick.AddListener (() => CloseWindow (window));
-
-
-//			Debug.LogFormat ("button width {0} button height {1} h_offset {2} v_offset {3} amount reduced {4} window width {5} " +
-//				"window height {6} window rect {7}", 
-//				closeButtonWidth, closeButtonHeight, closeButtonHorizontalOffset, closeButtonVerticalOffset, amountToReduce, width, height,
-//				rect );
-
 			return window;
 		}
 
-		public	static	Window	OpenWindow( Rect rect, string title, IEnumerable<string> displayStrings, bool isModal,
+		void AddCloseButton(Window window)
+		{
+            float closeButtonWidth = 0.3f * 320;
+            float closeButtonHeight = 0.15f * 144;
+            var closeButton = window.AddButtonBelowContent(closeButtonWidth, closeButtonHeight, "Close");
+            closeButton.name = "CloseButton";
+            closeButton.GetComponentInChildren<Button>().onClick.AddListener(() => CloseWindow(window));
+        }
+
+        public	static	Window	OpenWindow( GameObject windowPrefab, Rect rect, string title, IEnumerable<string> displayStrings, bool isModal,
 			Action<string, GameObject> onDisplayStringCreated, Action<Window> windowProcedure ) {
 
 
@@ -228,7 +224,7 @@ namespace UGameCore.Menu.Windows {
 //			}
 
 			// create window game object
-			var go = singleton.windowPrefab.InstantiateAsUIElement( singleton.windowsCanvas.transform );
+			var go = windowPrefab.InstantiateAsUIElement( singleton.windowsCanvas.transform );
 			Window window = go.AddComponentIfDoesntExist<Window>();
 
 			// assign parameters for old GUI system
@@ -273,7 +269,7 @@ namespace UGameCore.Menu.Windows {
 
 		public	static	Window	OpenWindow( Rect rect, string title, IEnumerable<string> displayStrings, bool isModal ) {
 
-			return OpenWindow (rect, title, displayStrings, isModal, null, null);
+			return OpenWindow (singleton.windowPrefab, rect, title, displayStrings, isModal, null, null);
 
 		}
 
