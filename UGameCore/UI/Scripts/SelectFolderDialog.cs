@@ -14,6 +14,8 @@ namespace UGameCore.UI
 
         public FolderSelectedEvent onSelect = new FolderSelectedEvent();
 
+        public Text titleText;
+
         public Text currentFolderDisplayText;
         public Button goUpButton;
 
@@ -49,6 +51,10 @@ namespace UGameCore.UI
             this.cancelButton.onClick.AddListener(this.OnCancelPressed);
 
             this.CurrentFolder = this.initialFolder;
+            if (this.CurrentFolder.IsNullOrWhiteSpace())
+                this.CurrentFolder = Directory.GetCurrentDirectory();
+
+            this.currentFolderDisplayText.text = this.CurrentFolder;
             this.PopulateFolderList();
 
             this.PopulateHeader();

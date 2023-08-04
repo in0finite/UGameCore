@@ -37,6 +37,7 @@ namespace UGameCore.UI
             var folderDialog = go.GetComponentOrThrow<SelectFolderDialog>();
             folderDialog.initialFolder = folder;
             folderDialog.onSelect.AddListener((str) => selectedFolder = str);
+            folderDialog.titleText.text = title;
 
             var window = go.GetOrAddComponent<Window>(); // add Window functionality to folder picker
 
