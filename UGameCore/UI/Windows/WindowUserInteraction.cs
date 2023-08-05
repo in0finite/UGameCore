@@ -10,7 +10,9 @@ namespace UGameCore.Menu.Windows
     /// </summary>
     public class WindowUserInteraction : MonoBehaviour, IUserInteraction
     {
-        public bool SupportsConfirm => false;
+        EditorDialogUserInteraction m_editorDialogUserInteraction = new EditorDialogUserInteraction();
+
+        public bool SupportsConfirm => true;
 
 
         void Awake()
@@ -21,6 +23,12 @@ namespace UGameCore.Menu.Windows
 
         public IEnumerator ConfirmAsync(Ref<bool> bResultRef, string title, string message, string ok, string cancel)
         {
+            if (!Application.isPlaying)
+            {
+                yield return m_editorDialogUserInteraction.ConfirmAsync(bResultRef, title, message, ok, cancel);
+                yield break;
+            }
+
             MessageBoxConfirmation msgBox = WindowManager.OpenMessageBoxConfirm(title, message);
 
             msgBox.OKButtonText = ok;
@@ -35,13 +43,14 @@ namespace UGameCore.Menu.Windows
             bResultRef.value = confirmResult;
         }
 
-        public void ShowMessage(string title, string message)
-        {
-            WindowManager.OpenMessageBox(title, message);
-        }
-
         public IEnumerator ShowMessageAsync(string title, string message)
         {
+            if (!Application.isPlaying)
+            {
+                yield return m_editorDialogUserInteraction.ShowMessageAsync(title, message);
+                yield break;
+            }
+
             var window = WindowManager.OpenMessageBox(title, message);
             while (window != null)
                 yield return null;
