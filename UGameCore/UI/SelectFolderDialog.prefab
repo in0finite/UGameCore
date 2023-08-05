@@ -538,7 +538,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 12
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -1245,6 +1245,8 @@ GameObject:
   - component: {fileID: 4476941443704405137}
   - component: {fileID: 6206478058951649021}
   - component: {fileID: 6678023893252122037}
+  - component: {fileID: 5524762485453873245}
+  - component: {fileID: 235951562129949792}
   m_Layer: 5
   m_Name: SelectFolderDialog
   m_TagString: Untagged
@@ -1344,6 +1346,34 @@ MonoBehaviour:
   destroyOnSelect: 1
   selectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   initialFolder: 
+--- !u!114 &5524762485453873245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6094159281431898546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8486cf981f7c4f59a3913321c60e42b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_windowTag: 
+--- !u!114 &235951562129949792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6094159281431898546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddeaf114918635b4eb8bae093915fc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateAnchors: 1
+  updateOffset: 0
+  updateAnchoredPosition: 0
 --- !u!1 &6598848702944951470
 GameObject:
   m_ObjectHideFlags: 0
