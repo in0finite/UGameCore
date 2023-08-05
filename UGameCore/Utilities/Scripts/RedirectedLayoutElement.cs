@@ -7,12 +7,8 @@ namespace UGameCore.Utilities
 	{
 
 		public	GameObject	layoutObject = null;
-		private	ILayoutElement	m_redirectedLayoutElement = null;
+		private	ILayoutElement	m_redirectedLayoutElement => this.layoutObject != null ? this.layoutObject.GetComponent<ILayoutElement>() : null;
 
-
-		void Awake() {
-			m_redirectedLayoutElement = layoutObject.GetComponent<ILayoutElement> ();
-		}
 
 
 		public void CalculateLayoutInputHorizontal ()
