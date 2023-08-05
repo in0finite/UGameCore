@@ -13,56 +13,28 @@ namespace UGameCore.Utilities
 
 		public void CalculateLayoutInputHorizontal ()
 		{
-			m_redirectedLayoutElement.CalculateLayoutInputHorizontal ();
+			m_redirectedLayoutElement?.CalculateLayoutInputHorizontal ();
 		}
 
 		public void CalculateLayoutInputVertical ()
 		{
-			m_redirectedLayoutElement.CalculateLayoutInputVertical ();
+			m_redirectedLayoutElement?.CalculateLayoutInputVertical ();
 		}
 
-		public float minWidth {
-			get {
-				return m_redirectedLayoutElement.minWidth;
-			}
-		}
+        public float minWidth => m_redirectedLayoutElement?.minWidth ?? 0f;
 
-		public float preferredWidth {
-			get {
-				return m_redirectedLayoutElement.preferredWidth;
-			}
-		}
+        public float preferredWidth => m_redirectedLayoutElement?.preferredWidth ?? 0f;
 
-		public float flexibleWidth {
-			get {
-				return m_redirectedLayoutElement.flexibleWidth;
-			}
-		}
+        public float flexibleWidth => m_redirectedLayoutElement?.flexibleWidth ?? 0f;
 
-		public float minHeight {
-			get {
-				return m_redirectedLayoutElement.minHeight;
-			}
-		}
+        public float minHeight => m_redirectedLayoutElement?.minHeight ?? 0f;
 
-		public float preferredHeight {
-			get {
-				return m_redirectedLayoutElement.preferredHeight;
-			}
-		}
+        public float preferredHeight => m_redirectedLayoutElement?.preferredHeight ?? 0f;
 
-		public float flexibleHeight {
-			get {
-				return m_redirectedLayoutElement.flexibleHeight;
-			}
-		}
+        public float flexibleHeight => m_redirectedLayoutElement?.flexibleHeight ?? 0f;
 
-		public int layoutPriority {
-			get {
-				return m_redirectedLayoutElement.layoutPriority;
-			}
-		}
+        public int layoutPriority => m_redirectedLayoutElement?.layoutPriority ?? 0;
 
-	}
+    }
 }
 
