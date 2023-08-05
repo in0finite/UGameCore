@@ -21,15 +21,16 @@ namespace UGameCore.UI
             m_windowManager = provider.GetRequiredService<WindowManager>();
         }
 
-        public string Select(string title, string folder, string defaultName)
-        {
-            var resultRef = new Ref<string>();
-            SelectAsync(resultRef, title, folder, defaultName).EnumerateToEnd();
-            return resultRef.value;
-        }
-
         public IEnumerator SelectAsync(Ref<string> resultRef, string title, string folder, string defaultName)
         {
+            if (!Application.isPlaying)
+            {
+#if UNITY_EDITOR
+                resultRef.value = UnityEditor.EditorUtility.OpenFolderPanel(title, folder, defaultName);
+#endif
+                yield break;
+            }
+
             GameObject go = this.selectFolderDialogPrefab.InstantiateAsUIElement(m_windowManager.windowsCanvas.transform);
 
             var folderDialog = go.GetComponentOrThrow<SelectFolderDialog>();
