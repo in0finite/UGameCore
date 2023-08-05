@@ -1346,6 +1346,7 @@ MonoBehaviour:
   destroyOnSelect: 1
   selectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   initialFolder: 
+  additionalFoldersInHeader: []
 --- !u!114 &5524762485453873245
 MonoBehaviour:
   m_ObjectHideFlags: 0

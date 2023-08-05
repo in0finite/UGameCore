@@ -39,6 +39,8 @@ namespace UGameCore.UI
 
         public string initialFolder;
 
+        public SerializablePair<string, string>[] additionalFoldersInHeader = Array.Empty<SerializablePair<string, string>>();
+
 
         private void Start()
         {
@@ -152,12 +154,13 @@ namespace UGameCore.UI
         {
             this.headerContainer.DestroyChildren();
 
+            foreach (var additionalHeaderFolder in this.additionalFoldersInHeader)
+                this.AddToHeader(additionalHeaderFolder.item1, additionalHeaderFolder.item2);
+
             var directories = FileBrowser.GetDirectoriesForTopPanel();
 
             foreach (var dir in directories)
-            {
                 this.AddToHeader(dir.Item1, dir.Item2);
-            }
         }
     }
 }

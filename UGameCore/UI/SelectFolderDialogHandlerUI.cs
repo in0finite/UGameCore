@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UGameCore.Menu.Windows;
 using UGameCore.Utilities;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace UGameCore.UI
     {
         public GameObject selectFolderDialogPrefab;
         WindowManager m_windowManager;
+        public SerializablePair<string, string>[] additionalFoldersInHeader = Array.Empty<SerializablePair<string, string>>();
 
 
         void Awake()
@@ -28,16 +30,15 @@ namespace UGameCore.UI
 
         public IEnumerator SelectAsync(Ref<string> resultRef, string title, string folder, string defaultName)
         {
-            if (null == this.selectFolderDialogPrefab)
-                throw new ArgumentException($"{nameof(selectFolderDialogPrefab)} not assigned");
-
             GameObject go = this.selectFolderDialogPrefab.InstantiateAsUIElement(m_windowManager.windowsCanvas.transform);
 
-            string selectedFolder = null;
             var folderDialog = go.GetComponentOrThrow<SelectFolderDialog>();
             folderDialog.initialFolder = folder;
-            folderDialog.onSelect.AddListener((str) => selectedFolder = str);
             folderDialog.titleText.text = title;
+            folderDialog.additionalFoldersInHeader = folderDialog.additionalFoldersInHeader.Concat(this.additionalFoldersInHeader).ToArray();
+            
+            string selectedFolder = null;
+            folderDialog.onSelect.AddListener((str) => selectedFolder = str);
 
             var window = go.GetOrAddComponent<Window>(); // add Window functionality to folder picker
 
