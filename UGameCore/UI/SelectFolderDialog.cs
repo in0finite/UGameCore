@@ -16,7 +16,7 @@ namespace UGameCore.UI
 
         public Text titleText;
 
-        public Text currentFolderDisplayText;
+        public InputField currentFolderInputField;
         public Button goUpButton;
 
         public Button selectButton;
@@ -51,12 +51,13 @@ namespace UGameCore.UI
             this.goUpButton.onClick.AddListener(this.GoUp);
             this.selectButton.onClick.AddListener(this.OnSelectPressed);
             this.cancelButton.onClick.AddListener(this.OnCancelPressed);
+            this.currentFolderInputField.onEndEdit.AddListener(this.OnEndEditCurrentPath);
 
             this.CurrentFolder = this.initialFolder;
             if (this.CurrentFolder.IsNullOrWhiteSpace())
                 this.CurrentFolder = Directory.GetCurrentDirectory();
 
-            this.currentFolderDisplayText.text = this.CurrentFolder;
+            this.currentFolderInputField.text = this.CurrentFolder;
             this.PopulateFolderList();
 
             this.PopulateHeader();
@@ -83,6 +84,11 @@ namespace UGameCore.UI
         {
             F.DestroyEvenInEditMode(this.gameObject);
             this.onSelect.Invoke(null);
+        }
+
+        void OnEndEditCurrentPath(string text)
+        {
+            this.ChangeCurrentFolder(text);
         }
 
         public void AddToHeader(string item, string directory)
@@ -115,7 +121,7 @@ namespace UGameCore.UI
             this.SelectedItemText = null;
             this.SelectedTextComponent = null;
 
-            this.currentFolderDisplayText.text = folder;
+            this.currentFolderInputField.text = folder;
 
             this.PopulateFolderList();
         }
