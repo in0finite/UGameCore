@@ -21,7 +21,18 @@ namespace UGameCore.Menu.Windows
 
         public IEnumerator ConfirmAsync(Ref<bool> bResultRef, string title, string message, string ok, string cancel)
         {
-            throw new System.NotSupportedException("Confirm not supported");
+            MessageBoxConfirmation msgBox = WindowManager.OpenMessageBoxConfirm(title, message);
+
+            msgBox.OKButtonText = ok;
+            msgBox.messageBox.CloseButtonText = cancel;
+
+            bool confirmResult = false;
+            msgBox.okButton.onClick.AddListener(() => confirmResult = true);
+
+            while (msgBox != null)
+                yield return null;
+
+            bResultRef.value = confirmResult;
         }
 
         public void ShowMessage(string title, string message)

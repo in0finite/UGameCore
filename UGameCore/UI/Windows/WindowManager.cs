@@ -19,6 +19,7 @@ namespace UGameCore.Menu.Windows {
 
 		public	GameObject	windowPrefab = null;
         public GameObject messageBoxPrefab = null;
+        public GameObject messageBoxConfirmationPrefab = null;
         public	GameObject	displayStringPrefab = null;
 		public	GameObject	textPrefab = null;
 		public	GameObject	buttonPrefab = null;
@@ -128,7 +129,7 @@ namespace UGameCore.Menu.Windows {
 
 			int width = (int) singleton.msgBoxSize.x;
 			int height = (int) singleton.msgBoxSize.y;
-			return OpenMessageBox ( width, height, text, isModal);
+			return OpenMessageBox (singleton.messageBoxPrefab, width, height, text, isModal);
 
 		}
 
@@ -141,19 +142,23 @@ namespace UGameCore.Menu.Windows {
 
 		public	static	Window	OpenMessageBox( string title, string text, int width, int height ) {
 
-			var window = WindowManager.OpenMessageBox (width, height, text, false);
+			var window = WindowManager.OpenMessageBox (singleton.messageBoxPrefab, width, height, text, false);
 			window.Title = title;
 			return window;
 		}
 
-		public	static	Window	OpenMessageBox( int width, int height, string text, bool isModal ) {
+        public static MessageBoxConfirmation OpenMessageBoxConfirm(string title, string text)
+        {
+            var window = WindowManager.OpenMessageBox(singleton.messageBoxConfirmationPrefab, (int)singleton.msgBoxSize.x, (int)singleton.msgBoxSize.y, text, false);
+            window.Title = title;
+            return window.GetComponentOrThrow<MessageBoxConfirmation>();
+        }
 
-			// compute position for window
-			Rect rect = GetCenteredRect (width / (float) Screen.width, height / (float) Screen.height);
-			rect.position += UnityEngine.Random.insideUnitCircle * 100;
+        public	static	Window	OpenMessageBox(GameObject prefab, int width, int height, string text, bool isModal)
+		{
+			Rect rect = singleton.GetRectForWindow(width, height);
 
-
-			Action<string,GameObject> processButton = (s, button) => {
+            Action<string,GameObject> processButton = (s, button) => {
 				// stretch button to parent size
 				var el = button.AddComponent<Utilities.StretchToParentLayoutElement>();
 				el.width = 1.0f;	// same width as parent
@@ -161,7 +166,7 @@ namespace UGameCore.Menu.Windows {
 				el.stretchElement = button.GetComponentInParent<ScrollRect>().GetRectTransform () ;
 			};
 
-			var window = OpenWindow( singleton.messageBoxPrefab, rect, "", new string[] {}, isModal, processButton, MessageBoxProcedure );
+			var window = OpenWindow(prefab, rect, "", new string[] {}, isModal, processButton, MessageBoxProcedure);
 
 			window.gameObject.name = "MessageBox";
 
@@ -203,6 +208,13 @@ namespace UGameCore.Menu.Windows {
 
 			return window;
 		}
+
+		public Rect GetRectForWindow(int width, int height)
+		{
+            Rect rect = GetCenteredRect(width / (float)Screen.width, height / (float)Screen.height);
+            rect.position += UnityEngine.Random.insideUnitCircle * 100;
+			return rect;
+        }
 
 		void AddCloseButton(Window window)
 		{
@@ -271,8 +283,5 @@ namespace UGameCore.Menu.Windows {
 			return OpenWindow (singleton.windowPrefab, rect, title, displayStrings, isModal, null, null);
 
 		}
-
-
 	}
-
 }

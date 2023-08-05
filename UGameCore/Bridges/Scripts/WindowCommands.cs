@@ -47,9 +47,9 @@ namespace UGameCore.Commands {
 				foreach (Vector2 size in sizes) {
 					foreach (int textLength in textLengths) {
 						string text = GenerateRandomString (textLength);
-						var msgBox = Menu.Windows.WindowManager.OpenMessageBox ((int)size.x, (int)size.y, text, false);
+						var msgBox = Menu.Windows.WindowManager.OpenMessageBox (text, false);
 						// use random title length
-						msgBox.Title = GenerateRandomString (Random.Range (0, 30));
+                        msgBox.Title = GenerateRandomString (Random.Range (0, 30));
 						// set random position on screen
 						msgBox.SetRectangle (new Rect (new Vector2 (Random.value * Screen.width, Random.value * Screen.height), size));
 					}
