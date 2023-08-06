@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Profiling;
 using UGameCore.Utilities;
 using Profiler = UnityEngine.Profiling.Profiler;
 
@@ -60,11 +59,8 @@ namespace UGameCore.Menu
 		private		int		m_historyBrowserIndex = -1 ;
 
 		public		event System.Action	onDrawStats = delegate {};
-	//	public		event System.Func<string>	onGetStats = delegate { return ""; };
-		private		List<System.Func<string>>	m_getStatsSubscribers = new List<System.Func<string>>();
-		public		event System.Action<string>	onTextSubmitted = delegate {};
 
-		private		string	m_lastStatsString = "" ;
+		public		event System.Action<string>	onTextSubmitted = delegate {};
 
 		public	List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
 		public	List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
@@ -73,8 +69,7 @@ namespace UGameCore.Menu
         public InputField	consoleTextDisplay = null;
         public Button	consoleSubmitButton = null;
         public InputField	consoleSubmitInputField = null;
-        public Text	consoleStatsTextControl = null;
-
+        
 
 
 		void Awake() {
@@ -131,17 +126,12 @@ namespace UGameCore.Menu
 
 		}
 
-		/// <summary>
-		/// Register statistics that will be displayed in console.
-		/// </summary>
 		public		void	RegisterStats( System.Func<string> getStatMethod ) {
-
-			m_getStatsSubscribers.Add (getStatMethod);
 
 		}
 
 		// Callback function for unity logs.
-			void	HandleLog(string logStr, string stackTrace, LogType type) {
+		void	HandleLog(string logStr, string stackTrace, LogType type) {
 
 			if (0 == this.m_maxCharacterCount)
 				return;
@@ -339,29 +329,6 @@ namespace UGameCore.Menu
 					}
 				}
 			}
-
-			// update stats
-			Profiler.BeginSample( "UpdateStats", this );
-			if(m_isConsoleOpened) {
-				
-				string text = "" ;
-				foreach( var method in m_getStatsSubscribers ) {
-					string s = method.Invoke();
-					if (s.Length > 0)
-						text += s + "    ";
-				}
-
-				if(m_lastStatsString != text) {
-					// stats text changed
-					// update UI
-					if(consoleStatsTextControl != null) {
-						consoleStatsTextControl.text = text ;
-					}
-
-					m_lastStatsString = text ;
-				}
-			}
-			Profiler.EndSample();
 
 
 			Profiler.BeginSample( "UpdateLogMessages", this );
