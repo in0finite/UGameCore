@@ -6,19 +6,15 @@ namespace UGameCore
 {
     public class CommandManager : MonoBehaviour
     {
-        public static CommandManager Singleton { get; private set; }
-
         readonly Dictionary<string, CommandInfo> m_registeredCommands =
             new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
 
-        public IEnumerable<string> RegisteredCommands => m_registeredCommands.Keys;
+        public IReadOnlyCollection<string> RegisteredCommands => m_registeredCommands.Keys;
 
         public static string invalidSyntaxText => "Invalid syntax";
 
-        [SerializeField] private List<string> m_forbiddenCommands = new List<string>();
-
-        /// <summary> Forbidden commands can not be registered. </summary>
-        public List<string> ForbiddenCommands => m_forbiddenCommands;
+        [Tooltip("Forbidden commands can not be registered or executed")]
+        public List<string> forbiddenCommands = new List<string>();
 
         [SerializeField] private bool m_registerHelpCommand = true;
 
@@ -70,6 +66,7 @@ namespace UGameCore
 
             public static ProcessCommandResult UnknownCommand => new ProcessCommandResult {response = "Unknown command"};
             public static ProcessCommandResult InvalidCommand => new ProcessCommandResult {response = "Invalid command"};
+            public static ProcessCommandResult ForbiddenCommand => new ProcessCommandResult { response = "Forbidden command" };
             public static ProcessCommandResult NoPermissions => new ProcessCommandResult {response = "You don't have permissions to run this command"};
             public static ProcessCommandResult CanOnlyRunOnServer => new ProcessCommandResult {response = "This command can only run on server"};
             public static ProcessCommandResult LimitInterval(float interval) => new ProcessCommandResult {response = $"This command can only be used on an interval of {interval} seconds"};
@@ -99,9 +96,6 @@ namespace UGameCore
 
         void Awake()
         {
-            if (null == Singleton)
-                Singleton = this;
-
             Player.onDisable += PlayerOnDisable;
 
             if (m_registerHelpCommand)
@@ -113,7 +107,7 @@ namespace UGameCore
             m_perPlayerData.Remove(player);
         }
 
-        public bool RegisterCommand(CommandInfo commandInfo)
+        public void RegisterCommand(CommandInfo commandInfo)
         {
             if (null == commandInfo.commandHandler)
                 throw new System.ArgumentException("Command handler must be provided");
@@ -123,14 +117,13 @@ namespace UGameCore
 
             commandInfo.command = commandInfo.command.Trim();
 
-            if (this.ForbiddenCommands.Contains(commandInfo.command))
-                return false;
+            if (this.forbiddenCommands.Contains(commandInfo.command))
+                throw new System.InvalidOperationException("Command is forbidden");
 
             if (m_registeredCommands.ContainsKey(commandInfo.command))
-                return false;
+                throw new System.ArgumentException("Command was already registered");
 
             m_registeredCommands.Add(commandInfo.command, commandInfo);
-            return true;
         }
 
         public bool RemoveCommand(string command)
