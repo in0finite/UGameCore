@@ -51,7 +51,7 @@ namespace UGameCore.UI
             this.goUpButton.onClick.AddListener(this.GoUp);
             this.selectButton.onClick.AddListener(this.OnSelectPressed);
             this.cancelButton.onClick.AddListener(this.OnCancelPressed);
-            this.currentFolderInputField.onEndEdit.AddListener(this.OnEndEditCurrentPath);
+            this.currentFolderInputField.onSubmit.AddListener(this.OnInputFieldSubmit);
 
             this.CurrentFolder = this.initialFolder;
             if (this.CurrentFolder.IsNullOrWhiteSpace())
@@ -86,7 +86,7 @@ namespace UGameCore.UI
             this.onSelect.Invoke(null);
         }
 
-        void OnEndEditCurrentPath(string text)
+        void OnInputFieldSubmit(string text)
         {
             this.ChangeCurrentFolder(text);
         }
