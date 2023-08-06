@@ -56,7 +56,7 @@ namespace UGameCore.Menu
 		private		string		m_consoleCommandText = "" ;
 
 		private		List<string>	m_history = new List<string> ();
-		public		IEnumerable<string>	History { get { return m_history; } }
+		public		IReadOnlyList<string>	History { get { return m_history; } }
 		private		int		m_historyBrowserIndex = -1 ;
 
 		public		event System.Action	onDrawStats = delegate {};
@@ -69,33 +69,20 @@ namespace UGameCore.Menu
 		public	List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
 		public	List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
 
-		private	ConsoleCanvas	consoleCanvas = null;
-		private	ScrollRect	consoleScrollView = null;
-		private	InputField	consoleTextDisplay = null;
-		private	Button	consoleSubmitButton = null;
-		private	InputField	consoleSubmitInputField = null;
-		private	Text	consoleStatsTextControl = null;
+        public ScrollRect	consoleScrollView = null;
+        public InputField	consoleTextDisplay = null;
+        public Button	consoleSubmitButton = null;
+        public InputField	consoleSubmitInputField = null;
+        public Text	consoleStatsTextControl = null;
 
 
-
-		Console() {
-
-			// add some default ignored messages
-			this.ignoreMessages.Add(new IgnoreMessageInfo() {text = "HandleTransform no gameObject", ignoreAllLogTypes = true} );
-			this.ignoreMessagesThatStartWith.Add (new IgnoreMessageInfo () {text = "Did not find target for sync message for", ignoreAllLogTypes = true});
-
-		}
 
 		void Awake() {
 
+			this.EnsureSerializableReferencesAssigned();
+
 			// initialize log buffer
 			m_stringBuilder = new System.Text.StringBuilder(this.m_maxCharacterCount);
-
-			// register log callback
-			Application.logMessageReceived += HandleLog;
-
-			// find UI elements
-			this.FindUIElements();
 
 			// register functions for displaying our stats
 			RegisterStats( () => { return "FPS: " + GameManager.GetAverageFps() ; } );
@@ -103,7 +90,17 @@ namespace UGameCore.Menu
 
 		}
 
-		void Start () {
+        private void OnEnable()
+        {
+            Application.logMessageReceived += HandleLog;
+        }
+
+        private void OnDisable()
+        {
+            Application.logMessageReceived -= HandleLog;
+        }
+
+        void Start () {
 
 			if (this.consoleSubmitInputField != null) {
 				
@@ -131,18 +128,6 @@ namespace UGameCore.Menu
 						} );
 				}
 			}
-
-		}
-
-		private void FindUIElements() {
-
-			this.consoleCanvas = Utilities.Utilities.FindObjectOfTypeOrLogError<ConsoleCanvas>();
-			var tr = this.consoleCanvas.transform;
-			this.consoleScrollView = tr.GetComponentInChildren<ScrollRect> ();
-			this.consoleTextDisplay = tr.FindChildRecursivelyOrLogError ("TextDisplay").GetComponent<InputField>();
-			this.consoleSubmitButton = tr.FindChildRecursivelyOrLogError ("SubmitButton").GetComponent<Button>();
-			this.consoleSubmitInputField = tr.FindChildRecursivelyOrLogError ("SubmitInputField").GetComponent<InputField>();
-			this.consoleStatsTextControl = tr.FindChildRecursivelyOrLogError ("Stats").GetComponent<Text>();
 
 		}
 
@@ -316,15 +301,6 @@ namespace UGameCore.Menu
 				// opened state changed
 
 				m_wasOpenedLastFrame = m_isConsoleOpened ;
-
-				if(this.consoleCanvas != null) {
-					var canvas = this.consoleCanvas.GetComponentInChildren<Canvas>(true);
-					if(canvas != null) {
-						canvas.gameObject.BroadcastMessageNoExceptions("OnPreCanvasStateChanged", m_isConsoleOpened);
-						canvas.enabled = m_isConsoleOpened ;
-						canvas.gameObject.BroadcastMessageNoExceptions("OnPostCanvasStateChanged", m_isConsoleOpened);
-					}
-				}
 
 				if(m_isConsoleOpened) {
 					// update display text if something was logged in the meantime
