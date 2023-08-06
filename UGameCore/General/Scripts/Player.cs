@@ -467,6 +467,20 @@ namespace UGameCore {
 
 		}
 
+		public CommandManager.ProcessCommandResult ExecuteCommand(CommandManager commandManager, string command)
+		{
+            bool hasServerPermissions = this.isLocalPlayer || this.IsServerAdmin;
+			double t = this.LastTimeExecutedCommand;
+			this.LastTimeExecutedCommand = Time.timeAsDouble;
+            return commandManager.ProcessCommand(new CommandManager.ProcessCommandContext
+            {
+                command = command,
+                hasServerPermissions = hasServerPermissions,
+                executor = this,
+				lastTimeExecutedCommand = t,
+            });
+        }
+
 		[ClientRpc]
 		public	void	RpcExecuteCommandOnClient( string command, bool sendResponse ) {
 
@@ -612,8 +626,11 @@ namespace UGameCore {
 
 		public	static	Player	local { get ; private set ; }
 
+		public double LastTimeExecutedCommand { get; private set; } = 0;
 
-	}
+		public bool IsServerAdmin { get; set; } = false;
+
+    }
 
 }
 

@@ -18,13 +18,6 @@ namespace UGameCore
 
         [SerializeField] private bool m_registerHelpCommand = true;
 
-        private struct PlayerData
-        {
-            public double timeWhenLastExecutedCommand;
-        }
-
-        readonly Dictionary<Player, PlayerData> m_perPlayerData = new Dictionary<Player, PlayerData>();
-
         public struct CommandInfo
         {
             public string command;
@@ -87,24 +80,22 @@ namespace UGameCore
             public bool hasServerPermissions;
             
             /// <summary>
-            /// Player who is executing the command.
+            /// The one who is executing the command.
             /// </summary>
-            public Player player;
+            public object executor;
+
+            /// <summary>
+            /// Last time when executor executed a command. If specified, the value will be used for rate-limiting.
+            /// </summary>
+            public double? lastTimeExecutedCommand;
         }
 
 
 
         void Awake()
         {
-            Player.onDisable += PlayerOnDisable;
-
             if (m_registerHelpCommand)
                 RegisterCommand(new CommandInfo { command = "help", commandHandler = ProcessHelpCommand, allowToRunWithoutServerPermissions = true });
-        }
-
-        void PlayerOnDisable(Player player)
-        {
-            m_perPlayerData.Remove(player);
         }
 
         public void RegisterCommand(CommandInfo commandInfo)
@@ -194,7 +185,7 @@ namespace UGameCore
             return color;
         }
 
-        ProcessCommandResult ProcessCommand(ProcessCommandContext context)
+        public ProcessCommandResult ProcessCommand(ProcessCommandContext context)
         {
             if (string.IsNullOrWhiteSpace(context.command))
                 return ProcessCommandResult.UnknownCommand;
@@ -215,15 +206,10 @@ namespace UGameCore
             if (!context.hasServerPermissions && !commandInfo.allowToRunWithoutServerPermissions)
                 return ProcessCommandResult.NoPermissions;
 
-            if (context.player != null)
+            if (context.lastTimeExecutedCommand.HasValue)
             {
-                m_perPlayerData.TryGetValue(context.player, out PlayerData playerData);
-
-                if (commandInfo.limitInterval > 0 && Time.timeAsDouble - playerData.timeWhenLastExecutedCommand < commandInfo.limitInterval)
+                if (commandInfo.limitInterval > 0 && Time.timeAsDouble - context.lastTimeExecutedCommand.Value < commandInfo.limitInterval)
                     return ProcessCommandResult.LimitInterval(commandInfo.limitInterval);
-
-                playerData.timeWhenLastExecutedCommand = Time.timeAsDouble;
-                m_perPlayerData[context.player] = playerData;
             }
 
             return commandInfo.commandHandler(context);
@@ -232,20 +218,6 @@ namespace UGameCore
         public ProcessCommandResult ProcessCommandAsServer(string command)
         {
             return ProcessCommand(new ProcessCommandContext {command = command, hasServerPermissions = true});
-        }
-
-        public ProcessCommandResult ProcessCommandForPlayer(Player player, string command)
-        {
-            if (null == player)
-                throw new System.ArgumentNullException(nameof(player));
-
-            bool hasServerPermissions = player == Player.local || player.IsServerAdmin;
-            return ProcessCommand(new ProcessCommandContext
-            {
-                command = command,
-                hasServerPermissions = hasServerPermissions,
-                player = player,
-            });
         }
 
         ProcessCommandResult ProcessHelpCommand(ProcessCommandContext context)
