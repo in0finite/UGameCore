@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Profiling;
+using UGameCore.Utilities;
+using Profiler = UnityEngine.Profiling.Profiler;
 
 namespace UGameCore.Menu
 {
@@ -249,13 +251,8 @@ namespace UGameCore.Menu
 
 			Debug.Log ( "> " + textToProcess );
 
-			try {
-				// TODO: should we invoke all subscribers exception safe ?
-				onTextSubmitted (textToProcess);
-			} catch( System.Exception ex ) {
-				Debug.LogException (ex);
-			}
-
+			onTextSubmitted.InvokeEventExceptionSafe (textToProcess);
+			
 			if (textToProcess.Length > 0) {
 				// add this command to list of executed commands
 				m_history.Add (textToProcess);
@@ -318,7 +315,7 @@ namespace UGameCore.Menu
 			#if UNITY_ANDROID
 			if (Input.GetKeyDown (KeyCode.Menu)) {
 			#else
-			if (Input.GetKeyDown (singleton.openKey)) {
+			if (Input.GetKeyDown (this.openKey)) {
 			#endif
 
 				m_isConsoleOpened = ! m_isConsoleOpened;
@@ -493,136 +490,5 @@ namespace UGameCore.Menu
 
 
 		}
-
-
-		void OnGUI() {
-
-			if (m_isConsoleOpened) {
-				// Draw console.
-			//	DrawConsole ();
-			}
-
-		}
-
-		static	void	DrawConsole() {
-
-
-			int consoleWidth = Screen.width;
-			int consoleHeight = Screen.height / 2;
-
-			// Draw rectangle in background.
-			GUI.Box( new Rect(0, 0, consoleWidth, consoleHeight) , "");
-
-
-			// Draw some statistics above console
-
-			GUILayout.BeginArea (new Rect (0, 0, Screen.width, 30));
-			GUILayout.BeginHorizontal ();
-
-			// display fps
-			GUILayout.Label( "FPS: " + GameManager.GetAverageFps() );
-
-			// display uptime
-			if (NetworkStatus.IsServerStarted) {
-				GUILayout.Label (" uptime: " + Utilities.Utilities.FormatElapsedTime( Time.realtimeSinceStartup ) );
-			}
-
-			// let anybody else display their own stats
-			try {
-				onDrawStats();
-			} catch (System.Exception ex) {
-				Debug.LogException (ex);
-			}
-
-			GUILayout.EndHorizontal ();
-			GUILayout.EndArea ();
-
-
-			m_consoleScrollPosition = GUILayout.BeginScrollView (
-				m_consoleScrollPosition, GUILayout.Width (consoleWidth), GUILayout.Height (consoleHeight) );
-
-
-			/*
-			// Display player information
-			if( networkManager.IsServer() ) {
-
-				GUILayout.Label("Players");
-				GUILayout.Label("name\t\t | health\t | kills\t | deaths\t | ping");
-				foreach ( Player player in networkManager.players ) {
-
-					string s = "";
-					s += player.playerName + "\t ";
-					if (player.mainNetworkScript != null) {
-						s += player.mainNetworkScript.health + "\t " + player.mainNetworkScript.numKills + "\t " + player.mainNetworkScript.numDeaths ;
-					}
-					s += "\t 0 ms";
-
-					GUILayout.Label( s );
-				}
-			}
-			*/
-
-			// Draw log string
-			//	if( logString != "" ) {
-			{
-				/*
-				GUIStyle style = new GUIStyle( GUI.skin.textArea );
-			//	style.wordWrap = true;
-				style.richText = true ;
-				GUILayout.Space(25);
-				GUILayout.TextArea( logString, style, GUILayout.MinHeight (consoleHeight - 30) );
-				*/
-
-				GUILayout.Space(30);
-				GUILayout.Label (m_logString);
-			}
-
-			GUILayout.EndScrollView ();
-
-
-			GUILayout.BeginHorizontal ();
-
-			string textToProcess = "";
-
-			// Edit box for commands input.
-			GUI.SetNextControlName("commands_input");
-			m_consoleCommandText = GUILayout.TextField( m_consoleCommandText, 1000, GUILayout.Width( Screen.width / 4 ), GUILayout.Height( 40 ) );
-			if (Event.current.isKey && GUI.GetNameOfFocusedControl () == "commands_input") {
-				if (Event.current.keyCode == KeyCode.UpArrow) {
-					// up arrow pressed and edit box is in focus
-					BrowseHistoryBackwards();
-
-				} else if (Event.current.keyCode == KeyCode.DownArrow) {
-					// down arrow pressed and edit box is in focus
-					BrowseHistoryForwards();
-
-				} else if (Event.current.keyCode == KeyCode.Return) {
-					// enter pressed
-					textToProcess = m_consoleCommandText ;
-				}
-			}
-
-			// submit button
-			//	bool submited = GUILayout.Button( "Submit", GUILayout.Width(60), GUILayout.Height(40) );
-			bool submited = Utilities.GUIUtils.ButtonWithCalculatedSize("Submit");
-			if (submited) {
-				textToProcess = m_consoleCommandText;
-			}
-
-			GUILayout.EndHorizontal ();
-
-
-			if (textToProcess != "") {
-
-				SubmittedText (textToProcess);
-
-				// clear input text box
-				SetInputBoxText("");
-			}
-
-
-		}
-
 	}
-
 }
