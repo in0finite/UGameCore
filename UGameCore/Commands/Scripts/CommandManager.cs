@@ -206,6 +206,9 @@ namespace UGameCore
             if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
                 return ProcessCommandResult.UnknownCommand;
 
+            if (this.forbiddenCommands.Contains(commandInfo.command))
+                return ProcessCommandResult.ForbiddenCommand;
+
             if (commandInfo.runOnlyOnServer && !NetworkStatus.IsServer)
                 return ProcessCommandResult.CanOnlyRunOnServer;
 
