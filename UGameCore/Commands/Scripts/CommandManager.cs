@@ -1,145 +1,270 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace UGameCore.Commands {
+namespace UGameCore
+{
+    public class CommandManager : MonoBehaviour
+    {
+        public static CommandManager Singleton { get; private set; }
 
-	using CommandCallback = System.Func<string, string> ;
+        readonly Dictionary<string, CommandInfo> m_registeredCommands =
+            new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
 
-	public class CommandManager : MonoBehaviour {
+        public IEnumerable<string> RegisteredCommands => m_registeredCommands.Keys;
 
-		public	static	CommandManager	singleton { get ; private set ; }
+        public static string invalidSyntaxText => "Invalid syntax";
 
-		static	Dictionary<string, CommandCallback>	m_registeredCommands = new Dictionary<string, CommandCallback>();
-		public	static	IEnumerable<string>	registeredCommands { get { return m_registeredCommands.Keys; } }
+        [SerializeField] private List<string> m_forbiddenCommands = new List<string>();
 
-		public	static	string	invalidSyntaxText { get { return "Invalid syntax"; } }
+        /// <summary> Forbidden commands can not be registered. </summary>
+        public List<string> ForbiddenCommands => m_forbiddenCommands;
 
-		[SerializeField]	private	List<string>	m_forbiddenCommands = new List<string>();
-		/// <summary> Forbidden commands can not be registered. </summary>
-		public	static	List<string>	forbiddenCommands { get { return singleton.m_forbiddenCommands; } }
+        [SerializeField] private bool m_registerHelpCommand = true;
+
+        private struct PlayerData
+        {
+            public double timeWhenLastExecutedCommand;
+        }
+
+        readonly Dictionary<Player, PlayerData> m_perPlayerData = new Dictionary<Player, PlayerData>();
+
+        public struct CommandInfo
+        {
+            public string command;
+            public string description;
+            public System.Func<ProcessCommandContext, ProcessCommandResult> commandHandler;
+            public bool allowToRunWithoutServerPermissions;
+            public bool runOnlyOnServer;
+            public float limitInterval;
+
+            public CommandInfo(string command, bool allowToRunWithoutServerPermissions)
+                : this()
+            {
+                this.command = command;
+                this.allowToRunWithoutServerPermissions = allowToRunWithoutServerPermissions;
+            }
+
+            public CommandInfo(string command, string description, bool allowToRunWithoutServerPermissions)
+                : this()
+            {
+                this.command = command;
+                this.description = description;
+                this.allowToRunWithoutServerPermissions = allowToRunWithoutServerPermissions;
+            }
+
+            public CommandInfo(string command, string description, bool allowToRunWithoutServerPermissions, bool runOnlyOnServer, float limitInterval)
+                : this()
+            {
+                this.command = command;
+                this.description = description;
+                this.allowToRunWithoutServerPermissions = allowToRunWithoutServerPermissions;
+                this.runOnlyOnServer = runOnlyOnServer;
+                this.limitInterval = limitInterval;
+            }
+        }
+
+        public class ProcessCommandResult
+        {
+            public string response;
+
+            public static ProcessCommandResult UnknownCommand => new ProcessCommandResult {response = "Unknown command"};
+            public static ProcessCommandResult InvalidCommand => new ProcessCommandResult {response = "Invalid command"};
+            public static ProcessCommandResult NoPermissions => new ProcessCommandResult {response = "You don't have permissions to run this command"};
+            public static ProcessCommandResult CanOnlyRunOnServer => new ProcessCommandResult {response = "This command can only run on server"};
+            public static ProcessCommandResult LimitInterval(float interval) => new ProcessCommandResult {response = $"This command can only be used on an interval of {interval} seconds"};
+            public static ProcessCommandResult Error(string errorMessage) => new ProcessCommandResult {response = errorMessage};
+            public static ProcessCommandResult Success => new ProcessCommandResult();
+        }
+
+        public class ProcessCommandContext
+        {
+            /// <summary>
+            /// Command that should be processed. This variable contains the entire command, including arguments.
+            /// </summary>
+            public string command;
+
+            /// <summary>
+            /// Does the executor have server permissions ?
+            /// </summary>
+            public bool hasServerPermissions;
+            
+            /// <summary>
+            /// Player who is executing the command.
+            /// </summary>
+            public Player player;
+        }
 
 
 
-		void Awake() {
+        void Awake()
+        {
+            if (null == Singleton)
+                Singleton = this;
 
-			if (null == singleton)
-				singleton = this;
+            Player.onDisable += PlayerOnDisable;
 
-			RegisterCommand( "help", ProcessHelpCommand );
+            if (m_registerHelpCommand)
+                RegisterCommand(new CommandInfo { command = "help", commandHandler = ProcessHelpCommand, allowToRunWithoutServerPermissions = true });
+        }
 
-		}
+        void PlayerOnDisable(Player player)
+        {
+            m_perPlayerData.Remove(player);
+        }
 
-		void Start () {
-			
-		}
+        public bool RegisterCommand(CommandInfo commandInfo)
+        {
+            if (null == commandInfo.commandHandler)
+                throw new System.ArgumentException("Command handler must be provided");
 
-		public	static	void	RegisterCommand( string command, CommandCallback callback ) {
+            if (string.IsNullOrWhiteSpace(commandInfo.command))
+                throw new System.ArgumentException("Command can not be empty");
 
-			if (CommandManager.forbiddenCommands.Contains (command)) {
-				// this command is forbidden
-				return ;
-			}
+            commandInfo.command = commandInfo.command.Trim();
 
-			if (m_registeredCommands.ContainsKey (command))
-				return;
+            if (this.ForbiddenCommands.Contains(commandInfo.command))
+                return false;
 
-			m_registeredCommands.Add (command, callback);
+            if (m_registeredCommands.ContainsKey(commandInfo.command))
+                return false;
 
-		}
+            m_registeredCommands.Add(commandInfo.command, commandInfo);
+            return true;
+        }
 
-		public	static	bool	RemoveCommand( string command ) {
+        public bool RemoveCommand(string command)
+        {
+            return m_registeredCommands.Remove(command);
+        }
 
-			return m_registeredCommands.Remove (command);
+        public static string[] SplitCommandIntoArguments(string command)
+        {
+            // TODO: add support for arguments that have spaces, i.e. those enclosed with quotes
 
-		}
+            return command.Split(new string[] {" ", "\t"}, System.StringSplitOptions.RemoveEmptyEntries);
+        }
 
-		public	static	string[]	SplitCommandIntoArguments( string command ) {
+        public static string GetRestOfTheCommand(string command, int argumentIndex)
+        {
+            if (argumentIndex < 0)
+                return "";
 
-			// TODO: add support for arguments that have spaces, i.e. those enclosed with quotes
+            string[] args = SplitCommandIntoArguments(command);
 
-			return command.Split (new string[]{ " ", "\t" }, System.StringSplitOptions.RemoveEmptyEntries);
+            if (argumentIndex > args.Length - 2)
+                return "";
 
-		}
+            return string.Join(" ", args, argumentIndex + 1, args.Length - argumentIndex - 1);
+        }
 
-		public	static	string	GetRestOfTheCommand( string command, int argumentIndex ) {
+        public static Vector3 ParseVector3(string[] arguments, int startIndex)
+        {
+            if (startIndex + 2 >= arguments.Length)
+                throw new System.ArgumentException("Failed to parse Vector3: not enough arguments");
 
-			if (argumentIndex < 0)
-				return "";
+            Vector3 v = Vector3.zero;
+            for (int i = 0; i < 3; i++)
+            {
+                if (!float.TryParse(arguments[startIndex + i], out float f))
+                    throw new System.ArgumentException("Failed to parse Vector3: invalid number");
+                v[i] = f;
+            }
 
-			string[] args = SplitCommandIntoArguments (command);
+            return v;
+        }
 
-			if (argumentIndex > args.Length - 2)
-				return "";
+        public static Quaternion ParseQuaternion(string[] arguments, int startIndex)
+        {
+            if (startIndex + 3 >= arguments.Length)
+                throw new System.ArgumentException("Failed to parse Quaternion: not enough arguments");
 
-			return string.Join( " ", args, argumentIndex + 1, args.Length - argumentIndex - 1);
+            Quaternion quaternion = Quaternion.identity;
+            for (int i = 0; i < 4; i++)
+            {
+                if (!float.TryParse(arguments[startIndex + i], out float f))
+                    throw new System.ArgumentException("Failed to parse Quaternion: invalid number");
+                quaternion[i] = f;
+            }
 
-		}
+            return quaternion;
+        }
 
-		public	static	int		ProcessCommand( string command, ref string response ) {
+        public static Color ParseColor(string[] arguments, int startIndex)
+        {
+            if (startIndex >= arguments.Length)
+                throw new System.ArgumentException("Failed to parse color: not enough arguments");
 
-			if (string.IsNullOrEmpty (command))
-				return -1;
+            if (!ColorUtility.TryParseHtmlString(arguments[startIndex], out Color color))
+                throw new System.ArgumentException("Failed to parse color");
 
-			string[] arguments = SplitCommandIntoArguments (command);
-			if (0 == arguments.Length)
-				return -1;
-			
-			// find a handler for this command and invoke it
+            return color;
+        }
 
-			CommandCallback callback = null;
-			if (m_registeredCommands.TryGetValue (arguments [0], out callback)) {
+        ProcessCommandResult ProcessCommand(ProcessCommandContext context)
+        {
+            if (string.IsNullOrWhiteSpace(context.command))
+                return ProcessCommandResult.UnknownCommand;
 
-				// we need separate variable, because 'ref' parameters can not be used in lambda
-				string responseFromHandler = "";
+            string[] arguments = SplitCommandIntoArguments(context.command);
+            if (0 == arguments.Length)
+                return ProcessCommandResult.InvalidCommand;
 
-				// TODO: should this be exception safe ?
-				Utilities.Utilities.RunExceptionSafe (() => {
-					responseFromHandler = callback (command);
-				});
+            if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
+                return ProcessCommandResult.UnknownCommand;
 
-				// assign response
-				response = responseFromHandler ;
+            if (commandInfo.runOnlyOnServer && !NetworkStatus.IsServer)
+                return ProcessCommandResult.CanOnlyRunOnServer;
 
-				return 0;
-			} else {
-				response = "Unknown command: " + command;
-			}
+            if (!context.hasServerPermissions && !commandInfo.allowToRunWithoutServerPermissions)
+                return ProcessCommandResult.NoPermissions;
 
-			return -1;
-		}
+            if (context.player != null)
+            {
+                m_perPlayerData.TryGetValue(context.player, out PlayerData playerData);
 
-		static	string	ProcessHelpCommand( string command ) {
+                if (commandInfo.limitInterval > 0 && Time.timeAsDouble - playerData.timeWhenLastExecutedCommand < commandInfo.limitInterval)
+                    return ProcessCommandResult.LimitInterval(commandInfo.limitInterval);
 
-			string response = "List of available commands:\n";
+                playerData.timeWhenLastExecutedCommand = Time.timeAsDouble;
+                m_perPlayerData[context.player] = playerData;
+            }
 
-			foreach (var pair in m_registeredCommands) {
-				response += pair.Key + "\n";
-			}
+            return commandInfo.commandHandler(context);
+        }
 
-			response += "\n";
+        public ProcessCommandResult ProcessCommandAsServer(string command)
+        {
+            return ProcessCommand(new ProcessCommandContext {command = command, hasServerPermissions = true});
+        }
 
-			return response;
-		}
-		
-		public	static	void	SendCommandToAllPlayers( string command, bool sendResponse ) {
+        public ProcessCommandResult ProcessCommandForPlayer(Player player, string command)
+        {
+            if (null == player)
+                throw new System.ArgumentNullException(nameof(player));
 
-			foreach (var p in PlayerManager.players) {
-				p.RpcExecuteCommandOnClient( command, sendResponse );
-			}
+            bool hasServerPermissions = player == Player.local || player.IsServerAdmin;
+            return ProcessCommand(new ProcessCommandContext
+            {
+                command = command,
+                hasServerPermissions = hasServerPermissions,
+                player = player,
+            });
+        }
 
-		}
+        ProcessCommandResult ProcessHelpCommand(ProcessCommandContext context)
+        {
+            string response = "List of available commands: " +
+                              string.Join(", ", m_registeredCommands
+                                  .Where(pair => context.hasServerPermissions || pair.Value.allowToRunWithoutServerPermissions)
+                                  .Select(pair => pair.Key));
 
-		/// <summary>
-		/// Throws exception if server is not started, with explanation that command can only be used on server.
-		/// </summary>
-		public	static	void	EnsureServerIsStarted() {
+            return new ProcessCommandResult {response = response};
+        }
 
-			if (!NetworkStatus.IsServerStarted) {
-				throw new System.Exception ("Only server can use this command");
-			}
-
-		}
-
-	}
-
+        public bool HasCommand(string command)
+        {
+            return m_registeredCommands.ContainsKey(command);
+        }
+    }
 }
