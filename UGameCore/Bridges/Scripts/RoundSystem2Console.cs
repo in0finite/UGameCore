@@ -1,21 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UGameCore.RoundManagement;
+using UGameCore.Menu;
+using UGameCore.Utilities;
 
-namespace UGameCore {
-	
-	public class RoundSystem2Console : MonoBehaviour {
+namespace UGameCore
+{
+
+    public class RoundSystem2Console : MonoBehaviour {
+
+        public Console console;
 
 
-		void Start () {
-			Menu.Console.onDrawStats += () => {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
+
+			this.console.onDrawStats += () => {
 				if (NetworkStatus.IsServerStarted) {
 					GUILayout.Label (GetTextForConsole());
 				}
 			};
 
-			Menu.Console.RegisterStats( () => {
+            this.console.RegisterStats( () => {
 				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole();
 				}

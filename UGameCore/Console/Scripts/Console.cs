@@ -33,42 +33,38 @@ namespace UGameCore.Menu
 		}
 
 
-		private	static	bool	m_isConsoleOpened = false ;
-		public	static	bool	IsOpened { get { return m_isConsoleOpened; } set { m_isConsoleOpened = value; } }
+		private		bool	m_isConsoleOpened = false ;
+		public		bool	IsOpened { get { return m_isConsoleOpened; } set { m_isConsoleOpened = value; } }
 
-		private	static	bool	m_wasOpenedLastFrame = false ;
+		private		bool	m_wasOpenedLastFrame = false ;
 
-		private	static	bool	m_shouldUpdateDisplayTextWhenConsoleIsOpened = false;
+		private		bool	m_shouldUpdateDisplayTextWhenConsoleIsOpened = false;
 
 		/// <summary>Key which is used to open/close console.</summary>
 		public	KeyCode	openKey = KeyCode.BackQuote ;
 
-		private	static	string	m_logString = "" ;
-	//	[SerializeField]	private	int		m_logMessagesBufferLength = 100 ;
 		[SerializeField]	private	int		m_maxCharacterCount = 2000 ;
-		private	static	LinkedList<LogMessage>	m_logMessages = new LinkedList<LogMessage>() ;
-		private	static	System.Text.StringBuilder	m_stringBuilder = null;
-		public	static	int		TotalLengthOfMessages { get { return m_stringBuilder.Length; } }
+		private		LinkedList<LogMessage>	m_logMessages = new LinkedList<LogMessage>() ;
+		private		System.Text.StringBuilder	m_stringBuilder = null;
+		public		int		TotalLengthOfMessages { get { return m_stringBuilder.Length; } }
 
-		private	static	LinkedList<LogMessage>	m_messagesArrivedThisFrame = new LinkedList<LogMessage>() ;
-	//	private	static	int		m_totalLengthOfMessagesArrivedThisFrame = 0;
+		private		LinkedList<LogMessage>	m_messagesArrivedThisFrame = new LinkedList<LogMessage>() ;
+	//	private		int		m_totalLengthOfMessagesArrivedThisFrame = 0;
 
-		private	static	Vector2		m_consoleScrollPosition = Vector2.zero ;
+		private		Vector2		m_consoleScrollPosition = Vector2.zero ;
 
-		private	static	string		m_consoleCommandText = "" ;
+		private		string		m_consoleCommandText = "" ;
 
-		private	static	List<string>	m_history = new List<string> ();
-		public	static	IEnumerable<string>	History { get { return m_history; } }
-		private	static	int		m_historyBrowserIndex = -1 ;
+		private		List<string>	m_history = new List<string> ();
+		public		IEnumerable<string>	History { get { return m_history; } }
+		private		int		m_historyBrowserIndex = -1 ;
 
-		public	static	Console	singleton { get ; private set ; }
+		public		event System.Action	onDrawStats = delegate {};
+	//	public		event System.Func<string>	onGetStats = delegate { return ""; };
+		private		List<System.Func<string>>	m_getStatsSubscribers = new List<System.Func<string>>();
+		public		event System.Action<string>	onTextSubmitted = delegate {};
 
-		public	static	event System.Action	onDrawStats = delegate {};
-	//	public	static	event System.Func<string>	onGetStats = delegate { return ""; };
-		private	static	List<System.Func<string>>	m_getStatsSubscribers = new List<System.Func<string>>();
-		public	static	event System.Action<string>	onTextSubmitted = delegate {};
-
-		private	static	string	m_lastStatsString = "" ;
+		private		string	m_lastStatsString = "" ;
 
 		public	List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
 		public	List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
@@ -92,8 +88,6 @@ namespace UGameCore.Menu
 
 		void Awake() {
 
-			singleton = this;
-			
 			// initialize log buffer
 			m_stringBuilder = new System.Text.StringBuilder(this.m_maxCharacterCount);
 
@@ -117,14 +111,14 @@ namespace UGameCore.Menu
 				this.consoleSubmitInputField.onEndEdit.AddListener ((arg0) => {
 					if(Input.GetKeyDown (KeyCode.Return)) {
 						// submit
-						SubmittedText( singleton.consoleSubmitInputField.text );
+						SubmittedText( this.consoleSubmitInputField.text );
 
 						// clear input field
-						singleton.consoleSubmitInputField.text = "";
+						this.consoleSubmitInputField.text = "";
 
 						// set focus to input field
-						singleton.consoleSubmitInputField.Select ();
-						singleton.consoleSubmitInputField.ActivateInputField ();
+						this.consoleSubmitInputField.Select ();
+						this.consoleSubmitInputField.ActivateInputField ();
 					}
 				});
 
@@ -155,16 +149,16 @@ namespace UGameCore.Menu
 		/// <summary>
 		/// Register statistics that will be displayed in console.
 		/// </summary>
-		public	static	void	RegisterStats( System.Func<string> getStatMethod ) {
+		public		void	RegisterStats( System.Func<string> getStatMethod ) {
 
 			m_getStatsSubscribers.Add (getStatMethod);
 
 		}
 
 		// Callback function for unity logs.
-		static	void	HandleLog(string logStr, string stackTrace, LogType type) {
+			void	HandleLog(string logStr, string stackTrace, LogType type) {
 
-			if (0 == singleton.m_maxCharacterCount)
+			if (0 == this.m_maxCharacterCount)
 				return;
 
 
@@ -178,15 +172,15 @@ namespace UGameCore.Menu
 
 		}
 
-		public	static	bool	ShouldMessageBeIgnored(string logStr, LogType type) {
+		public		bool	ShouldMessageBeIgnored(string logStr, LogType type) {
 
-			foreach (var im in singleton.ignoreMessages) {
+			foreach (var im in this.ignoreMessages) {
 				if (im.text == logStr && ( im.ignoreAllLogTypes || im.logType == type )) {
 					return true;
 				}
 			}
 
-			foreach (var im in singleton.ignoreMessagesThatStartWith) {
+			foreach (var im in this.ignoreMessagesThatStartWith) {
 				if (logStr.StartsWith(im.text) && ( im.ignoreAllLogTypes || im.logType == type )) {
 					return true;
 				}
@@ -195,7 +189,7 @@ namespace UGameCore.Menu
 			return false;
 		}
 
-		public	static	string	GetRichText( LogMessage logMessage ) {
+		public		string	GetRichText( LogMessage logMessage ) {
 			
 			if (logMessage.logType == LogType.Log) {
 
@@ -212,40 +206,33 @@ namespace UGameCore.Menu
 		}
 
 
-		public	static	void	ClearLog() {
+		public		void	ClearLog() {
 
 			m_logMessages.Clear ();
 			m_stringBuilder.Length = 0;
-			m_logString = "";
-
+			
 			UpdateDisplayText ();
 
 		}
 
-		private	static	void	UpdateDisplayText() {
+		private		void	UpdateDisplayText() {
 
-			if (singleton.consoleTextDisplay != null) {
-				singleton.consoleTextDisplay.text = m_stringBuilder.ToString ();
-				LayoutRebuilder.MarkLayoutForRebuild (singleton.consoleTextDisplay.GetComponent<RectTransform> ());
+			if (this.consoleTextDisplay != null) {
+				this.consoleTextDisplay.text = m_stringBuilder.ToString ();
+				LayoutRebuilder.MarkLayoutForRebuild (this.consoleTextDisplay.GetComponent<RectTransform> ());
 			}
 
 		}
 
-		private	static	void	ScrollToEnd() {
+		private		void	ScrollToEnd() {
 
-			if (singleton.consoleScrollView != null) {
-				singleton.consoleScrollView.verticalScrollbar.value = 0f;
+			if (this.consoleScrollView != null) {
+				this.consoleScrollView.verticalScrollbar.value = 0f;
 			}
 
 		}
 
-		private	void	ScrollToEndNonStatic() {
-
-			ScrollToEnd ();
-
-		}
-
-		private	static	void	SubmittedText( string textToProcess ) {
+		private		void	SubmittedText( string textToProcess ) {
 
 			// log this text, process command
 
@@ -266,17 +253,17 @@ namespace UGameCore.Menu
 
 		}
 
-		public	static	void	SetInputBoxText( string text ) {
+		public		void	SetInputBoxText( string text ) {
 
 			m_consoleCommandText = text;
 
-			if (singleton.consoleSubmitInputField != null) {
-				singleton.consoleSubmitInputField.text = text;
+			if (this.consoleSubmitInputField != null) {
+				this.consoleSubmitInputField.text = text;
 			}
 			
 		}
 
-		public	static	void	BrowseHistoryBackwards() {
+		public		void	BrowseHistoryBackwards() {
 
 			if (m_history.Count > 0) {
 				if (-1 == m_historyBrowserIndex)
@@ -293,7 +280,7 @@ namespace UGameCore.Menu
 
 		}
 
-		public	static	void	BrowseHistoryForwards() {
+		public		void	BrowseHistoryForwards() {
 
 			if (m_history.Count > 0) {
 				if (-1 != m_historyBrowserIndex) {
@@ -483,7 +470,7 @@ namespace UGameCore.Menu
 			m_consoleScrollPosition.y = Mathf.Infinity;
 
 			if (m_isConsoleOpened) {
-				singleton.Invoke ("ScrollToEndNonStatic", 0.1f);
+				this.Invoke (nameof(this.ScrollToEnd), 0.1f);
 			} else {
 				// it will be scrolled later
 			}

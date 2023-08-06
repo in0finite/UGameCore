@@ -1,15 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UGameCore.Menu;
+using UGameCore.Utilities;
 using UnityEngine;
 
-namespace UGameCore {
-	
-	public class Console2Commands : MonoBehaviour {
+namespace UGameCore
+{
 
-		// Use this for initialization
+    public class Console2Commands : MonoBehaviour {
+
+		public Console console;
+
+
 		void Start () {
 
-			UGameCore.Menu.Console.onTextSubmitted += TextSubmitted;
+			this.EnsureSerializableReferencesAssigned();
+			this.console.onTextSubmitted += TextSubmitted;
 
 		}
 

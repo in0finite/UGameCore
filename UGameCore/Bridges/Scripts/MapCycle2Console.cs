@@ -1,30 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UGameCore.MapManagement;
+using UGameCore.Menu;
+using UGameCore.Utilities;
 
-namespace UGameCore {
-	
-	public class MapCycle2Console : MonoBehaviour {
+namespace UGameCore
+{
+
+    public class MapCycle2Console : MonoBehaviour {
+
+        public Console console;
 
 
-		void Start () {
+        void Start () {
 			
-			Menu.Console.onDrawStats += () => {
+			this.EnsureSerializableReferencesAssigned();
+
+			this.console.onDrawStats += () => {
 				if (NetworkStatus.IsServerStarted) {
 					GUILayout.Label (GetTextForConsole1());
 					GUILayout.Label (GetTextForConsole2());
 				}
 			};
 
-
-			Menu.Console.RegisterStats( () => {
+            this.console.RegisterStats( () => {
 				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole1();
 				}
 				return "" ;
 			});
-			Menu.Console.RegisterStats( () => {
+
+            this.console.RegisterStats( () => {
 				if (NetworkStatus.IsServerStarted) {
 					return GetTextForConsole2();
 				}
