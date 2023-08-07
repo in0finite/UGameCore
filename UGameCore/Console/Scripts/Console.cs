@@ -41,9 +41,12 @@ namespace UGameCore.Menu
         private bool m_forceUIUpdateNextFrame = false;
 
 		[Tooltip("Key which is used to open/close console")]
-        public	KeyCode	openKey = KeyCode.BackQuote ;
+        public	KeyCode	openKey = KeyCode.BackQuote;
 
-		public volatile int maxNumLogMessages = 100;
+        [Tooltip("Key which is used to open/close console on mobile and console platforms")]
+        public KeyCode openKeyMobileAndConsole = KeyCode.Menu;
+
+        public volatile int maxNumLogMessages = 100;
         public int maxNumPooledLogMessages = 100;
 
 		public volatile int numLinesToDisplayForLogMessage = 2;
@@ -284,14 +287,13 @@ namespace UGameCore.Menu
 
 			// open/close console
 
-			#if UNITY_ANDROID
-			if (Input.GetKeyDown (KeyCode.Menu)) {
-			#else
-			if (Input.GetKeyDown (this.openKey)) {
-			#endif
+			KeyCode keyCode = Application.isMobilePlatform || Application.isConsolePlatform
+				? this.openKeyMobileAndConsole
+				: this.openKey;
 
+			if (Input.GetKeyDown(keyCode) && !F.UIHasFocus())
+			{
 				this.IsOpened = ! this.IsOpened;
-
 			}
 
 			// check for key events from input field
