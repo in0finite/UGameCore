@@ -57,13 +57,13 @@ namespace UGameCore.Menu
 
 		public ConsoleLogEntryComponent SelectedLogEntry { get; private set; }
 
-		public Color selectedLogEntryColor = Color.gray;
+		public Color selectedLogEntryColor = new Color(0.5f, 0.5f, 0.5f, 0.2f);
 
 		private readonly System.Diagnostics.Stopwatch m_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         private		List<string>	m_history = new List<string> ();
-		public		IReadOnlyList<string>	History { get { return m_history; } }
-		private		int		m_historyBrowserIndex = -1 ;
+        public IReadOnlyList<string> History => m_history;
+        private		int		m_historyBrowserIndex = -1 ;
 
 		public		event System.Action	onDrawStats = delegate {};
 
@@ -377,8 +377,6 @@ namespace UGameCore.Menu
                 CreateUIForLogMessage(logMessage);
             }
 
-            //LayoutRebuilder.MarkLayoutForRebuild(this.consoleScrollView.GetRectTransform());
-
             System.Array.Clear(s_logMessagesBuffer, 0, s_logMessagesBuffer.Length); // release references
         }
 
@@ -391,7 +389,6 @@ namespace UGameCore.Menu
             if (m_pooledLogEntryComponents.Count < this.maxNumPooledLogMessages)
             {
                 m_pooledLogEntryComponents.Enqueue(logMessage.logEntryComponent);
-                logMessage.logEntryComponent.LogMessage = null;
                 logMessage.logEntryComponent.gameObject.SetActive(false);
             }
             else
@@ -399,6 +396,7 @@ namespace UGameCore.Menu
                 F.DestroyEvenInEditMode(logMessage.logEntryComponent.gameObject);
             }
 
+            logMessage.logEntryComponent.LogMessage = null;
             logMessage.logEntryComponent = null;
         }
 
