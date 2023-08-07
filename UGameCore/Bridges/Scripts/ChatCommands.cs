@@ -1,31 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UGameCore.Utilities;
 using UnityEngine;
+using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands {
+namespace UGameCore.Commands
+{
 
-	public class ChatCommands : MonoBehaviour {
+    public class ChatCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
 
 			string[] commands = new string[] { "say" };
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
 
-		string ProcessCommand( string command ) {
+		ProcessCommandResult ProcessCommand(ProcessCommandContext context) {
 
-		//	string invalidSyntaxString = "Invalid syntax.";
+			string command = context.command;
 
 			string[] words = command.Split( " ".ToCharArray() );
 			int numWords = words.Length ;
 			string restOfTheCommand = command.Substring (command.IndexOf (' ') + 1);
-
-			string response = "";
 
 			if (numWords > 1 && words [0] == "say") {
 
@@ -36,13 +39,14 @@ namespace UGameCore.Commands {
 						chatSync.CmdChatMsg (restOfTheCommand);
 					}
 
-				} else {
-					response += "This command is only available when you are connected to server.";
+					return ProcessCommandResult.Success;
+                } else {
+					return ProcessCommandResult.Error("This command is only available when you are connected to server.");
 				}
 
 			}
 
-			return response;
+			return ProcessCommandResult.InvalidCommand;
 		}
 	
 	

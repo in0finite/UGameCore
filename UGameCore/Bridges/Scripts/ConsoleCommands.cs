@@ -1,11 +1,12 @@
-﻿using UGameCore.Commands;
-using UGameCore.Menu;
+﻿using UGameCore.Menu;
 using UGameCore.Utilities;
 using UnityEngine;
+using static UGameCore.CommandManager;
 
-namespace UGameCore {
-	
-	public class ConsoleCommands : MonoBehaviour
+namespace UGameCore
+{
+
+    public class ConsoleCommands : MonoBehaviour
 	{
 		public Console console;
 		public CommandManager commandManager;
@@ -19,7 +20,7 @@ namespace UGameCore {
             // clear the console
             commandManager.RegisterCommand ("clear", (cmd) => {
                 this.console.ClearLog();
-				return "";
+				return ProcessCommandResult.Success;
 			});
 
             // display all entered commands (history)
@@ -28,7 +29,7 @@ namespace UGameCore {
 				foreach(var historyCommand in this.console.History) {
 					output += historyCommand + "\n" ;
 				}
-				return output;
+				return ProcessCommandResult.SuccessResponse(output);
 			});
 
 		}

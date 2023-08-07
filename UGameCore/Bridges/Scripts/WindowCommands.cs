@@ -1,23 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using UGameCore.Utilities;
 using UnityEngine;
+using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands {
+namespace UGameCore.Commands
+{
 
-	public class WindowCommands : MonoBehaviour {
+    public class WindowCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
 
 			string[] commands = new string[] { "msgbox", "modal_msgbox", "msgboxtest", "msgboxallclients" };
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
 
-		string ProcessCommand( string command ) {
-			
+        ProcessCommandResult ProcessCommand( ProcessCommandContext context ) {
+
+			string command = context.command;
 			string[] words = CommandManager.SplitCommandIntoArguments (command);
 			int numWords = words.Length ;
 
@@ -57,7 +64,7 @@ namespace UGameCore.Commands {
 
 			} else if (words [0] == "msgboxallclients") {
 
-				CommandManager.EnsureServerIsStarted();
+				NetworkStatus.ThrowIfNotOnServer();
 
 				if (numWords < 3) {
 					response += CommandManager.invalidSyntaxText ;
@@ -75,7 +82,7 @@ namespace UGameCore.Commands {
 			}
 
 
-			return response;
+			return ProcessCommandResult.SuccessResponse(response);
 		}
 
 

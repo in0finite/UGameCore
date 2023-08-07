@@ -1,26 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using UGameCore.Net;
 
-namespace UGameCore {
+namespace UGameCore
+{
 
-
-	public	enum PlayerStatus
-	{
-		ShouldLogin = 1,
-		WaitingToChooseTeam,
-		ShouldChooseTeam,
-		ShouldBeSpawnedInNextRound,
-		ShouldBeSpawnedInThisRound,
-		Playing,
-		ShouldDisconnect
-
-	}
-
-
-	public class Player : NetworkBehaviour {
+    public class Player : NetworkBehaviour {
 
 
 		static	Player() {
@@ -488,20 +473,21 @@ namespace UGameCore {
 				return ;
 			}
 
-			// log the command that will be executed
-			//	this.mainScript.Log (command);
+			var context = new CommandManager.ProcessCommandContext
+			{
+				command = command,
+				executor = null,
+				hasServerPermissions = true,
+				lastTimeExecutedCommand = null,
+			};
 
-			string response = "";
-			Commands.CommandManager.ProcessCommand (command, ref response);
+			var result = CommandManager.Singleton.ProcessCommand (context);
 
-			if (response != "") {
-				//	this.mainScript.Log (response);
-				if (sendResponse) {
-					// send response back to server
-					CmdSendingCommandResponse (response);			
-				}
+			if (sendResponse) {
+				// send response back to server
+				CmdSendingCommandResponse (result.response);			
 			}
-
+			
 		}
 
 		[ServerRpc]

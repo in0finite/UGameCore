@@ -1,33 +1,37 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UGameCore.Utilities;
 using UnityEngine;
+using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands {
+namespace UGameCore.Commands
+{
 
-	public class TeamCommands : MonoBehaviour {
+    public class TeamCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
 
 			string[] commands = new string[] { "team_change" };
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
 
-		string ProcessCommand( string command ) {
+        ProcessCommandResult ProcessCommand(ProcessCommandContext context) {
 
-			string invalidSyntaxString = "Invalid syntax.";
+			string command = context.command;
+            string invalidSyntaxString = CommandManager.invalidSyntaxText;
 
 			string[] words = command.Split( " ".ToCharArray() );
 			int numWords = words.Length ;
 			string restOfTheCommand = command.Substring (command.IndexOf (' ') + 1);
 
 			string response = "";
-
-		//	var networkManager = UnityEngine.Networking.NetworkManager.singleton;
 
 			if (words [0] == "team_change") {
 
@@ -52,7 +56,7 @@ namespace UGameCore.Commands {
 
 			}
 
-			return response;
+			return ProcessCommandResult.SuccessResponse(response);
 		}
 	
 

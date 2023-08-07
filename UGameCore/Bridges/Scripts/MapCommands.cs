@@ -1,29 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UGameCore.MapManagement;
+using UGameCore.Utilities;
+using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands {
+namespace UGameCore.Commands
+{
 
-	public class MapCommands : MonoBehaviour {
+    public class MapCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
 
 			string[] commands = new string[] { "change_scene", "list_maps", "timeleft",
 				"nextmap" };
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
 
-		string ProcessCommand( string command ) {
+        ProcessCommandResult ProcessCommand(ProcessCommandContext context) {
 
-		//	string invalidSyntaxString = "Invalid syntax.";
+			string command = context.command;
 
-			string[] words = command.Split( " ".ToCharArray() );
+            string[] words = command.Split( " ".ToCharArray() );
 			int numWords = words.Length ;
 		//	string restOfTheCommand = command.Substring (command.IndexOf (' ') + 1);
 
@@ -78,7 +83,7 @@ namespace UGameCore.Commands {
 
 			}
 
-			return response;
+			return ProcessCommandResult.SuccessResponse(response);
 		}
 
 

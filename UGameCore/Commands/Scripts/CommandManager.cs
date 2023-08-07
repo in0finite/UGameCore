@@ -6,6 +6,8 @@ namespace UGameCore
 {
     public class CommandManager : MonoBehaviour
     {
+        public static CommandManager Singleton { get; private set; }
+
         readonly Dictionary<string, CommandInfo> m_registeredCommands =
             new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
 
@@ -55,16 +57,20 @@ namespace UGameCore
 
         public class ProcessCommandResult
         {
+            public int exitCode;
             public string response;
 
-            public static ProcessCommandResult UnknownCommand => new ProcessCommandResult {response = "Unknown command"};
-            public static ProcessCommandResult InvalidCommand => new ProcessCommandResult {response = "Invalid command"};
-            public static ProcessCommandResult ForbiddenCommand => new ProcessCommandResult { response = "Forbidden command" };
-            public static ProcessCommandResult NoPermissions => new ProcessCommandResult {response = "You don't have permissions to run this command"};
-            public static ProcessCommandResult CanOnlyRunOnServer => new ProcessCommandResult {response = "This command can only run on server"};
-            public static ProcessCommandResult LimitInterval(float interval) => new ProcessCommandResult {response = $"This command can only be used on an interval of {interval} seconds"};
-            public static ProcessCommandResult Error(string errorMessage) => new ProcessCommandResult {response = errorMessage};
-            public static ProcessCommandResult Success => new ProcessCommandResult();
+            public bool IsSuccess => this.exitCode == 0;
+
+            public static ProcessCommandResult UnknownCommand => Error("Unknown command");
+            public static ProcessCommandResult InvalidCommand => Error("Invalid command");
+            public static ProcessCommandResult ForbiddenCommand => Error("Forbidden command");
+            public static ProcessCommandResult NoPermissions => Error("You don't have permissions to run this command");
+            public static ProcessCommandResult CanOnlyRunOnServer => Error("This command can only run on server");
+            public static ProcessCommandResult LimitInterval(float interval) => Error($"This command can only be used on an interval of {interval} seconds");
+            public static ProcessCommandResult Error(string errorMessage) => new ProcessCommandResult { exitCode = 1, response = errorMessage };
+            public static ProcessCommandResult Success => SuccessResponse(null);
+            public static ProcessCommandResult SuccessResponse(string response) => new ProcessCommandResult() { exitCode = 0, response = response };
         }
 
         public class ProcessCommandContext
@@ -94,6 +100,9 @@ namespace UGameCore
 
         void Awake()
         {
+            if (null == Singleton)
+                Singleton = this;
+
             if (m_registerHelpCommand)
                 RegisterCommand(new CommandInfo { command = "help", commandHandler = ProcessHelpCommand, allowToRunWithoutServerPermissions = true });
         }
@@ -115,6 +124,12 @@ namespace UGameCore
                 throw new System.ArgumentException("Command was already registered");
 
             m_registeredCommands.Add(commandInfo.command, commandInfo);
+        }
+
+        public void RegisterCommand(string command, System.Func<ProcessCommandContext, ProcessCommandResult> function)
+        {
+            var commandInfo = new CommandInfo(command, true) { commandHandler = function };
+            this.RegisterCommand(commandInfo);
         }
 
         public bool RemoveCommand(string command)

@@ -1,34 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UGameCore.RoundManagement;
+using static UGameCore.CommandManager;
+using UGameCore.Utilities;
 
-namespace UGameCore.Commands {
+namespace UGameCore.Commands
+{
 
-	public class RoundCommands : MonoBehaviour {
+    public class RoundCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
+
+			this.EnsureSerializableReferencesAssigned();
 
 			string[] commands = new string[] { "endround" };
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
 
-		string ProcessCommand( string command ) {
+        ProcessCommandResult ProcessCommand( ProcessCommandContext context ) {
 
-		//	string invalidSyntaxString = "Invalid syntax.";
+			string command = context.command;
 
-			string[] words = command.Split( " ".ToCharArray() );
-			int numWords = words.Length ;
-		//	string restOfTheCommand = command.Substring (command.IndexOf (' ') + 1);
-
+            string[] words = command.Split( " ".ToCharArray() );
+			
 			string response = "";
-
-		//	var networkManager = UnityEngine.Networking.NetworkManager.singleton;
 
 			if (words [0] == "endround") {
 
@@ -40,7 +41,7 @@ namespace UGameCore.Commands {
 
 			}
 
-			return response;
+			return ProcessCommandResult.SuccessResponse(response);
 		}
 	
 	}

@@ -121,7 +121,7 @@
         public static void ThrowIfNotOnServer()
         {
             if (!NetworkStatus.IsServer)
-                throw new System.Exception("Not on a server");
+                throw new System.InvalidOperationException("Not on a server");
         }
 
 

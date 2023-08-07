@@ -1,25 +1,29 @@
-﻿using System.Collections.Generic;
-using UGameCore.Net;
+﻿using UGameCore.Net;
 using UnityEngine;
+using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands {
-	
-	public class DefaultCommands : MonoBehaviour {
+namespace UGameCore.Commands
+{
+
+    public class DefaultCommands : MonoBehaviour {
+
+		public CommandManager commandManager;
 
 
-		void Start () {
+        void Start () {
 			
 			string[] commands = new string[] { "camera_disable", "uptime", "client_cmd", "players", "kick", "kick_instantly",
 				"startserver", "starthost", "connect", "stopnet", "exit"};
 
 			foreach (var cmd in commands) {
-				CommandManager.RegisterCommand( cmd, ProcessCommand );
+				this.commandManager.RegisterCommand( cmd, ProcessCommand );
 			}
 
 		}
-		
-		string ProcessCommand( string command ) {
 
+        ProcessCommandResult ProcessCommand(ProcessCommandContext context) {
+
+			string command = context.command;
 			string[] words = CommandManager.SplitCommandIntoArguments (command);
 			int numWords = words.Length ;
 			string restOfTheCommand = CommandManager.GetRestOfTheCommand (command, 0);
@@ -62,10 +66,17 @@ namespace UGameCore.Commands {
 
 				if (NetworkStatus.IsServerStarted) {
 					if (numWords < 2)
-						response += CommandManager.invalidSyntaxText;
-					else
-						CommandManager.SendCommandToAllPlayers (restOfTheCommand, true);
-				}
+                    {
+                        response += CommandManager.invalidSyntaxText;
+                    }
+                    else
+                    {
+						foreach (var player in PlayerManager.players)
+						{
+							player.RpcExecuteCommandOnClient(restOfTheCommand, true);
+                        }
+                    }
+                }
 
 			} else if (words [0] == "players") {
 
@@ -234,7 +245,7 @@ namespace UGameCore.Commands {
 
 			}
 
-			return response ;
+			return ProcessCommandResult.SuccessResponse(response);
 
 		}
 
