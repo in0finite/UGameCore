@@ -453,8 +453,8 @@ namespace UGameCore.Menu
 			this.IsDetailsAreaOpened = this.SelectedLogEntry != null;
 			if (this.SelectedLogEntry != null)
 			{
-				var detailsText = this.detailsScrollView.content.GetComponentInChildrenOrThrow<Text>();
-				detailsText.text = GetDetailsText(this.SelectedLogEntry.LogMessage);
+				var detailsInputField = this.detailsScrollView.content.GetComponentInChildrenOrThrow<InputField>();
+				detailsInputField.text = GetDetailsText(this.SelectedLogEntry.LogMessage);
 			}
         }
 
