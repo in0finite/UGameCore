@@ -938,9 +938,6 @@ GameObject:
   - component: {fileID: 314217410576642497}
   - component: {fileID: 2614955995719968271}
   - component: {fileID: 7064879207128086689}
-  - component: {fileID: 7755751749610626865}
-  - component: {fileID: 1644705600326479048}
-  - component: {fileID: 8907779394552722150}
   - component: {fileID: 7439954492849720898}
   - component: {fileID: 2451637887748468735}
   m_Layer: 5
@@ -1010,55 +1007,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7755751749610626865
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5019265763978468269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ac2ecf97d70d447fab568a27ea9aea6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  openKey: 96
-  maxNumLogMessages: 100
-  maxNumPooledLogMessages: 100
-  ignoreMessages: []
-  ignoreMessagesThatStartWith: []
-  logEntryPrefab: {fileID: 3892949753433482773, guid: 698751ced92458342a1c63d1b54cc616, type: 3}
-  consoleScrollView: {fileID: 8301373456802288835}
-  consoleSubmitButton: {fileID: 4492380097370532992}
-  consoleSubmitInputField: {fileID: 8509858087897297365}
---- !u!114 &1644705600326479048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5019265763978468269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4912c1263c0a84f1a86a051c86ef2ea9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  console: {fileID: 7755751749610626865}
-  commandManager: {fileID: 0}
---- !u!114 &8907779394552722150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5019265763978468269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 525e3c928d0044d8090acb950b999444, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  console: {fileID: 7755751749610626865}
-  commandManager: {fileID: 0}
 --- !u!114 &7439954492849720898
 MonoBehaviour:
   m_ObjectHideFlags: 0

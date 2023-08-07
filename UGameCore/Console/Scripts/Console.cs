@@ -36,11 +36,11 @@ namespace UGameCore.Menu
 		}
 
 
-		public		bool	IsOpened { get => this.gameObject.activeSelf; set => this.gameObject.SetActive(value); }
+		public		bool	IsOpened { get => this.consoleUIRoot.activeInHierarchy; set => this.consoleUIRoot.SetActive(value); }
 
         private bool m_forceUIUpdateNextFrame = false;
 
-        /// <summary>Key which is used to open/close console.</summary>
+		[Tooltip("Key which is used to open/close console")]
         public	KeyCode	openKey = KeyCode.BackQuote ;
 
 		public volatile int maxNumLogMessages = 100;
@@ -68,9 +68,10 @@ namespace UGameCore.Menu
 
 		public GameObject logEntryPrefab;
 
-        public ScrollRect	consoleScrollView = null;
-        public Button	consoleSubmitButton = null;
-        public InputField	consoleSubmitInputField = null;
+		public GameObject consoleUIRoot;
+        public ScrollRect	consoleScrollView;
+        public Button	consoleSubmitButton;
+        public InputField	consoleSubmitInputField;
         
 
 
