@@ -10,10 +10,12 @@ namespace UGameCore.Utilities
 		public	float	width = 0.9f;
 		public	float	height = 0.9f;
 		public	RectTransform	stretchElement = null;
+		public int priority = 1;
 
 
 
-		public void CalculateLayoutInputHorizontal ()
+
+        public void CalculateLayoutInputHorizontal ()
 		{
 			
 		}
@@ -61,7 +63,7 @@ namespace UGameCore.Utilities
 
 		public int layoutPriority {
 			get {
-				return 0;
+				return this.priority;
 			}
 		}
 
