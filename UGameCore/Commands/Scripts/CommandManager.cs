@@ -1,5 +1,7 @@
 ﻿﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UGameCore.Utilities;
 using UnityEngine;
 
 namespace UGameCore
@@ -19,6 +21,19 @@ namespace UGameCore
         public List<string> forbiddenCommands = new List<string>();
 
         [SerializeField] private bool m_registerHelpCommand = true;
+
+        /// <summary>
+        /// Annotate a method with this attribute to register it as a command.
+        /// </summary>
+        [System.AttributeUsageAttribute(System.AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+        public class CommandMethodAttribute : System.Attribute
+        {
+            public string command;
+            public string description;
+            public bool allowToRunWithoutServerPermissions;
+            public bool runOnlyOnServer;
+            public float limitInterval;
+        }
 
         public struct CommandInfo
         {
@@ -130,6 +145,53 @@ namespace UGameCore
         {
             var commandInfo = new CommandInfo(command, true) { commandHandler = function };
             this.RegisterCommand(commandInfo);
+        }
+
+        public void RegisterCommandsFromTypeMethods(object instanceObject, System.Type type)
+        {
+            var methods = type.GetMethods(
+                BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.Static
+                | BindingFlags.Instance);
+
+            foreach (var method in methods)
+            {
+                if (!method.IsDefined(typeof(CommandMethodAttribute), true))
+                    continue;
+
+                if (!F.RunExceptionSafe(() => CheckIfCommandMethodIsCorrect(type, method)))
+                    continue;
+
+                var attrs = method.GetCustomAttributes<CommandMethodAttribute>(true);
+                foreach (CommandMethodAttribute attr in attrs)
+                {
+                    var commandInfo = new CommandInfo
+                    {
+                        command = attr.command,
+                        description = attr.description,
+                        allowToRunWithoutServerPermissions = attr.allowToRunWithoutServerPermissions,
+                        runOnlyOnServer = attr.runOnlyOnServer,
+                        limitInterval = attr.limitInterval,
+                        commandHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context }),
+                    };
+
+                    F.RunExceptionSafe(() => this.RegisterCommand(commandInfo));
+                }
+            }
+        }
+
+        void CheckIfCommandMethodIsCorrect(System.Type type, MethodInfo method)
+        {
+            if (method.ReturnType != typeof(ProcessCommandResult))
+                throw new System.ArgumentException($"Return type must be {nameof(ProcessCommandResult)}, method: {type.Name}.{method.Name}()");
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 1)
+                throw new System.ArgumentException($"Method must have exactly 1 parameter ({nameof(ProcessCommandContext)}), method: {type.Name}.{method.Name}()");
+
+            if (parameters[0].ParameterType != typeof(ProcessCommandContext))
+                throw new System.ArgumentException($"Type of parameter must be ({nameof(ProcessCommandContext)}), method: {type.Name}.{method.Name}()");
         }
 
         public bool RemoveCommand(string command)
