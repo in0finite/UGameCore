@@ -6,22 +6,26 @@ using Profiler = UnityEngine.Profiling.Profiler;
 
 namespace UGameCore.Menu
 {
-
     public class Console : MonoBehaviour {
 
 		public class LogMessage
 		{
-			public	string	text = null ;
-			public	string	stackTrace = null;
-			public	LogType	logType ;
-			public	string	displayText = null;
+			public	string	text;
+			public	string	stackTrace;
+			public	LogType	logType;
+			public	string	displayText;
+			public double time;
+			public ConsoleLogEntryComponent logEntryComponent;
 
 			public LogMessage (string text, string stackTrace, LogType logType)
 			{
 				this.text = text;
 				this.stackTrace = stackTrace;
 				this.logType = logType;
-			}
+				this.displayText = null;
+				this.time = 0;
+				this.logEntryComponent = null;
+            }
 		}
 
 		[System.Serializable]
@@ -32,29 +36,26 @@ namespace UGameCore.Menu
 		}
 
 
-		private		bool	m_isConsoleOpened = false ;
-		public		bool	IsOpened { get { return m_isConsoleOpened; } set { m_isConsoleOpened = value; } }
+		public		bool	IsOpened { get => this.gameObject.activeSelf; set => this.gameObject.SetActive(value); }
 
-		private		bool	m_wasOpenedLastFrame = false ;
+        private bool m_forceUIUpdateNextFrame = false;
 
-		private		bool	m_shouldUpdateDisplayTextWhenConsoleIsOpened = false;
+        /// <summary>Key which is used to open/close console.</summary>
+        public	KeyCode	openKey = KeyCode.BackQuote ;
 
-		/// <summary>Key which is used to open/close console.</summary>
-		public	KeyCode	openKey = KeyCode.BackQuote ;
+		public volatile int maxNumLogMessages = 100;
+        public int maxNumPooledLogMessages = 100;
 
-		[SerializeField]	private	int		m_maxCharacterCount = 2000 ;
-		private		LinkedList<LogMessage>	m_logMessages = new LinkedList<LogMessage>() ;
-		private		System.Text.StringBuilder	m_stringBuilder = null;
-		public		int		TotalLengthOfMessages { get { return m_stringBuilder.Length; } }
+        private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
+        
+		private readonly Queue<LogMessage> m_logMessages = new Queue<LogMessage>();
+        private static LogMessage[] s_logMessagesBuffer;
 
-		private		LinkedList<LogMessage>	m_messagesArrivedThisFrame = new LinkedList<LogMessage>() ;
-	//	private		int		m_totalLengthOfMessagesArrivedThisFrame = 0;
+        private readonly Queue<ConsoleLogEntryComponent> m_pooledLogEntryComponents = new Queue<ConsoleLogEntryComponent>();
 
-		private		Vector2		m_consoleScrollPosition = Vector2.zero ;
+		private readonly System.Diagnostics.Stopwatch m_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-		private		string		m_consoleCommandText = "" ;
-
-		private		List<string>	m_history = new List<string> ();
+        private		List<string>	m_history = new List<string> ();
 		public		IReadOnlyList<string>	History { get { return m_history; } }
 		private		int		m_historyBrowserIndex = -1 ;
 
@@ -62,56 +63,48 @@ namespace UGameCore.Menu
 
 		public		event System.Action<string>	onTextSubmitted = delegate {};
 
-		public	List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
-		public	List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
+		public List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
+		public List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
+
+		public GameObject logEntryPrefab;
 
         public ScrollRect	consoleScrollView = null;
-        public InputField	consoleTextDisplay = null;
         public Button	consoleSubmitButton = null;
         public InputField	consoleSubmitInputField = null;
         
 
 
-		void Awake() {
-
-			this.EnsureSerializableReferencesAssigned();
-
-			// initialize log buffer
-			m_stringBuilder = new System.Text.StringBuilder(this.m_maxCharacterCount);
-
-			// register functions for displaying our stats
-			RegisterStats( () => { return "FPS: " + GameManager.GetAverageFps() ; } );
-			RegisterStats( () => { return "uptime: " + Utilities.Utilities.FormatElapsedTime( Time.realtimeSinceStartup ) ; } );
-
-		}
-
         private void OnEnable()
         {
-            Application.logMessageReceived += HandleLog;
+            Application.logMessageReceivedThreaded += HandleLogThreaded;
+
+			m_forceUIUpdateNextFrame = true;
         }
 
         private void OnDisable()
         {
-            Application.logMessageReceived -= HandleLog;
+            Application.logMessageReceivedThreaded -= HandleLogThreaded;
         }
 
         void Start () {
 
-			if (this.consoleSubmitInputField != null) {
+            this.EnsureSerializableReferencesAssigned();
+
+            if (this.consoleSubmitInputField != null) {
 				
 				// detect enter
-				this.consoleSubmitInputField.onEndEdit.AddListener ((arg0) => {
-					if(Input.GetKeyDown (KeyCode.Return)) {
-						// submit
-						SubmittedText( this.consoleSubmitInputField.text );
+				this.consoleSubmitInputField.onSubmit.AddListener ((arg0) => {
+					
+					// submit
+					SubmittedText( this.consoleSubmitInputField.text );
 
-						// clear input field
-						this.consoleSubmitInputField.text = "";
+					// clear input field
+					this.consoleSubmitInputField.text = "";
 
-						// set focus to input field
-						this.consoleSubmitInputField.Select ();
-						this.consoleSubmitInputField.ActivateInputField ();
-					}
+					// set focus to input field
+					this.consoleSubmitInputField.Select ();
+					this.consoleSubmitInputField.ActivateInputField ();
+					
 				});
 
 				// register submit button handler
@@ -131,19 +124,25 @@ namespace UGameCore.Menu
 		}
 
 		// Callback function for unity logs.
-		void	HandleLog(string logStr, string stackTrace, LogType type) {
+		void	HandleLogThreaded(string logStr, string stackTrace, LogType type) {
 
-			if (0 == this.m_maxCharacterCount)
+			if (this.maxNumLogMessages <= 0)
 				return;
 
+            // check if this message should be ignored
+            if (ShouldMessageBeIgnored(logStr, type))
+                return;
 
-			// check if this message should be ignored
-			if (ShouldMessageBeIgnored (logStr, type))
-				return;
-
+            // keep the buffer limited in size - we don't need more than this number.
+            // this also prevents running out of memory.
+            m_messagesArrivedThisFrame.DequeueUntilCountReaches(this.maxNumLogMessages);
 
 			var logMessage = new LogMessage (logStr, stackTrace, type);
-			m_messagesArrivedThisFrame.AddLast (logMessage);
+			string prefix = type == LogType.Log ? string.Empty : (type == LogType.Warning ? "W " : "E ");
+			double time = m_stopwatch.Elapsed.TotalSeconds;
+            logMessage.displayText = $"{prefix}[{F.FormatElapsedTime(time)}] {logStr}";
+
+            m_messagesArrivedThisFrame.Enqueue (logMessage);
 
 		}
 
@@ -183,19 +182,8 @@ namespace UGameCore.Menu
 
 		public		void	ClearLog() {
 
-			m_logMessages.Clear ();
-			m_stringBuilder.Length = 0;
-			
-			UpdateDisplayText ();
-
-		}
-
-		private		void	UpdateDisplayText() {
-
-			if (this.consoleTextDisplay != null) {
-				this.consoleTextDisplay.text = m_stringBuilder.ToString ();
-				LayoutRebuilder.MarkLayoutForRebuild (this.consoleTextDisplay.GetComponent<RectTransform> ());
-			}
+			m_logMessages.Clear();
+			m_forceUIUpdateNextFrame = true;
 
 		}
 
@@ -229,8 +217,6 @@ namespace UGameCore.Menu
 		}
 
 		public		void	SetInputBoxText( string text ) {
-
-			m_consoleCommandText = text;
 
 			if (this.consoleSubmitInputField != null) {
 				this.consoleSubmitInputField.text = text;
@@ -271,7 +257,6 @@ namespace UGameCore.Menu
 
 		void Update () {
 
-
 			// open/close console
 
 			#if UNITY_ANDROID
@@ -280,46 +265,16 @@ namespace UGameCore.Menu
 			if (Input.GetKeyDown (this.openKey)) {
 			#endif
 
-				m_isConsoleOpened = ! m_isConsoleOpened;
+				this.IsOpened = ! this.IsOpened;
 
 			}
-
-
-			// enable/disable canvas
-			Profiler.BeginSample( "SetCanvasEnabledState", this );
-			if (m_wasOpenedLastFrame != m_isConsoleOpened) {
-				// opened state changed
-
-				m_wasOpenedLastFrame = m_isConsoleOpened ;
-
-				if(m_isConsoleOpened) {
-					// update display text if something was logged in the meantime
-					if(m_shouldUpdateDisplayTextWhenConsoleIsOpened) {
-						
-						m_shouldUpdateDisplayTextWhenConsoleIsOpened = false ;
-
-						UpdateDisplayText();
-
-						// also scroll to end
-						ScrollToEnd();
-					}
-				}
-
-			}
-			Profiler.EndSample();
 
 			// check for key events from input field
 			if(this.consoleSubmitInputField != null) {
 				
 				if( this.consoleSubmitInputField.isFocused ) {
 					
-					if(Input.GetKeyDown(KeyCode.Return)) {
-						// enter pressed
-						// submit
-					//	SubmittedText( this.consoleSubmitInputField.text );
-					//	SetInputBoxText("");
-
-					} else if(Input.GetKeyDown(KeyCode.UpArrow)) {
+					if(Input.GetKeyDown(KeyCode.UpArrow)) {
 						// browse history backwards
 						BrowseHistoryBackwards();
 
@@ -330,95 +285,121 @@ namespace UGameCore.Menu
 				}
 			}
 
-
 			Profiler.BeginSample( "UpdateLogMessages", this );
 			this.UpdateLogMessages();
 			Profiler.EndSample();
 
+            if (m_forceUIUpdateNextFrame && this.IsOpened)
+            {
+				m_forceUIUpdateNextFrame = false;
+                this.RebuildLogUI();
+				this.ScrollToEnd();
+            }
 
-		}
+        }
 
 		void UpdateLogMessages() {
 
-			if (0 == m_messagesArrivedThisFrame.Count)
+			if (this.maxNumLogMessages <= 0)
+			{
+				m_messagesArrivedThisFrame.Clear();
+                return;
+			}
+
+			s_logMessagesBuffer ??= new LogMessage[500];
+
+            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToArray(
+                s_logMessagesBuffer, 0, s_logMessagesBuffer.Length);
+
+            if (0 == numNewlyAdded)
 				return;
 
+			for (int i = 0; i < numNewlyAdded; i++)
+				m_logMessages.Enqueue(s_logMessagesBuffer[i]);
+            
+            // limit number of log messages
 
-			// loop through newly arrived messages
-			// find their total length
-			// if needed, remove old messages, and recompute text for display
-			// otherwise, just add new messages
+            while (m_logMessages.Count > this.maxNumLogMessages)
+			{
+                var logMessage = m_logMessages.Dequeue();
+				ReleaseLogMessage(logMessage);
+            }
 
-			int lengthOfNewMessages = 0;
-			foreach(var msg in m_messagesArrivedThisFrame) {
-				msg.displayText = GetRichText (msg) + "\n";
-				lengthOfNewMessages += msg.displayText.Length ;
-			}
+			if (!this.IsOpened)
+            {
+                m_forceUIUpdateNextFrame = true;
+                return;
+            }
 
-			int newLength = TotalLengthOfMessages + lengthOfNewMessages;
+			// update UI
 
-			if (newLength > m_maxCharacterCount) {
-				// need to remove old messages
+			if (m_forceUIUpdateNextFrame) // no need to update here, because it will be rebuilt
+				return;
 
-				int lengthToRemove = newLength - m_maxCharacterCount ;
-				int lengthRemoved = 0;
-
-				while (lengthRemoved < lengthToRemove && m_logMessages.Count != 0) {
-					lengthRemoved += m_logMessages.First.Value.displayText.Length ;
-
-					m_logMessages.RemoveFirst ();
-				}
-
-				// removed enough messages
-
-			//	TotalLengthOfMessages -= lengthRemoved;
-
-			//	m_logString = m_logString.Remove (0, lengthRemoved);
-				m_stringBuilder.Remove( 0, lengthRemoved );
-
-			} else {
-				// no need to remove messages
-				// just add new messages
-
-			}
-
-			// add new messages
-
-			while (m_messagesArrivedThisFrame.Count != 0) {
-				m_logMessages.AddLast (m_messagesArrivedThisFrame.First.Value);
-
-				m_stringBuilder.Append (m_messagesArrivedThisFrame.First.Value.displayText);
-
-				m_messagesArrivedThisFrame.RemoveFirst ();
-			}
-
-			// cache string
-		//	m_logString = m_stringBuilder.ToString ();
-
-		//	TotalLengthOfMessages += lengthOfNewMessages;
-
-			// update text display
-
-			if (m_isConsoleOpened) {	// only update it if console is opened
-				
-				UpdateDisplayText ();
-
-			} else {
-				// update display text later
-				m_shouldUpdateDisplayTextWhenConsoleIsOpened = true ;
-			}
+            for (int i = 0; i < numNewlyAdded; i++)
+			{
+				var logMessage = s_logMessagesBuffer[i];
+				CreateUIForLogMessage(logMessage);
+            }
 
 			// scroll to the end
+			this.Invoke (nameof(this.ScrollToEnd), 0.1f);
 
-			m_consoleScrollPosition.y = Mathf.Infinity;
+			System.Array.Clear(s_logMessagesBuffer, 0, numNewlyAdded);
+        }
 
-			if (m_isConsoleOpened) {
-				this.Invoke (nameof(this.ScrollToEnd), 0.1f);
-			} else {
-				// it will be scrolled later
+		void RebuildLogUI()
+		{
+			foreach (var logMessage in m_logMessages)
+			{
+				ReleaseLogMessage(logMessage);
 			}
 
+            foreach (var logMessage in m_logMessages)
+            {
+                CreateUIForLogMessage(logMessage);
+            }
 
-		}
+            //LayoutRebuilder.MarkLayoutForRebuild(this.consoleScrollView.GetRectTransform());
+
+            System.Array.Clear(s_logMessagesBuffer, 0, s_logMessagesBuffer.Length); // release references
+        }
+
+		void ReleaseLogMessage(LogMessage logMessage)
+		{
+            if (null == logMessage.logEntryComponent)
+                return;
+
+            // try return to pool
+            if (m_pooledLogEntryComponents.Count < this.maxNumPooledLogMessages)
+            {
+                m_pooledLogEntryComponents.Enqueue(logMessage.logEntryComponent);
+                logMessage.logEntryComponent.LogMessage = null;
+                logMessage.logEntryComponent.gameObject.SetActive(false);
+            }
+            else
+            {
+                F.DestroyEvenInEditMode(logMessage.logEntryComponent.gameObject);
+            }
+
+            logMessage.logEntryComponent = null;
+        }
+
+		void CreateUIForLogMessage(LogMessage logMessage)
+		{
+            // try take from pool
+            if (!m_pooledLogEntryComponents.TryDequeue(out var logEntryComponent))
+            {
+                logEntryComponent = this.logEntryPrefab.InstantiateAsUIElement(this.consoleScrollView.content)
+                    .GetComponentOrThrow<ConsoleLogEntryComponent>();
+            }
+
+            logEntryComponent.transform.SetAsLastSibling();
+            logEntryComponent.textComponent.text = logMessage.displayText;
+            logEntryComponent.gameObject.SetActive(true);
+            logEntryComponent.LogMessage = logMessage;
+
+            logMessage.logEntryComponent = logEntryComponent;
+        }
 	}
 }
