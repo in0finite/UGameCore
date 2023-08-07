@@ -33,6 +33,9 @@ namespace UGameCore
             // The actual command callback can decide what to do based on network state, and potentially
             // send the command to server.
 
+            if (text.IsNullOrWhiteSpace())
+                return;
+
             var player = Player.local;
 
             var context = new CommandManager.ProcessCommandContext

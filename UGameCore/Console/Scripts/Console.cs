@@ -215,7 +215,7 @@ namespace UGameCore.Menu
 
 			onTextSubmitted.InvokeEventExceptionSafe (textToProcess);
 			
-			if (textToProcess.Length > 0) {
+			if (!textToProcess.IsNullOrWhiteSpace()) {
 				// add this command to list of executed commands
 				m_history.Add (textToProcess);
 				if (m_history.Count > 100) {
