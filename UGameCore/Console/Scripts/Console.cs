@@ -138,9 +138,8 @@ namespace UGameCore.Menu
             m_messagesArrivedThisFrame.DequeueUntilCountReaches(this.maxNumLogMessages);
 
 			var logMessage = new LogMessage (logStr, stackTrace, type);
-			string prefix = type == LogType.Log ? string.Empty : (type == LogType.Warning ? "W " : "E ");
 			double time = m_stopwatch.Elapsed.TotalSeconds;
-            logMessage.displayText = $"{prefix}[{F.FormatElapsedTime(time)}] {logStr}";
+            logMessage.displayText = $"[{F.FormatElapsedTime(time)}] {logStr}";
 
             m_messagesArrivedThisFrame.Enqueue (logMessage);
 
@@ -396,6 +395,7 @@ namespace UGameCore.Menu
 
             logEntryComponent.transform.SetAsLastSibling();
             logEntryComponent.textComponent.text = logMessage.displayText;
+			logEntryComponent.textComponent.color = logMessage.logType == LogType.Log ? Color.white : (logMessage.logType == LogType.Warning ? Color.yellow : Color.red);
             logEntryComponent.gameObject.SetActive(true);
             logEntryComponent.LogMessage = logMessage;
 
