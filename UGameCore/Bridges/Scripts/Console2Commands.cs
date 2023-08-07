@@ -4,31 +4,46 @@ using UnityEngine;
 
 namespace UGameCore
 {
-
-    public class Console2Commands : MonoBehaviour {
-
+    public class Console2Commands : MonoBehaviour
+	{
 		public Console console;
+		public CommandManager commandManager;
 
 
-		void Start () {
+        private void OnEnable()
+        {
+            this.console.onTextSubmitted += TextSubmitted;
+        }
 
+        private void OnDisable()
+        {
+            this.console.onTextSubmitted -= TextSubmitted;
+        }
+
+        void Start()
+		{
 			this.EnsureSerializableReferencesAssigned();
-			this.console.onTextSubmitted += TextSubmitted;
-
 		}
 
 		void TextSubmitted( string text ) {
 
 			// Process command
-			string response = "" ;
-			Commands.CommandManager.ProcessCommand( text, ref response );
 
-			if( response != "" )
-				Debug.Log ( response );
+			// do it locally (don't send to server), for now
 
+			var player = Player.local;
+
+			var context = new CommandManager.ProcessCommandContext
+			{
+				command = text,
+				hasServerPermissions = true,
+				executor = player,
+				lastTimeExecutedCommand = player != null ? player.LastTimeExecutedCommand : null,
+			};
+
+            var result = this.commandManager.ProcessCommand(context);
+
+			Debug.Log(result.response);
 		}
-		
-
 	}
-
 }
