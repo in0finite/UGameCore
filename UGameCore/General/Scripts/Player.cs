@@ -454,7 +454,7 @@ namespace UGameCore
 
 		public CommandManager.ProcessCommandResult ExecuteCommand(CommandManager commandManager, string command)
 		{
-            bool hasServerPermissions = this.isLocalPlayer || this.IsServerAdmin;
+            bool hasServerPermissions = this.IsServerAdmin;
 			double t = this.LastTimeExecutedCommand;
 			this.LastTimeExecutedCommand = Time.timeAsDouble;
             return commandManager.ProcessCommand(new CommandManager.ProcessCommandContext
