@@ -3,16 +3,15 @@ using UnityEngine.UI;
 
 namespace UGameCore.Utilities
 {
+	/// <summary>
+	/// Changes layout dimensions of current UI element to be proportional of dimensions of target element.
+	/// </summary>
 	public class StretchToParentLayoutElement : MonoBehaviour, ILayoutElement
 	{
-
-	//	private	RectTransform	m_parent { get { return this.transform.parent as RectTransform; } }
 		public	float	width = 0.9f;
 		public	float	height = 0.9f;
 		public	RectTransform	stretchElement = null;
 		public int priority = 1;
-
-
 
 
         public void CalculateLayoutInputHorizontal ()
@@ -25,48 +24,20 @@ namespace UGameCore.Utilities
 			
 		}
 
-		public float minWidth {
-			get {
-				return 0;
-			}
-		}
+        public float minWidth => 0;
 
-		public float preferredWidth {
-			get {
-				return this.stretchElement.rect.width * this.width;
-			}
-		}
+        public float preferredWidth => this.stretchElement.rect.width * this.width;
 
-		public float flexibleWidth {
-			get {
-				return -1;
-			}
-		}
+        public float flexibleWidth => -1;
 
-		public float minHeight {
-			get {
-				return 0;
-			}
-		}
+        public float minHeight => 0;
 
-		public float preferredHeight {
-			get {
-				return this.stretchElement.rect.height * this.height;
-			}
-		}
+        public float preferredHeight => this.stretchElement.rect.height * this.height;
 
-		public float flexibleHeight {
-			get {
-				return -1;
-			}
-		}
+        public float flexibleHeight => -1;
 
-		public int layoutPriority {
-			get {
-				return this.priority;
-			}
-		}
+        public int layoutPriority => this.priority;
 
-	}
+    }
 }
 
