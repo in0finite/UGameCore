@@ -453,6 +453,8 @@ namespace UGameCore.Menu
 			{
 				var detailsInputField = this.detailsScrollView.content.GetComponentInChildrenOrThrow<InputField>();
 				detailsInputField.text = GetDetailsText(this.SelectedLogEntry.LogMessage);
+                // need to rebuild layout for InputField, because it's not done automatically
+                LayoutRebuilder.MarkLayoutForRebuild(detailsInputField.GetRectTransform());
 			}
         }
 
