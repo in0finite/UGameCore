@@ -14,7 +14,6 @@ namespace UGameCore.Menu
 			public	string	stackTrace;
 			public	LogType	logType;
 			public	string	displayText;
-			public double time;
 			public ConsoleLogEntryComponent logEntryComponent;
 
 			public LogMessage (string text, string stackTrace, LogType logType)
@@ -23,7 +22,6 @@ namespace UGameCore.Menu
 				this.stackTrace = stackTrace;
 				this.logType = logType;
 				this.displayText = null;
-				this.time = 0;
 				this.logEntryComponent = null;
             }
 		}
@@ -45,6 +43,8 @@ namespace UGameCore.Menu
 
 		public volatile int maxNumLogMessages = 100;
         public int maxNumPooledLogMessages = 100;
+
+		public volatile int numLinesToDisplayForLogMessage = 2;
 
         private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
         
@@ -140,10 +140,10 @@ namespace UGameCore.Menu
 
 			var logMessage = new LogMessage (logStr, stackTrace, type);
 			double time = m_stopwatch.Elapsed.TotalSeconds;
-            logMessage.displayText = $"[{F.FormatElapsedTime(time)}] {logStr}";
 
-            m_messagesArrivedThisFrame.Enqueue (logMessage);
+            logMessage.displayText = GetDisplayText(logStr, time);
 
+            m_messagesArrivedThisFrame.Enqueue(logMessage);
 		}
 
 		public		bool	ShouldMessageBeIgnored(string logStr, LogType type) {
@@ -163,7 +163,32 @@ namespace UGameCore.Menu
 			return false;
 		}
 
-		public		string	GetRichText( LogMessage logMessage ) {
+		string GetDisplayText(string logStr, double time)
+		{
+            int lastIndexOfNewLine = -1;
+
+            for (int i = 0; i < this.numLinesToDisplayForLogMessage; i++)
+            {
+                int newLineIndex = logStr.IndexOf('\n', lastIndexOfNewLine + 1);
+                if (newLineIndex < 0)
+                {
+					lastIndexOfNewLine = -1;
+                    break;
+                }
+
+                // found new '\n' character
+                lastIndexOfNewLine = newLineIndex;
+            }
+
+            if (lastIndexOfNewLine != -1)
+            {
+                logStr = logStr[..lastIndexOfNewLine];
+            }
+
+            return $"[{F.FormatElapsedTime(time)}] {logStr}";
+        }
+
+        public		string	GetRichText( LogMessage logMessage ) {
 			
 			if (logMessage.logType == LogType.Log) {
 
