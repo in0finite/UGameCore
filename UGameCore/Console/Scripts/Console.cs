@@ -426,7 +426,10 @@ namespace UGameCore.Menu
         private void LogEntryOnPointerClick(
 			ConsoleLogEntryComponent logEntryComponent, UnityEngine.EventSystems.PointerEventData eventData)
         {
-			this.SetSelectedLogEntry(logEntryComponent);
+			if (this.SelectedLogEntry == logEntryComponent)
+				this.SetSelectedLogEntry(null); // deselect
+			else
+				this.SetSelectedLogEntry(logEntryComponent);
         }
 
 		public void SetSelectedLogEntry(ConsoleLogEntryComponent logEntryComponent)
