@@ -27,16 +27,18 @@ namespace UGameCore
 
 		void TextSubmitted( string text ) {
 
-			// Process command
+            // process it as a command
 
-			// do it locally (don't send to server), for now
+            // Commands are always executed locally (ie. not sent to server).
+            // The actual command callback can decide what to do based on network state, and potentially
+            // send the command to server.
 
-			var player = Player.local;
+            var player = Player.local;
 
-			var context = new CommandManager.ProcessCommandContext
+            var context = new CommandManager.ProcessCommandContext
 			{
 				command = text,
-				hasServerPermissions = true,
+				hasServerPermissions = player != null ? player.IsServerAdmin : true, // only give perms if offline or on dedicated server
 				executor = player,
 				lastTimeExecutedCommand = player != null ? player.LastTimeExecutedCommand : null,
 			};
