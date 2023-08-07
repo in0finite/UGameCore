@@ -384,7 +384,33 @@ MonoBehaviour:
     stack trace
 
     stack
-    trace'
+    trace
+
+    stack trace
+
+    stack trace
+
+    stack trace
+
+    stack trace
+
+    stack
+    trace
+
+    stack trace
+
+    stack trace
+
+    stack trace
+
+    stack trace
+
+    stack
+    trace
+
+    stack trace
+
+    stack trace'
 --- !u!1 &1644174345085398892
 GameObject:
   m_ObjectHideFlags: 0
@@ -2378,7 +2404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
   m_MinWidth: -1
-  m_MinHeight: -1
+  m_MinHeight: 150
   m_PreferredWidth: -1
   m_PreferredHeight: 150
   m_FlexibleWidth: 1

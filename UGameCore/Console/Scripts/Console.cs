@@ -36,6 +36,8 @@ namespace UGameCore.Menu
 
 		public		bool	IsOpened { get => this.consoleUIRoot.activeInHierarchy; set => this.consoleUIRoot.SetActive(value); }
 
+		public bool IsDetailsAreaOpened { get; set; } = false;
+
         private bool m_forceUIUpdateNextFrame = false;
 
 		[Tooltip("Key which is used to open/close console")]
@@ -52,6 +54,10 @@ namespace UGameCore.Menu
         private static LogMessage[] s_logMessagesBuffer;
 
         private readonly Queue<ConsoleLogEntryComponent> m_pooledLogEntryComponents = new Queue<ConsoleLogEntryComponent>();
+
+		public ConsoleLogEntryComponent SelectedLogEntry { get; private set; }
+
+		public Color selectedLogEntryColor = Color.gray;
 
 		private readonly System.Diagnostics.Stopwatch m_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -70,6 +76,7 @@ namespace UGameCore.Menu
 
 		public GameObject consoleUIRoot;
         public ScrollRect	consoleScrollView;
+        public ScrollRect detailsScrollView;
         public Button	consoleSubmitButton;
         public InputField	consoleSubmitInputField;
         
@@ -188,23 +195,6 @@ namespace UGameCore.Menu
             return $"[{F.FormatElapsedTime(time)}] {logStr}";
         }
 
-        public		string	GetRichText( LogMessage logMessage ) {
-			
-			if (logMessage.logType == LogType.Log) {
-
-				return logMessage.text ;
-
-			} else if (logMessage.logType == LogType.Warning) {
-
-				return "<color=yellow>" + logMessage.text + "</color>" ;
-
-			}
-
-			return "<color=red>" + logMessage.text + "\n" + logMessage.stackTrace + "</color>" ;
-
-		}
-
-
 		public		void	ClearLog() {
 
 			m_logMessages.Clear();
@@ -314,6 +304,8 @@ namespace UGameCore.Menu
 			this.UpdateLogMessages();
 			Profiler.EndSample();
 
+			this.detailsScrollView.gameObject.SetActive(this.IsDetailsAreaOpened);
+
             if (m_forceUIUpdateNextFrame && this.IsOpened)
             {
 				m_forceUIUpdateNextFrame = false;
@@ -417,15 +409,55 @@ namespace UGameCore.Menu
             {
                 logEntryComponent = this.logEntryPrefab.InstantiateAsUIElement(this.consoleScrollView.content)
                     .GetComponentOrThrow<ConsoleLogEntryComponent>();
+
+                logEntryComponent.eventsPickup.onPointerClick += (ev) => LogEntryOnPointerClick(logEntryComponent, ev);
             }
 
             logEntryComponent.transform.SetAsLastSibling();
             logEntryComponent.textComponent.text = logMessage.displayText;
 			logEntryComponent.textComponent.color = logMessage.logType == LogType.Log ? Color.white : (logMessage.logType == LogType.Warning ? Color.yellow : Color.red);
+			logEntryComponent.image.color = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
             logEntryComponent.gameObject.SetActive(true);
             logEntryComponent.LogMessage = logMessage;
 
             logMessage.logEntryComponent = logEntryComponent;
         }
-	}
+
+        private void LogEntryOnPointerClick(
+			ConsoleLogEntryComponent logEntryComponent, UnityEngine.EventSystems.PointerEventData eventData)
+        {
+			this.SetSelectedLogEntry(logEntryComponent);
+        }
+
+		public void SetSelectedLogEntry(ConsoleLogEntryComponent logEntryComponent)
+		{
+			if (this.SelectedLogEntry == logEntryComponent)
+				return;
+
+            // restore color of previously selected entry
+            if (this.SelectedLogEntry != null)
+            {
+                Color originalColor = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
+                this.SelectedLogEntry.image.color = originalColor;
+            }
+
+            this.SelectedLogEntry = logEntryComponent;
+
+			if (this.SelectedLogEntry != null)
+				this.SelectedLogEntry.image.color = this.selectedLogEntryColor;
+
+			// update details area
+			this.IsDetailsAreaOpened = this.SelectedLogEntry != null;
+			if (this.SelectedLogEntry != null)
+			{
+				var detailsText = this.detailsScrollView.content.GetComponentInChildrenOrThrow<Text>();
+				detailsText.text = GetDetailsText(this.SelectedLogEntry.LogMessage);
+			}
+        }
+
+		string GetDetailsText(LogMessage logMessage)
+		{
+			return logMessage.text + "\n\n" + logMessage.stackTrace;
+		}
+    }
 }
