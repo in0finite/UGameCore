@@ -49,7 +49,12 @@ namespace UGameCore
             var result = this.commandManager.ProcessCommand(context);
 
             if (result.response != null)
-			    Debug.Log(result.response);
-		}
+            {
+                if (result.IsSuccess)
+                    Debug.Log(result.response, this);
+                else
+                    Debug.LogError(result.response, this);
+            }
+        }
 	}
 }
