@@ -2,7 +2,7 @@
 using UnityEngine;
 using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands
+namespace UGameCore.Menu.Windows
 {
 
     public class WindowCommands : MonoBehaviour {
@@ -32,12 +32,12 @@ namespace UGameCore.Commands
 
 			if (words [0] == "msgbox") {
 
-				var msgBox = Menu.Windows.WindowManager.OpenMessageBox ("some example text", false);
+				var msgBox = WindowManager.OpenMessageBox ("some example text", false);
 				msgBox.Title = "Example message box";
 
 			} else if (words [0] == "modal_msgbox") {
 
-				var msgBox = Menu.Windows.WindowManager.OpenMessageBox ("this is modal message box", true);
+				var msgBox = WindowManager.OpenMessageBox ("this is modal message box", true);
 				msgBox.Title = "Modal msg box";
 
 			} else if (words [0] == "msgboxtest") {
@@ -54,7 +54,7 @@ namespace UGameCore.Commands
 				foreach (Vector2 size in sizes) {
 					foreach (int textLength in textLengths) {
 						string text = GenerateRandomString (textLength);
-						var msgBox = Menu.Windows.WindowManager.OpenMessageBox (text, false);
+						var msgBox = WindowManager.OpenMessageBox (text, false);
 						// use random title length
                         msgBox.Title = GenerateRandomString (Random.Range (0, 30));
 						// set random position on screen
@@ -73,7 +73,7 @@ namespace UGameCore.Commands
 					string title = words [1];
 					string text = CommandManager.GetRestOfTheCommand (command, 1);
 
-					foreach (var script in Player.GetComponentOnAllPlayers<Menu.Windows.Player2Windows> ()) {
+					foreach (var script in Player.GetComponentOnAllPlayers<Player2Windows> ()) {
 						script.DisplayMsgBoxOnClient( title, text );
 					}
 
