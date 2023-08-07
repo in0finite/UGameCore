@@ -48,7 +48,8 @@ namespace UGameCore
 
             var result = this.commandManager.ProcessCommand(context);
 
-			Debug.Log(result.response);
+            if (result.response != null)
+			    Debug.Log(result.response);
 		}
 	}
 }
