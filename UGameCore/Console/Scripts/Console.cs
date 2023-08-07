@@ -197,8 +197,18 @@ namespace UGameCore.Menu
 
 		public		void	ClearLog() {
 
+			foreach (LogMessage logMessage in m_logMessages)
+			{
+				ReleaseLogMessage(logMessage);
+			}
+
 			m_logMessages.Clear();
+
+			m_messagesArrivedThisFrame.Clear();
+			
 			m_forceUIUpdateNextFrame = true;
+
+			this.SetSelectedLogEntry(null);
 
 		}
 
