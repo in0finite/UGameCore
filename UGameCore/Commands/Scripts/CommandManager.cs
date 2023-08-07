@@ -33,6 +33,11 @@ namespace UGameCore
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
             public float limitInterval;
+
+            public CommandMethodAttribute(string command)
+            {
+                this.command = command;
+            }
         }
 
         public struct CommandInfo
@@ -147,7 +152,12 @@ namespace UGameCore
             this.RegisterCommand(commandInfo);
         }
 
-        public void RegisterCommandsFromTypeMethods(object instanceObject, System.Type type)
+        public void RegisterCommandsFromTypeMethods(object instanceObject)
+        {
+            this.RegisterCommandsFromTypeMethods(instanceObject, instanceObject.GetType());
+        }
+
+        void RegisterCommandsFromTypeMethods(object instanceObject, System.Type type)
         {
             var methods = type.GetMethods(
                 BindingFlags.Public
