@@ -32,8 +32,19 @@ namespace UGameCore
 				return ProcessCommandResult.SuccessResponse(output);
 			});
 
-		}
-		
+            this.commandManager.RegisterCommandsFromTypeMethods(this);
+
+        }
+
+#if UNITY_EDITOR
+		[CommandMethod("log100", description = "Log 100 messages")]
+        ProcessCommandResult Log100Cmd(ProcessCommandContext context)
+        {
+            for (int i = 0; i < 100; i++)
+				Debug.Log(i + "\n" + i + "\n" + i + "\n" + i, this);
+			return ProcessCommandResult.Success;
+        }
+#endif
 
 	}
 
