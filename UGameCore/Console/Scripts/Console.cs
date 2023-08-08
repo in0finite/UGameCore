@@ -223,7 +223,15 @@ namespace UGameCore.Menu
 
 		}
 
-		private		void	SubmittedText( string textToProcess ) {
+        private void ScrollToEndDelayed()
+        {
+            if (this.consoleScrollView != null)
+            {
+                this.Invoke(nameof(this.ScrollToEnd), 0.1f);
+            }
+        }
+
+        private		void	SubmittedText( string textToProcess ) {
 
 			// log this text, process command
 
@@ -371,8 +379,7 @@ namespace UGameCore.Menu
 				CreateUIForLogMessage(logMessage);
             }
 
-			// scroll to the end
-			this.Invoke (nameof(this.ScrollToEnd), 0.1f);
+			this.ScrollToEndDelayed();
 
 			System.Array.Clear(s_logMessagesBuffer, 0, numNewlyAdded);
         }
