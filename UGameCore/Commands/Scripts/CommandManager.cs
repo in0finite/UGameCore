@@ -114,6 +114,37 @@ namespace UGameCore
             /// Last time when executor executed a command. If specified, the value will be used for rate-limiting.
             /// </summary>
             public double? lastTimeExecutedCommand;
+
+            /// <summary>
+            /// All arguments, including command.
+            /// </summary>
+            public string[] arguments;
+
+            public int NumArguments => this.arguments.Length;
+
+            public int currentArgumentIndex = 1;
+
+            public string ReadString()
+            {
+                if (this.currentArgumentIndex >= this.NumArguments)
+                    throw new System.ArgumentException($"Trying to read command argument out of bounds (index {this.currentArgumentIndex}, num arguments {this.NumArguments})");
+
+                string arg = this.arguments[this.currentArgumentIndex];
+                this.currentArgumentIndex++;
+                return arg;
+            }
+
+            public int ReadInt()
+            {
+                string str = this.ReadString();
+                return int.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            public float ReadFloat()
+            {
+                string str = this.ReadString();
+                return float.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
+            }
         }
 
 
@@ -298,6 +329,8 @@ namespace UGameCore
                 if (commandInfo.limitInterval > 0 && Time.timeAsDouble - context.lastTimeExecutedCommand.Value < commandInfo.limitInterval)
                     return ProcessCommandResult.LimitInterval(commandInfo.limitInterval);
             }
+
+            context.arguments = arguments;
 
             return commandInfo.commandHandler(context);
         }
