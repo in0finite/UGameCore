@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UGameCore.Utilities;
 using Profiler = UnityEngine.Profiling.Profiler;
+using System.Linq;
 
 namespace UGameCore.Menu
 {
@@ -68,7 +69,7 @@ namespace UGameCore.Menu
         private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
         
 		private readonly Queue<LogMessage> m_logMessages = new Queue<LogMessage>();
-        private static LogMessage[] s_logMessagesBuffer;
+        private static List<LogMessage> s_logMessagesBufferList = new List<LogMessage>();
 
         private readonly Queue<ConsoleLogEntryComponent> m_pooledLogEntryComponents = new Queue<ConsoleLogEntryComponent>();
 
@@ -359,17 +360,15 @@ namespace UGameCore.Menu
                 return;
 			}
 
-			s_logMessagesBuffer ??= new LogMessage[500];
+            s_logMessagesBufferList.Clear();
 
-            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToArray(
-                s_logMessagesBuffer, 0, s_logMessagesBuffer.Length);
+            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToList(s_logMessagesBufferList, 500);
 
             if (0 == numNewlyAdded)
 				return;
 
-			for (int i = 0; i < numNewlyAdded; i++)
-				m_logMessages.Enqueue(s_logMessagesBuffer[i]);
-            
+			m_logMessages.EnqueueRange(s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)));
+
             // limit number of log messages
 
             while (m_logMessages.Count > this.maxNumLogMessages)
@@ -389,15 +388,14 @@ namespace UGameCore.Menu
 			if (m_forceUIUpdateNextFrame) // no need to update here, because it will be rebuilt
 				return;
 
-            for (int i = 0; i < numNewlyAdded; i++)
+			foreach (var logMessage in s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)))
 			{
-				var logMessage = s_logMessagesBuffer[i];
-				CreateUIForLogMessage(logMessage);
+                CreateUIForLogMessage(logMessage);
             }
 
 			this.ScrollToDelayed(0f);
 
-			System.Array.Clear(s_logMessagesBuffer, 0, numNewlyAdded);
+			s_logMessagesBufferList.Clear();
         }
 
 		void RebuildLogUI()
@@ -412,7 +410,7 @@ namespace UGameCore.Menu
                 CreateUIForLogMessage(logMessage);
             }
 
-            System.Array.Clear(s_logMessagesBuffer, 0, s_logMessagesBuffer.Length); // release references
+            s_logMessagesBufferList.Clear(); // release references
         }
 
 		void ReleaseLogMessage(LogMessage logMessage)
