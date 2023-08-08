@@ -44,8 +44,16 @@ namespace UGameCore
 				Debug.Log(i + "\n" + i + "\n" + i + "\n" + i, this);
 			return ProcessCommandResult.Success;
         }
+
+        [CommandMethod("log1000", description = "Log 1000 messages")]
+        ProcessCommandResult Log1000Cmd(ProcessCommandContext context)
+        {
+            for (int i = 0; i < 1000; i++)
+                Debug.Log(i + "\n" + i + "\n" + i + "\n" + i, this);
+            return ProcessCommandResult.Success;
+        }
 #endif
 
-	}
+    }
 
 }
