@@ -41,7 +41,9 @@ namespace UGameCore.Menu
             {
                 this.consoleUIRoot.SetActive(value);
 				if (value)
-					this.ScrollToDelayed(m_lastScrollViewValueWhileOpened);
+					this.ScrollToDelayed(m_lastScrollViewValueWhileOpened); // restore last value
+				else
+					m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value; // store last value
             }
         }
 
@@ -347,10 +349,6 @@ namespace UGameCore.Menu
                 this.RebuildLogUI();
 				//this.ScrollToEnd();
             }
-
-			// store last scrollbar value
-			if (this.IsOpened)
-				m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value;
 
         }
 
