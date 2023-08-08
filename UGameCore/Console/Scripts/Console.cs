@@ -58,7 +58,7 @@ namespace UGameCore.Menu
 
 		private float m_lastScrollViewValueWhileOpened = 0f;
         private float m_scrollToValue = 0f;
-		public float[] scrollBarUpdateDelays = new float[] { 0.025f, 0.05f, 0.1f };
+		public float[] scrollBarUpdateDelays = new float[] { 0.05f, 0.1f };
 
         [Tooltip("Key which is used to open/close console")]
         public	KeyCode	openKey = KeyCode.BackQuote;
@@ -265,7 +265,7 @@ namespace UGameCore.Menu
 				// add this command to list of executed commands
 				m_history.Add (textToProcess);
 				if (m_history.Count > 100) {
-					m_history.RemoveAt (0);
+					m_history.RemoveRange (0, 20);
 				}
 			}
 
