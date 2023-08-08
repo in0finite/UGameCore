@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UGameCore.Utilities;
 using Profiler = UnityEngine.Profiling.Profiler;
 using System.Linq;
+using UnityEngine.Events;
 
 namespace UGameCore.Menu
 {
@@ -86,6 +87,8 @@ namespace UGameCore.Menu
 		public		event System.Action	onDrawStats = delegate {};
 
 		public		event System.Action<string>	onTextSubmitted = delegate {};
+
+		public UnityEvent<string, int> onAutoComplete = new UnityEvent<string, int>();
 
 		public List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
 		public List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
@@ -307,6 +310,15 @@ namespace UGameCore.Menu
 
 		}
 
+		void AutoComplete()
+		{
+			// auto-complete current command
+
+			int caret = this.consoleSubmitInputField.caretPosition;
+
+			this.onAutoComplete.Invoke(this.consoleSubmitInputField.text, caret);
+        }
+
 
 		void Update () {
 
@@ -322,18 +334,19 @@ namespace UGameCore.Menu
 			}
 
 			// check for key events from input field
-			if(this.consoleSubmitInputField != null) {
-				
-				if( this.consoleSubmitInputField.isFocused ) {
-					
-					if(Input.GetKeyDown(KeyCode.UpArrow)) {
-						// browse history backwards
-						BrowseHistoryBackwards();
-
-					} else if(Input.GetKeyDown(KeyCode.DownArrow)) {
-						// browse history forwards
-						BrowseHistoryForwards();
-					}
+			if (this.consoleSubmitInputField != null && this.consoleSubmitInputField.isFocused)
+			{
+				if (Input.GetKeyDown(KeyCode.UpArrow))
+				{
+					BrowseHistoryBackwards();
+				}
+				else if (Input.GetKeyDown(KeyCode.DownArrow))
+				{
+					BrowseHistoryForwards();
+				}
+				else if (Input.GetKeyDown(KeyCode.Tab))
+				{
+					AutoComplete();
 				}
 			}
 

@@ -317,6 +317,103 @@ namespace UGameCore
             return new ProcessCommandResult {response = response};
         }
 
+        public void AutoCompleteCommand(ProcessCommandContext context, List<string> outResults)
+        {
+            if (string.IsNullOrWhiteSpace(context.command))
+                return;
+
+            string[] arguments = SplitCommandIntoArguments(context.command);
+            if (0 == arguments.Length)
+                return;
+
+            if (arguments.Length > 1)
+            {
+                // TODO: ask the command handler to do auto-completion
+
+                return;
+            }
+
+            // only 1 argument, the command itself, auto-complete it
+
+            if (m_registeredCommands.ContainsKey(arguments[0]))
+            {
+                return;
+            }
+
+            // go through all registered commands and see which ones match
+
+            // example (commands: net_start, net_stop, net_exit, net_socket, neptun):
+            // 
+            // input: n
+            // output: ne (longest common prefix for ALL commands that start with it)
+            //
+            // input: ne
+            // output: ne (no expansion)
+            //
+            // input: net
+            // output: net_ (longest common prefix for ALL commands that start with it)
+            //
+            // input: net_st
+            // output: net_start, net_stop (longest common prefix is equal to input)
+            //
+            // input: net_s
+            // output: net_start, net_stop, net_socket (longest common prefix is equal to input)
+
+            var commandsStartingWith = new List<string>();
+
+            foreach (var pair in m_registeredCommands)
+            {
+                if (pair.Key.StartsWith(arguments[0], System.StringComparison.Ordinal))
+                    commandsStartingWith.Add(pair.Key);
+            }
+
+            if (commandsStartingWith.Count == 0)
+                return;
+
+            // find longest common prefix
+
+            string commandToTest = commandsStartingWith[0];
+
+            string commonPrefix = arguments[0];
+            int startIndex = commonPrefix.Length;
+
+            for (int i = startIndex; i < commandToTest.Length; i++)
+            {
+                char ch = commandToTest[i];
+
+                // if all other commands have this char at this index, it is part of common prefix
+
+                bool allCommandsHaveThisChar = true;
+
+                for (int j = 1; j < commandsStartingWith.Count; j++)
+                {
+                    string cmd = commandsStartingWith[j];
+                    if (i >= cmd.Length || cmd[i] != ch)
+                    {
+                        allCommandsHaveThisChar = false;
+                        break;
+                    }
+                }
+
+                if (!allCommandsHaveThisChar)
+                    break;
+
+                commonPrefix += ch;
+            }
+
+            if (commonPrefix.Equals(arguments[0], System.StringComparison.Ordinal))
+            {
+                // longest common prefix is equal to input
+                // return all commands that start with it
+
+                outResults.AddRange(commandsStartingWith);
+                return;
+            }
+
+            // return only the common prefix - command should be auto-completed into it
+            outResults.Add(commonPrefix);
+        }
+
         public bool HasCommand(string command)
         {
             return m_registeredCommands.ContainsKey(command);
