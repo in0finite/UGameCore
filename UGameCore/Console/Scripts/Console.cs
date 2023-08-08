@@ -51,6 +51,7 @@ namespace UGameCore.Menu
 
 		private float m_lastScrollViewValueWhileOpened = 0f;
         private float m_scrollToValue = 0f;
+		public float[] scrollBarUpdateDelays = new float[] { 0.025f, 0.05f, 0.1f };
 
         [Tooltip("Key which is used to open/close console")]
         public	KeyCode	openKey = KeyCode.BackQuote;
@@ -240,7 +241,8 @@ namespace UGameCore.Menu
             if (this.consoleScrollView != null)
             {
 				m_scrollToValue = value;
-                this.Invoke(nameof(this.ScrollToPredefined), 0.1f);
+				foreach (float delay in this.scrollBarUpdateDelays)
+					this.Invoke(nameof(this.ScrollToPredefined), delay);
             }
         }
 
