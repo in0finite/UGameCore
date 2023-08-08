@@ -34,13 +34,25 @@ namespace UGameCore.Menu
 		}
 
 
-		public		bool	IsOpened { get => this.consoleUIRoot.activeInHierarchy; set => this.consoleUIRoot.SetActive(value); }
+		public		bool	IsOpened
+        {
+            get => this.consoleUIRoot.activeInHierarchy;
+			set
+            {
+                this.consoleUIRoot.SetActive(value);
+				if (value)
+					this.ScrollToDelayed(m_lastScrollViewValueWhileOpened);
+            }
+        }
 
-		public bool IsDetailsAreaOpened { get; set; } = false;
+        public bool IsDetailsAreaOpened { get; set; } = false;
 
         private bool m_forceUIUpdateNextFrame = false;
 
-		[Tooltip("Key which is used to open/close console")]
+		private float m_lastScrollViewValueWhileOpened = 0f;
+        private float m_scrollToValue = 0f;
+
+        [Tooltip("Key which is used to open/close console")]
         public	KeyCode	openKey = KeyCode.BackQuote;
 
         [Tooltip("Key which is used to open/close console on mobile and console platforms")]
@@ -215,19 +227,20 @@ namespace UGameCore.Menu
 
 		}
 
-		private		void	ScrollToEnd() {
+		private		void	ScrollToPredefined() {
 
 			if (this.consoleScrollView != null) {
-				this.consoleScrollView.verticalScrollbar.value = 0f;
+				this.consoleScrollView.verticalScrollbar.value = m_scrollToValue;
 			}
 
 		}
 
-        private void ScrollToEndDelayed()
+        private void ScrollToDelayed(float value)
         {
             if (this.consoleScrollView != null)
             {
-                this.Invoke(nameof(this.ScrollToEnd), 0.1f);
+				m_scrollToValue = value;
+                this.Invoke(nameof(this.ScrollToPredefined), 0.1f);
             }
         }
 
@@ -330,8 +343,12 @@ namespace UGameCore.Menu
             {
 				m_forceUIUpdateNextFrame = false;
                 this.RebuildLogUI();
-				this.ScrollToEnd();
+				//this.ScrollToEnd();
             }
+
+			// store last scrollbar value
+			if (this.IsOpened)
+				m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value;
 
         }
 
@@ -379,7 +396,7 @@ namespace UGameCore.Menu
 				CreateUIForLogMessage(logMessage);
             }
 
-			this.ScrollToEndDelayed();
+			this.ScrollToDelayed(0f);
 
 			System.Array.Clear(s_logMessagesBuffer, 0, numNewlyAdded);
         }
