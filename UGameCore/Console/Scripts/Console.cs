@@ -47,7 +47,7 @@ namespace UGameCore.Menu
 				if (value)
                 {
 					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleScrollView.GetRectTransform());
-                    this.ScrollToDelayed(m_lastScrollViewValueWhileOpened); // restore last value
+                    this.consoleScrollView.verticalScrollbar.value = m_lastScrollViewValueWhileOpened; // restore last value
                 }
             }
         }
