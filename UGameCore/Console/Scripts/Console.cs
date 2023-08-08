@@ -45,7 +45,10 @@ namespace UGameCore.Menu
                 this.consoleUIRoot.SetActive(value);
 				
 				if (value)
-					this.ScrollToDelayed(m_lastScrollViewValueWhileOpened); // restore last value
+                {
+					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleScrollView.GetRectTransform());
+                    this.ScrollToDelayed(m_lastScrollViewValueWhileOpened); // restore last value
+                }
             }
         }
 
