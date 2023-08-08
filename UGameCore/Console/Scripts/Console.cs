@@ -435,8 +435,10 @@ namespace UGameCore.Menu
 
 		void CreateUIForLogMessage(LogMessage logMessage)
 		{
+			ConsoleLogEntryComponent logEntryComponent = logMessage.logEntryComponent;
+
             // try take from pool
-            if (!m_pooledLogEntryComponents.TryDequeue(out var logEntryComponent))
+            if (null == logEntryComponent && !m_pooledLogEntryComponents.TryDequeue(out logEntryComponent))
             {
                 logEntryComponent = this.logEntryPrefab.InstantiateAsUIElement(this.consoleScrollView.content)
                     .GetComponentOrThrow<ConsoleLogEntryComponent>();
