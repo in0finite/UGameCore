@@ -39,11 +39,13 @@ namespace UGameCore.Menu
             get => this.consoleUIRoot.activeInHierarchy;
 			set
             {
+				if (!value)
+                    m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value; // store last value
+
                 this.consoleUIRoot.SetActive(value);
+				
 				if (value)
 					this.ScrollToDelayed(m_lastScrollViewValueWhileOpened); // restore last value
-				else
-					m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value; // store last value
             }
         }
 
