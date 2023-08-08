@@ -80,22 +80,22 @@ namespace UGameCore
             if (null == context)
                 return;
 
-            var results = new List<string>();
-            this.commandManager.AutoCompleteCommand(context, results);
+            var possibleCompletions = new List<string>();
+            this.commandManager.AutoCompleteCommand(context, out string exactCompletion, possibleCompletions);
 
-            if (results.Count == 0)
+            // log all possible completions
+            if (possibleCompletions.Count > 0)
+                Debug.Log(string.Join("\t\t", possibleCompletions), this);
+            
+            // assign the exact completion into the InputField, respecting the caret position
+
+            if (exactCompletion == null)
                 return;
 
             string textAfterCaret = text[caretPosition..];
 
-            if (results.Count == 1)
-            {
-                this.console.consoleSubmitInputField.text = results[0] + textAfterCaret;
-                this.console.consoleSubmitInputField.caretPosition = results[0].Length;
-                return;
-            }
-
-            Debug.Log(string.Join("\t\t", results), this);
+            this.console.consoleSubmitInputField.text = exactCompletion + textAfterCaret;
+            this.console.consoleSubmitInputField.caretPosition = exactCompletion.Length;
         }
 	}
 }

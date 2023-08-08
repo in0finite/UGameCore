@@ -317,8 +317,10 @@ namespace UGameCore
             return new ProcessCommandResult {response = response};
         }
 
-        public void AutoCompleteCommand(ProcessCommandContext context, List<string> outResults)
+        public void AutoCompleteCommand(ProcessCommandContext context, out string outExactCompletion, List<string> outPossibleCompletions)
         {
+            outExactCompletion = null;
+
             if (string.IsNullOrWhiteSpace(context.command))
                 return;
 
@@ -335,29 +337,23 @@ namespace UGameCore
 
             // only 1 argument, the command itself, auto-complete it
 
-            if (m_registeredCommands.ContainsKey(arguments[0]))
-            {
-                return;
-            }
-
-            // go through all registered commands and see which ones match
 
             // example (commands: net_start, net_stop, net_exit, net_socket, neptun):
             // 
             // input: n
-            // output: ne (longest common prefix for ALL commands that start with it)
+            // output: ne (common prefix for ALL commands that start with it)
             //
             // input: ne
             // output: ne (no expansion)
             //
             // input: net
-            // output: net_ (longest common prefix for ALL commands that start with it)
+            // output: net_ (common prefix for ALL commands that start with it)
             //
             // input: net_st
-            // output: net_start, net_stop (longest common prefix is equal to input)
+            // output: net_start, net_stop (common prefix is equal to input)
             //
             // input: net_s
-            // output: net_start, net_stop, net_socket (longest common prefix is equal to input)
+            // output: net_start, net_stop, net_socket (common prefix is equal to input)
 
             var commandsStartingWith = new List<string>();
 
@@ -370,7 +366,7 @@ namespace UGameCore
             if (commandsStartingWith.Count == 0)
                 return;
 
-            // find longest common prefix
+            // find common prefix
 
             string commandToTest = commandsStartingWith[0];
 
@@ -404,14 +400,15 @@ namespace UGameCore
             if (commonPrefix.Equals(arguments[0], System.StringComparison.Ordinal))
             {
                 // longest common prefix is equal to input
-                // return all commands that start with it
+                // no need to auto-complete, only return all possible completions
 
-                outResults.AddRange(commandsStartingWith);
+                if (commandsStartingWith.Count > 1) // don't return 1 command only (which would be equal to input)
+                    outPossibleCompletions.AddRange(commandsStartingWith);
                 return;
             }
 
-            // return only the common prefix - command should be auto-completed into it
-            outResults.Add(commonPrefix);
+            // auto-complete the command into common prefix
+            outExactCompletion = commonPrefix;
         }
 
         public bool HasCommand(string command)
