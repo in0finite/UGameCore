@@ -39,16 +39,11 @@ namespace UGameCore.Menu
             get => this.consoleUIRoot.activeInHierarchy;
 			set
             {
-				if (!value)
-                    m_lastScrollViewValueWhileOpened = this.consoleScrollView.verticalScrollbar.value; // store last value
-
                 this.consoleUIRoot.SetActive(value);
 				
+				// need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
 				if (value)
-                {
 					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleScrollView.GetRectTransform());
-                    this.consoleScrollView.verticalScrollbar.value = m_lastScrollViewValueWhileOpened; // restore last value
-                }
             }
         }
 
@@ -56,7 +51,6 @@ namespace UGameCore.Menu
 
         private bool m_forceUIUpdateNextFrame = false;
 
-		private float m_lastScrollViewValueWhileOpened = 0f;
         private float m_scrollToValue = 0f;
 		public float[] scrollBarUpdateDelays = new float[] { 0.05f, 0.1f };
 
