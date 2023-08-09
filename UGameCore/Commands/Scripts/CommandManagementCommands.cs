@@ -1,3 +1,4 @@
+using System.Linq;
 using UGameCore.Utilities;
 using UnityEngine;
 using static UGameCore.CommandManager;
@@ -14,6 +15,16 @@ namespace UGameCore
             this.EnsureSerializableReferencesAssigned();
 
             this.commandManager.RegisterCommandsFromTypeMethods(this);
+        }
+
+        [CommandMethod("help", allowToRunWithoutServerPermissions = true)]
+        ProcessCommandResult ForbidCmd(ProcessCommandContext context)
+        {
+            string response = "List of available commands: " +
+                              string.Join(", ", this.commandManager.RegisteredCommandsDict
+                                  .Select(pair => pair.Key));
+
+            return ProcessCommandResult.SuccessResponse(response);
         }
 
         [CommandMethod("command_remove")]

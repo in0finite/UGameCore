@@ -14,13 +14,12 @@ namespace UGameCore
             new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
 
         public IReadOnlyCollection<string> RegisteredCommands => m_registeredCommands.Keys;
+        public IReadOnlyDictionary<string, CommandInfo> RegisteredCommandsDict => m_registeredCommands;
 
         public static string invalidSyntaxText => "Invalid syntax";
 
         [Tooltip("Forbidden commands can not be registered or executed")]
         public List<string> forbiddenCommands = new List<string>();
-
-        [SerializeField] private bool m_registerHelpCommand = true;
 
         /// <summary>
         /// Annotate a method with this attribute to register it as a command.
@@ -184,9 +183,6 @@ namespace UGameCore
         {
             if (null == Singleton)
                 Singleton = this;
-
-            if (m_registerHelpCommand)
-                RegisterCommand(new CommandInfo { command = "help", commandHandler = ProcessHelpCommand, allowToRunWithoutServerPermissions = true });
         }
 
         public void RegisterCommand(CommandInfo commandInfo)
@@ -416,16 +412,6 @@ namespace UGameCore
         public ProcessCommandResult ProcessCommandAsServer(string command)
         {
             return ProcessCommand(new ProcessCommandContext {command = command, hasServerPermissions = true});
-        }
-
-        ProcessCommandResult ProcessHelpCommand(ProcessCommandContext context)
-        {
-            string response = "List of available commands: " +
-                              string.Join(", ", m_registeredCommands
-                                  .Where(pair => context.hasServerPermissions || pair.Value.allowToRunWithoutServerPermissions)
-                                  .Select(pair => pair.Key));
-
-            return new ProcessCommandResult {response = response};
         }
 
         public void AutoCompleteCommand(ProcessCommandContext context, out string outExactCompletion, List<string> outPossibleCompletions)
