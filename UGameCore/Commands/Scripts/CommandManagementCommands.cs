@@ -76,7 +76,7 @@ namespace UGameCore
             return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
         }
 
-        [CommandMethod("command_remove", "Removes a command")]
+        [CommandMethod("command_remove", "Removes a command", syntax = "(string commandName)")]
         ProcessCommandResult RemoveCmd(ProcessCommandContext context)
         {
             string cmd = context.ReadString();
@@ -86,7 +86,7 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("command_forbid", "Forbids a command. Forbidden commands can not be registered or executed.")]
+        [CommandMethod("command_forbid", "Forbids a command. Forbidden commands can not be registered or executed.", syntax = "(string commandName)")]
         ProcessCommandResult ForbidCmd(ProcessCommandContext context)
         {
             string cmd = context.ReadString();
@@ -96,7 +96,7 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("alias", "Creates alias for a command")]
+        [CommandMethod("alias", "Creates alias for a command", syntax = "(string newCommand, string existingCommand)")]
         ProcessCommandResult AliasCmd(ProcessCommandContext context)
         {
             string newCmd = context.ReadString();

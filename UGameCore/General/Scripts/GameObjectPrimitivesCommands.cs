@@ -13,6 +13,8 @@ namespace UGameCore
         public float lifeTime = 0f;
         public float lifeTimeDynamic = 30f;
 
+        const string kSyntax = "([float scale])  or  ([float scaleX], [float scaleY], [float scaleZ])";
+
 
         void Start()
         {
@@ -56,28 +58,28 @@ namespace UGameCore
             }
         }
 
-        [CommandMethod("cube", "Creates static cube")]
+        [CommandMethod("cube", "Creates static cube", syntax = kSyntax)]
         ProcessCommandResult CubeCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Cube, false);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("sphere", "Creates static sphere")]
+        [CommandMethod("sphere", "Creates static sphere", syntax = kSyntax)]
         ProcessCommandResult SphereCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Sphere, false);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("cube_dynamic", "Creates dynamic cube")]
+        [CommandMethod("cube_dynamic", "Creates dynamic cube", syntax = kSyntax)]
         ProcessCommandResult CubeDynamicCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Cube, true);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("sphere_dynamic", "Creates dynamic sphere")]
+        [CommandMethod("sphere_dynamic", "Creates dynamic sphere", syntax = kSyntax)]
         ProcessCommandResult SphereDynamicCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Sphere, true);
