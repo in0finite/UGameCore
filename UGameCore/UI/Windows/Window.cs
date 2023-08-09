@@ -15,8 +15,8 @@ namespace UGameCore.Menu.Windows {
 		internal	bool	isModal = false ;
 		internal	string	title = "" ;
 		internal	Rect	rect = new Rect ();
-		internal	List<string>	displayStrings = new List<string> ();
-		internal	System.Action<Window>	procedure = null;
+		public	List<string>	displayStrings { get; internal set; } = new List<string> ();
+		public	System.Action<Window>	procedure { get; internal set; }
 	//	public	GameObject	gameObject { get ; internal set ; }
 
 
