@@ -10,9 +10,8 @@ namespace UGameCore
     {
         public static CommandManager Singleton { get; private set; }
 
-        // TODO: commands should be case-insensitive
         readonly Dictionary<string, CommandInfo> m_registeredCommands =
-            new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
+            new Dictionary<string, CommandInfo>(System.StringComparer.OrdinalIgnoreCase);
 
         public IReadOnlyCollection<string> RegisteredCommands => m_registeredCommands.Keys;
         public IReadOnlyDictionary<string, CommandInfo> RegisteredCommandsDict => m_registeredCommands;
@@ -20,7 +19,13 @@ namespace UGameCore
         public static string invalidSyntaxText => "Invalid syntax";
 
         [Tooltip("Forbidden commands can not be registered or executed")]
-        public List<string> forbiddenCommands = new List<string>();
+        [SerializeField]
+        List<string> m_forbiddenCommandsList = new List<string>();
+
+        /// <summary>
+        /// Forbidden commands can not be registered or executed.
+        /// </summary>
+        public readonly HashSet<string> ForbiddenCommands = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Annotate a method with this attribute to register it as a command.
@@ -184,6 +189,8 @@ namespace UGameCore
         {
             if (null == Singleton)
                 Singleton = this;
+
+            this.ForbiddenCommands.UnionWith(m_forbiddenCommandsList);
         }
 
         public void RegisterCommand(CommandInfo commandInfo)
@@ -194,9 +201,11 @@ namespace UGameCore
             if (string.IsNullOrWhiteSpace(commandInfo.command))
                 throw new System.ArgumentException("Command can not be empty");
 
-            commandInfo.command = commandInfo.command.Trim();
+            // TODO: check for invalid chars - only alphanumerics + '_-' should be allowed
 
-            if (this.forbiddenCommands.Contains(commandInfo.command))
+            commandInfo.command = commandInfo.command.ToLowerInvariant().Trim();
+
+            if (this.ForbiddenCommands.Contains(commandInfo.command))
                 throw new System.InvalidOperationException($"Command '{commandInfo.command}' is forbidden");
 
             if (m_registeredCommands.ContainsKey(commandInfo.command))
@@ -390,7 +399,7 @@ namespace UGameCore
             if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
                 return ProcessCommandResult.UnknownCommand(arguments[0]);
 
-            if (this.forbiddenCommands.Contains(commandInfo.command))
+            if (this.ForbiddenCommands.Contains(commandInfo.command))
                 return ProcessCommandResult.ForbiddenCommand;
 
             if (commandInfo.runOnlyOnServer && !NetworkStatus.IsServer)
@@ -479,24 +488,7 @@ namespace UGameCore
         {
             outExactCompletion = null;
 
-            // example (commands: net_start, net_stop, net_exit, net_socket, neptun):
-            // 
-            // input: n
-            // output: ne (common prefix for ALL commands that start with it)
-            //
-            // input: ne
-            // output: ne (no expansion)
-            //
-            // input: net
-            // output: net_ (common prefix for ALL commands that start with it)
-            //
-            // input: net_st
-            // output: net_start, net_stop (common prefix is equal to input)
-            //
-            // input: net_s
-            // output: net_start, net_stop, net_socket (common prefix is equal to input)
-
-            var stringComparison = System.StringComparison.Ordinal;
+            var stringComparison = System.StringComparison.OrdinalIgnoreCase;
 
             var optionsStartingWith = new List<string>();
 
@@ -527,8 +519,8 @@ namespace UGameCore
                 for (int j = 1; j < optionsStartingWith.Count; j++)
                 {
                     string option = optionsStartingWith[j];
-                    // TODO: char comparison does not respect the specified StringComparison
-                    if (i >= option.Length || option[i] != ch)
+                    
+                    if (i >= option.Length || char.ToLowerInvariant(option[i]) != char.ToLowerInvariant(ch))
                     {
                         allOptionsHaveThisChar = false;
                         break;
