@@ -360,27 +360,7 @@ namespace UGameCore.Menu
 
 		void Update () {
 
-			// open/close console
-
-			KeyCode keyCode = Application.isMobilePlatform || Application.isConsolePlatform
-				? this.openKeyMobileAndConsole
-				: this.openKey;
-
-			if (Input.GetKeyDown(keyCode)
-				&& (!F.UIHasFocus()
-					|| (this.consoleSubmitInputField.isFocused 
-						&& (this.consoleSubmitInputField.text.IsNullOrWhiteSpace() || this.consoleSubmitInputField.text[0] == (char)keyCode))))
-			{
-				this.IsOpened = !this.IsOpened;
-
-                if (!this.IsOpened)
-                {
-                    this.consoleSubmitInputField.text = string.Empty; // open-key will remain in InputField if we don't set this
-                    this.consoleSubmitInputField.DeactivateInputField();
-					if (EventSystem.current != null)
-						EventSystem.current.SetSelectedGameObject(null); // have to do this, otherwise InputField remains focused
-                }
-            }
+			this.UpdateOpenClose();
 
 			// check for key events from input field
 			if (this.consoleSubmitInputField != null && this.consoleSubmitInputField.isFocused)
@@ -414,7 +394,32 @@ namespace UGameCore.Menu
 
         }
 
-		void UpdateLogMessages() {
+        void UpdateOpenClose()
+		{
+            // open/close console
+
+            KeyCode keyCode = Application.isMobilePlatform || Application.isConsolePlatform
+                ? this.openKeyMobileAndConsole
+                : this.openKey;
+
+            if (Input.GetKeyDown(keyCode)
+                && (!F.UIHasFocus()
+                    || (this.consoleSubmitInputField.isFocused
+                        && (this.consoleSubmitInputField.text.IsNullOrWhiteSpace() || this.consoleSubmitInputField.text[0] == (char)keyCode))))
+            {
+                this.IsOpened = !this.IsOpened;
+
+                if (!this.IsOpened)
+                {
+                    this.consoleSubmitInputField.text = string.Empty; // open-key will remain in InputField if we don't set this
+                    this.consoleSubmitInputField.DeactivateInputField();
+                    if (EventSystem.current != null)
+                        EventSystem.current.SetSelectedGameObject(null); // have to do this, otherwise InputField remains focused
+                }
+            }
+        }
+
+        void UpdateLogMessages() {
 
 			if (this.maxNumLogMessages <= 0)
 			{
