@@ -70,7 +70,7 @@ namespace UGameCore.Menu
 		public volatile int numLinesToDisplayForLogMessage = 3;
         public volatile int maxCharsInLogMessage = 250;
 
-        private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
+        private readonly	Utilities.ConcurrentQueue<LogMessage>	m_threadedBuffer = new ConcurrentQueue<LogMessage>();
         
 		private readonly Queue<LogMessage> m_logMessages = new Queue<LogMessage>();
         private static List<LogMessage> s_logMessagesBufferList = new List<LogMessage>();
@@ -167,12 +167,12 @@ namespace UGameCore.Menu
 
             // keep the buffer limited in size - we don't need more than this number.
             // this also prevents running out of memory.
-            m_messagesArrivedThisFrame.DequeueUntilCountReaches(this.maxNumLogMessages);
+            m_threadedBuffer.DequeueUntilCountReaches(this.maxNumLogMessages);
 
             double time = m_stopwatch.Elapsed.TotalSeconds;
             var logMessage = new LogMessage (logStr, stackTrace, type, time);
 			
-            m_messagesArrivedThisFrame.Enqueue(logMessage);
+            m_threadedBuffer.Enqueue(logMessage);
 		}
 
 		public		bool	ShouldMessageBeIgnored(string logStr, LogType type) {
@@ -242,7 +242,7 @@ namespace UGameCore.Menu
 
 			m_logMessages.Clear();
 
-			m_messagesArrivedThisFrame.Clear();
+			m_threadedBuffer.Clear();
 			
 			m_forceUIUpdateNextFrame = true;
 
@@ -386,7 +386,7 @@ namespace UGameCore.Menu
 
 			if (this.maxNumLogMessages <= 0)
 			{
-				m_messagesArrivedThisFrame.Clear();
+				m_threadedBuffer.Clear();
                 return;
 			}
 
@@ -399,7 +399,7 @@ namespace UGameCore.Menu
 
             s_logMessagesBufferList.Clear();
 
-            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToList(s_logMessagesBufferList, this.maxNumLogMessages + 10);
+            int numNewlyAdded = m_threadedBuffer.DequeueToList(s_logMessagesBufferList, this.maxNumLogMessages + 10);
 
             if (0 == numNewlyAdded)
 				return;
