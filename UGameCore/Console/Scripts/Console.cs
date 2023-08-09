@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UGameCore.Utilities;
 using Profiler = UnityEngine.Profiling.Profiler;
 using System.Linq;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace UGameCore.Menu
@@ -98,12 +97,10 @@ namespace UGameCore.Menu
 
 		public		event System.Action	onDrawStats = delegate {};
 
-		public		event System.Action<string>	onTextSubmitted = delegate {};
-
-		public UnityEvent<string, int> onAutoComplete = new UnityEvent<string, int>();
-
 		public List<IgnoreMessageInfo>	ignoreMessages = new List<IgnoreMessageInfo> ();
 		public List<IgnoreMessageInfo>	ignoreMessagesThatStartWith = new List<IgnoreMessageInfo> ();
+
+		public CommandManager commandManager;
 
 		public GameObject logEntryPrefab;
 
@@ -119,7 +116,7 @@ namespace UGameCore.Menu
         {
             Application.logMessageReceivedThreaded += HandleLogThreaded;
 
-			m_forceUIUpdateNextFrame = true;
+			m_forceUIUpdateNextFrame = true; // not sure if needed, but just in case
         }
 
         private void OnDisable()
@@ -295,7 +292,7 @@ namespace UGameCore.Menu
 
 			Debug.Log ( "> " + textToProcess );
 
-			onTextSubmitted.InvokeEventExceptionSafe (textToProcess);
+			this.HandleTextSubmitted(textToProcess);
 			
 			if (!textToProcess.IsNullOrWhiteSpace()) {
 				// add this command to list of executed commands
@@ -310,7 +307,84 @@ namespace UGameCore.Menu
 
 		}
 
-		public		void	SetInputBoxText( string text ) {
+		void HandleTextSubmitted(string text)
+		{
+            // process it as a command
+
+            var context = CreateCommandContext(text);
+            if (null == context)
+                return;
+
+            var result = this.commandManager.ProcessCommand(context);
+
+            if (result.response != null)
+            {
+                if (result.IsSuccess)
+                    Debug.Log(result.response, this);
+                else
+                    Debug.LogError(result.response, this);
+            }
+        }
+
+        void AutoComplete()
+        {
+			// auto-complete current command
+
+			int caretPosition = this.consoleSubmitInputField.caretPosition;
+
+            if (caretPosition <= 0)
+                return;
+
+			string text = this.consoleSubmitInputField.text;
+
+            string textBeforeCaret = text[..caretPosition];
+
+            var context = CreateCommandContext(textBeforeCaret);
+            if (null == context)
+                return;
+
+            var possibleCompletions = new List<string>();
+            this.commandManager.AutoCompleteCommand(context, out string exactCompletion, possibleCompletions);
+
+            // log all possible completions
+            if (possibleCompletions.Count > 0)
+                Debug.Log(string.Join("\t\t", possibleCompletions), this);
+
+            // assign the exact completion into the InputField, respecting the caret position
+
+            if (exactCompletion == null)
+                return;
+
+            string textAfterCaret = text[caretPosition..];
+
+            this.consoleSubmitInputField.text = exactCompletion + textAfterCaret;
+            this.consoleSubmitInputField.caretPosition = exactCompletion.Length;
+
+        }
+
+        CommandManager.ProcessCommandContext CreateCommandContext(string text)
+        {
+            // Commands are always executed locally (ie. not sent to server).
+            // The actual command callback can decide what to do based on network state, and potentially
+            // send the command to server.
+
+            if (text.IsNullOrWhiteSpace())
+                return null;
+
+            var player = Player.local;
+
+            var context = new CommandManager.ProcessCommandContext
+            {
+                command = text,
+                hasServerPermissions = player != null ? player.IsServerAdmin : true, // only give perms if offline or on dedicated server
+                executor = player,
+                lastTimeExecutedCommand = player != null ? player.LastTimeExecutedCommand : null,
+            };
+
+            return context;
+        }
+
+        public		void	SetInputBoxText( string text ) {
 
 			if (this.consoleSubmitInputField != null) {
 				this.consoleSubmitInputField.text = text;
@@ -348,17 +422,8 @@ namespace UGameCore.Menu
 
 		}
 
-		void AutoComplete()
-		{
-			// auto-complete current command
 
-			int caret = this.consoleSubmitInputField.caretPosition;
-
-			this.onAutoComplete.Invoke(this.consoleSubmitInputField.text, caret);
-        }
-
-
-		void Update () {
+        void Update () {
 
 			this.UpdateOpenClose();
 
@@ -375,7 +440,7 @@ namespace UGameCore.Menu
 				}
 				else if (Input.GetKeyDown(KeyCode.Tab))
 				{
-					AutoComplete();
+					this.AutoComplete();
 				}
 			}
 
