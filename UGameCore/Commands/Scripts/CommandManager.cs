@@ -245,7 +245,7 @@ namespace UGameCore
                         allowToRunWithoutServerPermissions = attr.allowToRunWithoutServerPermissions,
                         runOnlyOnServer = attr.runOnlyOnServer,
                         limitInterval = attr.limitInterval,
-                        commandHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context }),
+                        commandHandler = CreateCommandHandler(method, instanceObject),
                     };
 
                     F.RunExceptionSafe(() => this.RegisterCommand(commandInfo));
@@ -276,9 +276,16 @@ namespace UGameCore
             if (commandInfo.autoCompletionHandler != null)
                 throw new System.ArgumentException($"Auto-complete handler for command '{cmd}' already exists");
             
-            commandInfo.autoCompletionHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context });
+            commandInfo.autoCompletionHandler = CreateCommandHandler(method, instanceObject);
 
             m_registeredCommands[cmd] = commandInfo;
+        }
+
+        System.Func<ProcessCommandContext, ProcessCommandResult> CreateCommandHandler(
+            MethodInfo method, object instanceObject)
+        {
+            return (ProcessCommandContext context) => 
+                (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context });
         }
 
         void CheckIfCommandMethodIsCorrect(MethodInfo method)
