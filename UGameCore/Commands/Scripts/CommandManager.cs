@@ -343,8 +343,6 @@ namespace UGameCore
 
         public static string[] SplitCommandIntoArguments(string command)
         {
-            // TODO: add support for escaping with \
-
             // examples:
             // abcd"abc"abc
             // abcd" abcd" abcd
@@ -390,12 +388,22 @@ namespace UGameCore
 
                 if ((ch == '\'' || ch == '\"') && !thisCharIsEscaped)
                 {
-                    if (ch == startingQuoteChar) // inside quotes, ending current argument
+                    if (ch == startingQuoteChar) // inside quotes
                     {
-                        string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                        arguments.Add(argument.Trim());
-                        argumentStartIndex = i;
-                        startingQuoteChar = (char)0;
+                        if (i == command.Length - 1 || char.IsWhiteSpace(command[i + 1]))
+                        {
+                            // whitespace is after this char, end current argument
+
+                            string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
+                            arguments.Add(argument.Trim());
+                            argumentStartIndex = i;
+                            startingQuoteChar = (char)0;
+
+                            continue;
+                        }
+
+                        // no whitespace after this char, treat it as regular char - he will be part of current argument
+
                         continue;
                     }
 
@@ -476,8 +484,6 @@ namespace UGameCore
 
         public string CombineArguments(string[] arguments)
         {
-            // TODO: add support for escaping with \
-
             var sb = new System.Text.StringBuilder();
 
             for (int i = 0; i < arguments.Length; i++)
