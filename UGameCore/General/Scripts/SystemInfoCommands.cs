@@ -17,7 +17,7 @@ namespace UGameCore
             this.commandManager.RegisterCommandsFromTypeMethods(this);
         }
 
-        [CommandMethod("sys_info")]
+        [CommandMethod("sys_info", "Displays various system information")]
         ProcessCommandResult SystemInfoCmd(ProcessCommandContext context)
         {
             var props = typeof(SystemInfo).GetProperties(

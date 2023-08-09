@@ -103,7 +103,7 @@ namespace UGameCore
 
             public bool IsSuccess => this.exitCode == 0;
 
-            public static ProcessCommandResult UnknownCommand => Error("Unknown command");
+            public static ProcessCommandResult UnknownCommand(string cmd) => Error($"Unknown command: {cmd}");
             public static ProcessCommandResult InvalidCommand => Error("Invalid command");
             public static ProcessCommandResult ForbiddenCommand => Error("Forbidden command");
             public static ProcessCommandResult NoPermissions => Error("You don't have permissions to run this command");
@@ -380,14 +380,14 @@ namespace UGameCore
         public ProcessCommandResult ProcessCommand(ProcessCommandContext context)
         {
             if (string.IsNullOrWhiteSpace(context.command))
-                return ProcessCommandResult.UnknownCommand;
+                return ProcessCommandResult.UnknownCommand(null);
 
             string[] arguments = SplitCommandIntoArguments(context.command);
             if (0 == arguments.Length)
                 return ProcessCommandResult.InvalidCommand;
 
             if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
-                return ProcessCommandResult.UnknownCommand;
+                return ProcessCommandResult.UnknownCommand(arguments[0]);
 
             if (this.forbiddenCommands.Contains(commandInfo.command))
                 return ProcessCommandResult.ForbiddenCommand;
@@ -438,8 +438,7 @@ namespace UGameCore
                 arguments[0],
                 m_registeredCommands.Select(pair => pair.Key),
                 out outExactCompletion,
-                outPossibleCompletions,
-                System.StringComparison.Ordinal);
+                outPossibleCompletions);
 
             if (outExactCompletion == null && outPossibleCompletions.Count == 0)
             {
@@ -475,8 +474,7 @@ namespace UGameCore
             string input,
             IEnumerable<string> availableOptions,
             out string outExactCompletion,
-            List<string> outPossibleCompletions,
-            System.StringComparison stringComparison)
+            List<string> outPossibleCompletions)
         {
             outExactCompletion = null;
 
@@ -496,6 +494,8 @@ namespace UGameCore
             //
             // input: net_s
             // output: net_start, net_stop, net_socket (common prefix is equal to input)
+
+            var stringComparison = System.StringComparison.Ordinal;
 
             var optionsStartingWith = new List<string>();
 

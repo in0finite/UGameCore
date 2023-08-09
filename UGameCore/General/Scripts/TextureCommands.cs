@@ -17,7 +17,7 @@ namespace UGameCore
             this.commandManager.RegisterCommandsFromTypeMethods(this);
         }
 
-        [CommandMethod("tex_info")]
+        [CommandMethod("tex_info", "Displays various texture information")]
         ProcessCommandResult TextureInfoCmd(ProcessCommandContext context)
         {
             var props = typeof(Texture).GetProperties(

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UGameCore.Utilities;
 using UnityEngine;
@@ -72,16 +73,18 @@ namespace UGameCore
 
             return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
         }
+
+        [CommandMethod("command_remove", "Removes a command")]
         ProcessCommandResult RemoveCmd(ProcessCommandContext context)
         {
             string cmd = context.ReadString();
             if (!this.commandManager.HasCommand(cmd))
-                return ProcessCommandResult.Error("Command not found");
+                return ProcessCommandResult.UnknownCommand(cmd);
             this.commandManager.RemoveCommand(cmd);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("command_forbid")]
+        [CommandMethod("command_forbid", "Forbids a command. Forbidden commands can not be registered or executed.")]
         ProcessCommandResult ForbidCmd(ProcessCommandContext context)
         {
             string cmd = context.ReadString();
@@ -91,14 +94,14 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("alias")]
+        [CommandMethod("alias", "Creates alias for a command")]
         ProcessCommandResult AliasCmd(ProcessCommandContext context)
         {
             string newCmd = context.ReadString();
             string existingCmd = context.ReadString();
 
             if (!this.commandManager.HasCommand(existingCmd))
-                return ProcessCommandResult.Error($"Command '{existingCmd}' not found");
+                return ProcessCommandResult.UnknownCommand(existingCmd);
 
             this.commandManager.RegisterCommand(newCmd, context =>
             {
