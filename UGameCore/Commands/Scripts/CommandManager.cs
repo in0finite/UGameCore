@@ -40,6 +40,20 @@ namespace UGameCore
             }
         }
 
+        /// <summary>
+        /// Annotate a method with this attribute to provide auto-completion for a command.
+        /// </summary>
+        [System.AttributeUsageAttribute(System.AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+        public class CommandAutoCompletionMethodAttribute : System.Attribute
+        {
+            public string command;
+
+            public CommandAutoCompletionMethodAttribute(string command)
+            {
+                this.command = command;
+            }
+        }
+
         public struct CommandInfo
         {
             public string command;
@@ -48,6 +62,7 @@ namespace UGameCore
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
             public float limitInterval;
+            public System.Func<ProcessCommandContext, ProcessCommandResult> autoCompletionHandler;
 
             public CommandInfo(string command, bool allowToRunWithoutServerPermissions)
                 : this()
@@ -79,6 +94,7 @@ namespace UGameCore
         {
             public int exitCode;
             public string response;
+            public List<string> autoCompletions;
 
             public bool IsSuccess => this.exitCode == 0;
 
@@ -88,9 +104,13 @@ namespace UGameCore
             public static ProcessCommandResult NoPermissions => Error("You don't have permissions to run this command");
             public static ProcessCommandResult CanOnlyRunOnServer => Error("This command can only run on server");
             public static ProcessCommandResult LimitInterval(float interval) => Error($"This command can only be used on an interval of {interval} seconds");
-            public static ProcessCommandResult Error(string errorMessage) => new ProcessCommandResult { exitCode = 1, response = errorMessage };
+            public static ProcessCommandResult Error(string errorMessage)
+                => new ProcessCommandResult { exitCode = 1, response = errorMessage };
             public static ProcessCommandResult Success => SuccessResponse(null);
-            public static ProcessCommandResult SuccessResponse(string response) => new ProcessCommandResult() { exitCode = 0, response = response };
+            public static ProcessCommandResult SuccessResponse(string response)
+                => new ProcessCommandResult() { exitCode = 0, response = response };
+            public static ProcessCommandResult AutoCompletion(string exactMatch, IEnumerable<string> autoCompletions)
+                => new ProcessCommandResult() { exitCode = 0, response = exactMatch, autoCompletions = new List<string>(autoCompletions) };
         }
 
         public class ProcessCommandContext
@@ -169,10 +189,10 @@ namespace UGameCore
             commandInfo.command = commandInfo.command.Trim();
 
             if (this.forbiddenCommands.Contains(commandInfo.command))
-                throw new System.InvalidOperationException("Command is forbidden");
+                throw new System.InvalidOperationException($"Command '{commandInfo.command}' is forbidden");
 
             if (m_registeredCommands.ContainsKey(commandInfo.command))
-                throw new System.ArgumentException("Command was already registered");
+                throw new System.ArgumentException($"Command '{commandInfo.command}' was already registered");
 
             m_registeredCommands.Add(commandInfo.command, commandInfo);
         }
@@ -196,13 +216,27 @@ namespace UGameCore
                 | BindingFlags.Static
                 | BindingFlags.Instance);
 
+            var autoCompleteMethods = new List<(MethodInfo, CommandAutoCompletionMethodAttribute)>();
+
             foreach (var method in methods)
             {
-                if (!method.IsDefined(typeof(CommandMethodAttribute), true))
+                bool isCommandExecutor = method.IsDefined(typeof(CommandMethodAttribute), true);
+                bool isCommandAutoCompletion = method.IsDefined(typeof(CommandAutoCompletionMethodAttribute), true);
+
+                if (!isCommandExecutor && !isCommandAutoCompletion)
                     continue;
 
                 if (!F.RunExceptionSafe(() => CheckIfCommandMethodIsCorrect(type, method)))
                     continue;
+
+                if (isCommandAutoCompletion)
+                {
+                    var autoCompleteAttrs = method.GetCustomAttributes<CommandAutoCompletionMethodAttribute>(true);
+                    foreach (var attr in autoCompleteAttrs)
+                        autoCompleteMethods.Add((method, attr));
+                    
+                    continue;
+                }
 
                 var attrs = method.GetCustomAttributes<CommandMethodAttribute>(true);
                 foreach (CommandMethodAttribute attr in attrs)
@@ -219,6 +253,32 @@ namespace UGameCore
 
                     F.RunExceptionSafe(() => this.RegisterCommand(commandInfo));
                 }
+            }
+
+            // 2nd pass to register auto-completion methods
+
+            foreach (var autoCompleteMethod in autoCompleteMethods)
+            {
+                string cmd = autoCompleteMethod.Item2.command;
+                MethodInfo method = autoCompleteMethod.Item1;
+
+                // TODO: refactor this: extract into a public method
+
+                if (!m_registeredCommands.TryGetValue(cmd, out CommandInfo commandInfo))
+                {
+                    Debug.LogError($"Failed to register auto-complete handler for command '{cmd}': command does not exist", this);
+                    continue;
+                }
+
+                if (commandInfo.autoCompletionHandler != null)
+                {
+                    Debug.LogError($"Auto-complete handler for command '{cmd}' already exists", this);
+                    continue;
+                }
+
+                commandInfo.autoCompletionHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context });
+
+                m_registeredCommands[cmd] = commandInfo;
             }
         }
 
@@ -363,8 +423,8 @@ namespace UGameCore
 
             if (arguments.Length > 1)
             {
-                // TODO: ask the command handler to do auto-completion
-
+                // ask the command handler to do auto-completion
+                this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
                 return;
             }
 
@@ -432,16 +492,49 @@ namespace UGameCore
 
             if (commonPrefix.Equals(arguments[0], System.StringComparison.Ordinal))
             {
-                // longest common prefix is equal to input
+                // common prefix is equal to input
                 // no need to auto-complete, only return all possible completions
 
                 if (commandsStartingWith.Count > 1) // don't return 1 command only (which would be equal to input)
+                {
                     outPossibleCompletions.AddRange(commandsStartingWith);
+                }
+                else
+                {
+                    // only 1 command shares common prefix with input - it means input is equal to that command
+
+                    // ask the command handler to do auto-completion
+                    this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
+                }
+
                 return;
             }
 
+            // common prefix is not equal to input (it's shorter) - expand it
             // auto-complete the command into common prefix
             outExactCompletion = commonPrefix;
+        }
+
+        void AutoCompleteUsingCommandHandler(
+            ProcessCommandContext context, out string outExactCompletion, List<string> outPossibleCompletions)
+        {
+            outExactCompletion = null;
+
+            var arguments = SplitCommandIntoArguments(context.command);
+
+            if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
+                return;
+
+            if (null == commandInfo.autoCompletionHandler)
+                return;
+
+            context.arguments = arguments;
+
+            var result = commandInfo.autoCompletionHandler(context);
+
+            outExactCompletion = result.response;
+            if (result.autoCompletions != null)
+                outPossibleCompletions.AddRange(result.autoCompletions);
         }
 
         public bool HasCommand(string command)
