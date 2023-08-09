@@ -10,6 +10,7 @@ namespace UGameCore
     {
         public static CommandManager Singleton { get; private set; }
 
+        // TODO: commands should be case-insensitive
         readonly Dictionary<string, CommandInfo> m_registeredCommands =
             new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCulture);
 
@@ -228,22 +229,11 @@ namespace UGameCore
             foreach (var method in methods)
             {
                 bool isCommandExecutor = method.IsDefined(typeof(CommandMethodAttribute), true);
-                bool isCommandAutoCompletion = method.IsDefined(typeof(CommandAutoCompletionMethodAttribute), true);
-
-                if (!isCommandExecutor && !isCommandAutoCompletion)
+                if (!isCommandExecutor)
                     continue;
 
-                if (!F.RunExceptionSafe(() => CheckIfCommandMethodIsCorrect(type, method)))
+                if (!F.RunExceptionSafe(() => CheckIfCommandMethodIsCorrect(method)))
                     continue;
-
-                if (isCommandAutoCompletion)
-                {
-                    var autoCompleteAttrs = method.GetCustomAttributes<CommandAutoCompletionMethodAttribute>(true);
-                    foreach (var attr in autoCompleteAttrs)
-                        autoCompleteMethods.Add((method, attr));
-                    
-                    continue;
-                }
 
                 var attrs = method.GetCustomAttributes<CommandMethodAttribute>(true);
                 foreach (CommandMethodAttribute attr in attrs)
@@ -264,33 +254,37 @@ namespace UGameCore
 
             // 2nd pass to register auto-completion methods
 
-            foreach (var autoCompleteMethod in autoCompleteMethods)
+            foreach (MethodInfo method in methods)
             {
-                string cmd = autoCompleteMethod.Item2.command;
-                MethodInfo method = autoCompleteMethod.Item1;
-
-                // TODO: refactor this: extract into a public method
-
-                if (!m_registeredCommands.TryGetValue(cmd, out CommandInfo commandInfo))
-                {
-                    Debug.LogError($"Failed to register auto-complete handler for command '{cmd}': command does not exist", this);
+                bool isCommandAutoCompletion = method.IsDefined(typeof(CommandAutoCompletionMethodAttribute), true);
+                if (!isCommandAutoCompletion)
                     continue;
-                }
 
-                if (commandInfo.autoCompletionHandler != null)
-                {
-                    Debug.LogError($"Auto-complete handler for command '{cmd}' already exists", this);
-                    continue;
-                }
-
-                commandInfo.autoCompletionHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context });
-
-                m_registeredCommands[cmd] = commandInfo;
+                var autoCompleteAttrs = method.GetCustomAttributes<CommandAutoCompletionMethodAttribute>(true);
+                foreach (CommandAutoCompletionMethodAttribute attr in autoCompleteAttrs)
+                    F.RunExceptionSafe(() => this.RegisterAutoCompletionMethod(method, attr.command, instanceObject));
             }
         }
 
-        void CheckIfCommandMethodIsCorrect(System.Type type, MethodInfo method)
+        void RegisterAutoCompletionMethod(MethodInfo method, string cmd, object instanceObject)
         {
+            CheckIfCommandMethodIsCorrect(method);
+
+            if (!m_registeredCommands.TryGetValue(cmd, out CommandInfo commandInfo))
+                throw new System.ArgumentException($"Failed to register auto-complete handler for command '{cmd}': command does not exist");
+            
+            if (commandInfo.autoCompletionHandler != null)
+                throw new System.ArgumentException($"Auto-complete handler for command '{cmd}' already exists");
+            
+            commandInfo.autoCompletionHandler = (ProcessCommandContext context) => (ProcessCommandResult)method.Invoke(method.IsStatic ? null : instanceObject, new object[] { context });
+
+            m_registeredCommands[cmd] = commandInfo;
+        }
+
+        void CheckIfCommandMethodIsCorrect(MethodInfo method)
+        {
+            System.Type type = method.DeclaringType;
+
             if (method.ReturnType != typeof(ProcessCommandResult))
                 throw new System.ArgumentException($"Return type must be {nameof(ProcessCommandResult)}, method: {type.Name}.{method.Name}()");
 
