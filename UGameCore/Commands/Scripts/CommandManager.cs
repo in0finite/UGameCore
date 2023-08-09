@@ -196,6 +196,16 @@ namespace UGameCore
             this.ForbiddenCommands.UnionWith(m_forbiddenCommandsList);
         }
 
+        void CheckIfHasInvalidChars(string cmd)
+        {
+            for (int i = 0; i < cmd.Length; i++)
+            {
+                char c = cmd[i];
+                if (!char.IsLetterOrDigit(c) && c != '_' && c != '-')
+                    throw new System.ArgumentException($"Command characters can only be letters or digits, found {c}");
+            }
+        }
+
         public void RegisterCommand(CommandInfo commandInfo)
         {
             if (null == commandInfo.commandHandler)
@@ -204,9 +214,9 @@ namespace UGameCore
             if (string.IsNullOrWhiteSpace(commandInfo.command))
                 throw new System.ArgumentException("Command can not be empty");
 
-            // TODO: check for invalid chars - only alphanumerics + '_-' should be allowed
-
             commandInfo.command = commandInfo.command.ToLowerInvariant().Trim();
+
+            this.CheckIfHasInvalidChars(commandInfo.command);
 
             if (this.ForbiddenCommands.Contains(commandInfo.command))
                 throw new System.InvalidOperationException($"Command '{commandInfo.command}' is forbidden");

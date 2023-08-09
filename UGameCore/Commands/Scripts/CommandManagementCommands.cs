@@ -88,9 +88,9 @@ namespace UGameCore
         ProcessCommandResult ForbidCmd(ProcessCommandContext context)
         {
             string cmd = context.ReadString();
-            if (!this.commandManager.forbiddenCommands.Contains(cmd))
+            if (!this.commandManager.ForbiddenCommands.Contains(cmd))
                 return ProcessCommandResult.Error("Command already forbidden");
-            this.commandManager.forbiddenCommands.Add(cmd);
+            this.commandManager.ForbiddenCommands.Add(cmd);
             return ProcessCommandResult.Success;
         }
 
