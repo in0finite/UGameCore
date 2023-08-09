@@ -8,8 +8,8 @@ namespace UGameCore
     {
         public CommandManager commandManager;
 
-        public float initialVelocity = 5f;
-        public float initialAngularVelocity = 45f;
+        public float initialVelocity = 40f;
+        public float initialAngularVelocity = 360f;
         public float lifeTime = 0f;
         public float lifeTimeDynamic = 30f;
 
@@ -56,28 +56,28 @@ namespace UGameCore
             }
         }
 
-        [CommandMethod("cube")]
+        [CommandMethod("cube", "Creates static cube")]
         ProcessCommandResult CubeCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Cube, false);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("sphere")]
+        [CommandMethod("sphere", "Creates static sphere")]
         ProcessCommandResult SphereCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Sphere, false);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("cube_dynamic")]
+        [CommandMethod("cube_dynamic", "Creates dynamic cube")]
         ProcessCommandResult CubeDynamicCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Cube, true);
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("sphere_dynamic")]
+        [CommandMethod("sphere_dynamic", "Creates dynamic sphere")]
         ProcessCommandResult SphereDynamicCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Sphere, true);

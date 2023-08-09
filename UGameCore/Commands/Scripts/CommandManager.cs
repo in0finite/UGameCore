@@ -38,6 +38,12 @@ namespace UGameCore
             {
                 this.command = command;
             }
+
+            public CommandMethodAttribute(string command, string description)
+            {
+                this.command = command;
+                this.description = description;
+            }
         }
 
         /// <summary>

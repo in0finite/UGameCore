@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 6743896830069084620}
   - component: {fileID: 2128493207871122006}
   - component: {fileID: 2882611135121461071}
-  - component: {fileID: 2615737275989498029}
+  - component: {fileID: 7181606764621534023}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandManager: {fileID: 6743896830069084620}
---- !u!114 &2615737275989498029
+--- !u!114 &7181606764621534023
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -236,3 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandManager: {fileID: 6743896830069084620}
+  initialVelocity: 40
+  initialAngularVelocity: 360
+  lifeTime: 0
+  lifeTimeDynamic: 30
