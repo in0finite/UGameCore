@@ -110,7 +110,7 @@ namespace UGameCore
             public static ProcessCommandResult SuccessResponse(string response)
                 => new ProcessCommandResult() { exitCode = 0, response = response };
             public static ProcessCommandResult AutoCompletion(string exactMatch, IEnumerable<string> autoCompletions)
-                => new ProcessCommandResult() { exitCode = 0, response = exactMatch, autoCompletions = new List<string>(autoCompletions) };
+                => new ProcessCommandResult() { exitCode = 0, response = exactMatch, autoCompletions = autoCompletions != null ? new List<string>(autoCompletions) : null };
         }
 
         public class ProcessCommandContext
@@ -423,96 +423,26 @@ namespace UGameCore
 
             if (arguments.Length > 1)
             {
-                // ask the command handler to do auto-completion
+                // there are multiple arguments - input can only be auto-completed using command handlers
                 this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
                 return;
             }
 
-            // only 1 argument, the command itself, auto-complete it
+            // there is only 1 argument, the command itself, auto-complete it
 
+            DoAutoCompletion(
+                arguments[0],
+                m_registeredCommands.Select(pair => pair.Key),
+                out outExactCompletion,
+                outPossibleCompletions,
+                System.StringComparison.Ordinal);
 
-            // example (commands: net_start, net_stop, net_exit, net_socket, neptun):
-            // 
-            // input: n
-            // output: ne (common prefix for ALL commands that start with it)
-            //
-            // input: ne
-            // output: ne (no expansion)
-            //
-            // input: net
-            // output: net_ (common prefix for ALL commands that start with it)
-            //
-            // input: net_st
-            // output: net_start, net_stop (common prefix is equal to input)
-            //
-            // input: net_s
-            // output: net_start, net_stop, net_socket (common prefix is equal to input)
-
-            var commandsStartingWith = new List<string>();
-
-            foreach (var pair in m_registeredCommands)
+            if (outExactCompletion == null && outPossibleCompletions.Count == 0)
             {
-                if (pair.Key.StartsWith(arguments[0], System.StringComparison.Ordinal))
-                    commandsStartingWith.Add(pair.Key);
+                // input could be equal to one of commands
+                // ask the command handler to do auto-completion
+                this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
             }
-
-            if (commandsStartingWith.Count == 0)
-                return;
-
-            // find common prefix
-
-            string commandToTest = commandsStartingWith[0];
-
-            string commonPrefix = arguments[0];
-            int startIndex = commonPrefix.Length;
-
-            for (int i = startIndex; i < commandToTest.Length; i++)
-            {
-                char ch = commandToTest[i];
-
-                // if all other commands have this char at this index, it is part of common prefix
-
-                bool allCommandsHaveThisChar = true;
-
-                for (int j = 1; j < commandsStartingWith.Count; j++)
-                {
-                    string cmd = commandsStartingWith[j];
-                    if (i >= cmd.Length || cmd[i] != ch)
-                    {
-                        allCommandsHaveThisChar = false;
-                        break;
-                    }
-                }
-
-                if (!allCommandsHaveThisChar)
-                    break;
-
-                commonPrefix += ch;
-            }
-
-            if (commonPrefix.Equals(arguments[0], System.StringComparison.Ordinal))
-            {
-                // common prefix is equal to input
-                // no need to auto-complete, only return all possible completions
-
-                if (commandsStartingWith.Count > 1) // don't return 1 command only (which would be equal to input)
-                {
-                    outPossibleCompletions.AddRange(commandsStartingWith);
-                }
-                else
-                {
-                    // only 1 command shares common prefix with input - it means input is equal to that command
-
-                    // ask the command handler to do auto-completion
-                    this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
-                }
-
-                return;
-            }
-
-            // common prefix is not equal to input (it's shorter) - expand it
-            // auto-complete the command into common prefix
-            outExactCompletion = commonPrefix;
         }
 
         void AutoCompleteUsingCommandHandler(
@@ -535,6 +465,98 @@ namespace UGameCore
             outExactCompletion = result.response;
             if (result.autoCompletions != null)
                 outPossibleCompletions.AddRange(result.autoCompletions);
+        }
+
+        public static void DoAutoCompletion(
+            string input,
+            IEnumerable<string> availableOptions,
+            out string outExactCompletion,
+            List<string> outPossibleCompletions,
+            System.StringComparison stringComparison)
+        {
+            outExactCompletion = null;
+
+            // example (commands: net_start, net_stop, net_exit, net_socket, neptun):
+            // 
+            // input: n
+            // output: ne (common prefix for ALL commands that start with it)
+            //
+            // input: ne
+            // output: ne (no expansion)
+            //
+            // input: net
+            // output: net_ (common prefix for ALL commands that start with it)
+            //
+            // input: net_st
+            // output: net_start, net_stop (common prefix is equal to input)
+            //
+            // input: net_s
+            // output: net_start, net_stop, net_socket (common prefix is equal to input)
+
+            var optionsStartingWith = new List<string>();
+
+            foreach (string option in availableOptions)
+            {
+                if (option.StartsWith(input, stringComparison))
+                    optionsStartingWith.Add(option);
+            }
+
+            if (optionsStartingWith.Count == 0)
+                return;
+
+            // find common prefix
+
+            string optionToTest = optionsStartingWith[0];
+
+            string commonPrefix = input;
+            int startIndex = commonPrefix.Length;
+
+            for (int i = startIndex; i < optionToTest.Length; i++)
+            {
+                char ch = optionToTest[i];
+
+                // if all other options have this char at this index, it is part of common prefix
+
+                bool allOptionsHaveThisChar = true;
+
+                for (int j = 1; j < optionsStartingWith.Count; j++)
+                {
+                    string option = optionsStartingWith[j];
+                    // TODO: char comparison does not respect the specified StringComparison
+                    if (i >= option.Length || option[i] != ch)
+                    {
+                        allOptionsHaveThisChar = false;
+                        break;
+                    }
+                }
+
+                if (!allOptionsHaveThisChar)
+                    break;
+
+                commonPrefix += ch;
+            }
+
+            if (commonPrefix.Equals(input, stringComparison))
+            {
+                // common prefix is equal to input
+                // no need to auto-complete, only return all possible completions
+
+                if (optionsStartingWith.Count > 1) // don't return 1 option only (which would be equal to input)
+                {
+                    outPossibleCompletions.AddRange(optionsStartingWith);
+                }
+                else
+                {
+                    // only 1 option shares common prefix with input - it means input is equal to that option
+                    // no need to do anything here
+                }
+
+                return;
+            }
+
+            // common prefix is not equal to input (it's shorter) - expand it
+            // auto-complete the input into common prefix
+            outExactCompletion = commonPrefix;
         }
 
         public bool HasCommand(string command)
