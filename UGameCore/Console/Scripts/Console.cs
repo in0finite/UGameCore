@@ -65,7 +65,8 @@ namespace UGameCore.Menu
         public volatile int maxNumLogMessages = 100;
         public int maxNumPooledLogMessages = 100;
 
-		public volatile int numLinesToDisplayForLogMessage = 2;
+		public volatile int numLinesToDisplayForLogMessage = 3;
+        public volatile int maxLogMessageSize = 200;
 
         private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
         
@@ -193,6 +194,13 @@ namespace UGameCore.Menu
 
 		string GetDisplayText(string logStr, double time)
 		{
+			// limit num characters
+
+			if (logStr.Length > this.maxLogMessageSize)
+				logStr = logStr[..Mathf.Max(0, this.maxLogMessageSize)] + " ...";
+
+			// limit num lines
+
             int lastIndexOfNewLine = -1;
 
             for (int i = 0; i < this.numLinesToDisplayForLogMessage; i++)
