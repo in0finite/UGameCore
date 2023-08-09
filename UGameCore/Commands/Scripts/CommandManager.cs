@@ -332,16 +332,108 @@ namespace UGameCore
 
         public static string[] SplitCommandIntoArguments(string command)
         {
-            // TODO: add support for arguments that have spaces, i.e. those enclosed with quotes
+            // TODO: add support for escaping with \
 
-            return command.Split(new string[] {" ", "\t"}, System.StringSplitOptions.RemoveEmptyEntries);
+            // examples:
+            // abcd"abc"abc
+            // abcd" abcd" abcd
+            // abcd "abcd"abcd
+
+            var arguments = new List<string>();
+
+            command = command.Trim();
+
+            int argumentStartIndex = -1;
+            char startingQuoteChar = (char)0;
+
+            for (int i = 0; i < command.Length; i++)
+            {
+                char ch = command[i];
+
+                if (char.IsWhiteSpace(ch))
+                {
+                    if (startingQuoteChar == 0) // not inside quotes
+                    {
+                        // cut argument here
+                        string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
+                        arguments.Add(argument.Trim());
+                        argumentStartIndex = i;
+                        continue;
+                    }
+
+                    // inside quotes
+                    // skip this character, he will be part of current argument
+
+                    continue;
+                }
+
+                if (ch == '\'' || ch == '\"')
+                {
+                    if (ch == startingQuoteChar) // inside quotes, ending current argument
+                    {
+                        string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
+                        arguments.Add(argument.Trim());
+                        argumentStartIndex = i;
+                        startingQuoteChar = (char)0;
+                        continue;
+                    }
+
+                    if (startingQuoteChar == 0) // not inside quotes
+                    {
+                        if (i == 0 || char.IsWhiteSpace(command[i - 1]))
+                        {
+                            // whitespace is before this char, open new argument
+                            startingQuoteChar = ch;
+                            argumentStartIndex = i;
+
+                            continue;
+                        }
+
+                        // no whitespace before this char, treat it as regular char - he will be part of current argument
+
+                        continue;
+                    }
+
+                    // different quote character, skip this character, he will be part of current argument
+
+                    continue;
+                }
+
+                // skip this character, he will be part of current argument
+
+                continue;
+            }
+
+            // add the remaining argument
+            string remainingArgument = command.Substring(argumentStartIndex + 1, command.Length - argumentStartIndex - 1);
+            arguments.Add(remainingArgument.Trim());
+
+            arguments.RemoveAll(arg => arg.Length == 0);
+
+            return arguments.ToArray();
         }
 
         public string CombineArguments(string[] arguments)
         {
-            // TODO: add support for arguments that have spaces
+            // TODO: add support for escaping with \
 
-            return string.Join(' ', arguments);
+            var sb = new System.Text.StringBuilder();
+
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                string arg = arguments[i];
+                bool hasWhitespace = arg.Any(char.IsWhiteSpace);
+                
+                if (hasWhitespace)
+                    sb.Append('\"');
+                sb.Append(arg);
+                if (hasWhitespace)
+                    sb.Append('\"');
+
+                sb.Append(' ');
+            }
+
+            return sb.ToString();
         }
 
         public static string GetRestOfTheCommand(string command, int argumentIndex)
