@@ -45,6 +45,8 @@ namespace UGameCore
             if (commandInfo.description != null)
                 response += "  -  " + commandInfo.description;
             response += "\n";
+            if (commandInfo.syntax != null)
+                response += "syntax:  " + commandInfo.syntax + "   ";
             response += $"requires server perms: {!commandInfo.allowToRunWithoutServerPermissions}   ";
             response += $"only on server: {commandInfo.runOnlyOnServer}   ";
             response += $"limit interval: {commandInfo.limitInterval}   ";

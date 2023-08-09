@@ -38,6 +38,7 @@ namespace UGameCore
         {
             public string command;
             public string description;
+            public string syntax;
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
             public float limitInterval;
@@ -72,6 +73,7 @@ namespace UGameCore
         {
             public string command;
             public string description;
+            public string syntax;
             public System.Func<ProcessCommandContext, ProcessCommandResult> commandHandler;
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
@@ -272,6 +274,7 @@ namespace UGameCore
                     {
                         command = attr.command,
                         description = attr.description,
+                        syntax = attr.syntax,
                         allowToRunWithoutServerPermissions = attr.allowToRunWithoutServerPermissions,
                         runOnlyOnServer = attr.runOnlyOnServer,
                         limitInterval = attr.limitInterval,

@@ -19,7 +19,7 @@ namespace UGameCore.Menu.Windows
             this.commandManager.RegisterCommandsFromTypeMethods(this);
 		}
 
-        [CommandMethod("msgbox", "Shows message box")]
+        [CommandMethod("msgbox", "Shows message box", syntax = "([string title], [string message])")]
         ProcessCommandResult MsgBoxCmd(ProcessCommandContext context)
         {
 			string title = context.ReadStringOrDefault(null);
@@ -60,7 +60,7 @@ namespace UGameCore.Menu.Windows
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("msgboxallclients", "Sends message box to all clients")]
+        [CommandMethod("msgboxallclients", "Sends message box to all clients", syntax = "([string title], [string message])")]
         ProcessCommandResult MsgBoxAllClientsCmd(ProcessCommandContext context)
         {
             NetworkStatus.ThrowIfNotOnServer();
