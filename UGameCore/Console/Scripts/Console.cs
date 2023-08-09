@@ -16,14 +16,16 @@ namespace UGameCore.Menu
 			public	string	stackTrace;
 			public	LogType	logType;
 			public	string	displayText;
+			public double time;
 			public ConsoleLogEntryComponent logEntryComponent;
 
-			public LogMessage (string text, string stackTrace, LogType logType)
+			public LogMessage (string text, string stackTrace, LogType logType, double time)
 			{
 				this.text = text;
 				this.stackTrace = stackTrace;
 				this.logType = logType;
 				this.displayText = null;
+				this.time = time;
 				this.logEntryComponent = null;
             }
 		}
@@ -167,11 +169,9 @@ namespace UGameCore.Menu
             // this also prevents running out of memory.
             m_messagesArrivedThisFrame.DequeueUntilCountReaches(this.maxNumLogMessages);
 
-			var logMessage = new LogMessage (logStr, stackTrace, type);
-			double time = m_stopwatch.Elapsed.TotalSeconds;
-
-            logMessage.displayText = GetDisplayText(logStr, time);
-
+            double time = m_stopwatch.Elapsed.TotalSeconds;
+            var logMessage = new LogMessage (logStr, stackTrace, type, time);
+			
             m_messagesArrivedThisFrame.Enqueue(logMessage);
 		}
 
@@ -381,14 +381,25 @@ namespace UGameCore.Menu
                 return;
 			}
 
+			// no need to update anything if Console is not opened
+			// threaded handler will keep an eye on buffer size
+            if (!this.IsOpened)
+            {
+                return;
+            }
+
             s_logMessagesBufferList.Clear();
 
-            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToList(s_logMessagesBufferList, 500);
+            int numNewlyAdded = m_messagesArrivedThisFrame.DequeueToList(s_logMessagesBufferList, this.maxNumLogMessages + 10);
 
             if (0 == numNewlyAdded)
 				return;
 
-			m_logMessages.EnqueueRange(s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)));
+			foreach (var logMessage in s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)))
+			{
+				logMessage.displayText = GetDisplayText(logMessage.text, logMessage.time);
+                m_logMessages.Enqueue(logMessage);
+            }
 
             // limit number of log messages
 
@@ -396,12 +407,6 @@ namespace UGameCore.Menu
 			{
                 var logMessage = m_logMessages.Dequeue();
 				ReleaseLogMessage(logMessage);
-            }
-
-			if (!this.IsOpened)
-            {
-                m_forceUIUpdateNextFrame = true;
-                return;
             }
 
 			// update UI
