@@ -206,6 +206,16 @@ namespace UGameCore
             this.ForbiddenCommands.UnionWith(m_forbiddenCommandsList);
         }
 
+        public bool HasCommand(string command)
+        {
+            return m_registeredCommands.ContainsKey(command);
+        }
+
+        public bool RemoveCommand(string command)
+        {
+            return m_registeredCommands.Remove(command);
+        }
+
         void CheckIfHasInvalidChars(string cmd)
         {
             for (int i = 0; i < cmd.Length; i++)
@@ -334,11 +344,6 @@ namespace UGameCore
 
             if (parameters[0].ParameterType != typeof(ProcessCommandContext))
                 throw new System.ArgumentException($"Type of parameter must be ({nameof(ProcessCommandContext)}), method: {type.Name}.{method.Name}()");
-        }
-
-        public bool RemoveCommand(string command)
-        {
-            return m_registeredCommands.Remove(command);
         }
 
         public static string[] SplitCommandIntoArguments(string command)
@@ -729,11 +734,6 @@ namespace UGameCore
             // common prefix is not equal to input (it's shorter) - expand it
             // auto-complete the input into common prefix
             outExactCompletion = commonPrefix;
-        }
-
-        public bool HasCommand(string command)
-        {
-            return m_registeredCommands.ContainsKey(command);
         }
     }
 }
