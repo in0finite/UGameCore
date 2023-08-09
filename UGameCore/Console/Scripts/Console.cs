@@ -375,9 +375,10 @@ namespace UGameCore.Menu
 
                 if (!this.IsOpened)
                 {
-                    this.consoleSubmitInputField.text = string.Empty;
+                    this.consoleSubmitInputField.text = string.Empty; // open-key will remain in InputField if we don't set this
                     this.consoleSubmitInputField.DeactivateInputField();
-					EventSystem.current.SetSelectedGameObject(null);
+					if (EventSystem.current != null)
+						EventSystem.current.SetSelectedGameObject(null); // have to do this, otherwise InputField remains focused
                 }
             }
 
