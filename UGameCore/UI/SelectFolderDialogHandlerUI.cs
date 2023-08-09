@@ -48,5 +48,10 @@ namespace UGameCore.UI
 
             resultRef.value = selectedFolder;
         }
+
+        public string Select(string title, string folder, string defaultName)
+        {
+            throw new NotSupportedException("Can not select folder synchronously");
+        }
     }
 }

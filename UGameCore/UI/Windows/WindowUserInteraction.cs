@@ -55,5 +55,16 @@ namespace UGameCore.Menu.Windows
             while (window != null)
                 yield return null;
         }
+
+        public void ShowMessage(string title, string message)
+        {
+            if (!Application.isPlaying)
+            {
+                m_editorDialogUserInteraction.ShowMessage(title, message);
+                return;
+            }
+
+            WindowManager.OpenMessageBox(title, message);
+        }
     }
 }
