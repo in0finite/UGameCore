@@ -19,6 +19,8 @@ namespace UGameCore
         public IReadOnlyCollection<string> RegisteredCommands => m_registeredCommands.Keys;
         public IReadOnlyDictionary<string, CommandInfo> RegisteredCommandsDict => m_registeredCommands;
 
+        public int maxNumCharactersInCommand = 300;
+
         public static string invalidSyntaxText => "Invalid syntax";
 
         [Tooltip("Forbidden commands can not be registered or executed")]
@@ -571,6 +573,9 @@ namespace UGameCore
         {
             if (string.IsNullOrWhiteSpace(context.command))
                 return ProcessCommandResult.UnknownCommand(null);
+
+            if (context.command.Length > this.maxNumCharactersInCommand)
+                return ProcessCommandResult.Error("Command too long");
 
             string[] arguments = SplitCommandIntoArguments(context.command);
             if (0 == arguments.Length)
