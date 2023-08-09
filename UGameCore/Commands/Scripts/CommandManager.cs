@@ -10,8 +10,11 @@ namespace UGameCore
     {
         public static CommandManager Singleton { get; private set; }
 
+        // note: we have to use InvariantCultureIgnoreCase instead of OrdinalIgnoreCase comparer,
+        // because on a lot of places we use ToLowerInvariant(), so we need to be consistent
+
         readonly Dictionary<string, CommandInfo> m_registeredCommands =
-            new Dictionary<string, CommandInfo>(System.StringComparer.OrdinalIgnoreCase);
+            new Dictionary<string, CommandInfo>(System.StringComparer.InvariantCultureIgnoreCase);
 
         public IReadOnlyCollection<string> RegisteredCommands => m_registeredCommands.Keys;
         public IReadOnlyDictionary<string, CommandInfo> RegisteredCommandsDict => m_registeredCommands;
@@ -25,7 +28,7 @@ namespace UGameCore
         /// <summary>
         /// Forbidden commands can not be registered or executed.
         /// </summary>
-        public readonly HashSet<string> ForbiddenCommands = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+        public readonly HashSet<string> ForbiddenCommands = new HashSet<string>(System.StringComparer.InvariantCultureIgnoreCase);
 
         /// <summary>
         /// Annotate a method with this attribute to register it as a command.
@@ -488,7 +491,7 @@ namespace UGameCore
         {
             outExactCompletion = null;
 
-            var stringComparison = System.StringComparison.OrdinalIgnoreCase;
+            var stringComparison = System.StringComparison.InvariantCultureIgnoreCase;
 
             var optionsStartingWith = new List<string>();
 
