@@ -68,7 +68,7 @@ namespace UGameCore.Menu
         public int maxNumPooledLogMessages = 100;
 
 		public volatile int numLinesToDisplayForLogMessage = 3;
-        public volatile int maxLogMessageSize = 200;
+        public volatile int maxCharsInLogMessage = 250;
 
         private readonly	Utilities.ConcurrentQueue<LogMessage>	m_messagesArrivedThisFrame = new ConcurrentQueue<LogMessage>();
         
@@ -194,12 +194,17 @@ namespace UGameCore.Menu
 
 		string GetDisplayText(string logStr, double time)
 		{
+			bool bLimited = false;
+
 			// limit num characters
 
-			if (logStr.Length > this.maxLogMessageSize)
-				logStr = logStr[..Mathf.Max(0, this.maxLogMessageSize)] + " ...";
+			if (logStr.Length > this.maxCharsInLogMessage)
+            {
+				bLimited = true;
+                logStr = logStr[..Mathf.Max(0, this.maxCharsInLogMessage)];
+            }
 
-			// limit num lines
+            // limit num lines
 
             int lastIndexOfNewLine = -1;
 
@@ -218,8 +223,12 @@ namespace UGameCore.Menu
 
             if (lastIndexOfNewLine != -1)
             {
+				bLimited = true;
                 logStr = logStr[..lastIndexOfNewLine];
             }
+
+			if (bLimited)
+				logStr += "  ...";
 
             return $"[{F.FormatElapsedTime(time)}] {logStr}";
         }
