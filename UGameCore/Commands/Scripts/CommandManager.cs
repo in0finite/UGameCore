@@ -168,6 +168,14 @@ namespace UGameCore
                 return arg;
             }
 
+            public string ReadStringOrDefault(string defaultValue)
+            {
+                if (this.currentArgumentIndex >= this.NumArguments)
+                    return defaultValue;
+
+                return this.ReadString();
+            }
+
             public int ReadInt()
             {
                 string str = this.ReadString();

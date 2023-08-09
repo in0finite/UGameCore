@@ -1,6 +1,7 @@
 ﻿using UGameCore.Utilities;
 using UnityEngine;
 using static UGameCore.CommandManager;
+using Random = UnityEngine.Random;
 
 namespace UGameCore.Menu.Windows
 {
@@ -8,83 +9,70 @@ namespace UGameCore.Menu.Windows
     public class WindowCommands : MonoBehaviour {
 
 		public CommandManager commandManager;
+		public WindowManager windowManager;
 
 
         void Start () {
 
 			this.EnsureSerializableReferencesAssigned();
 
-			string[] commands = new string[] { "msgbox", "modal_msgbox", "msgboxtest", "msgboxallclients" };
-
-			foreach (var cmd in commands) {
-				this.commandManager.RegisterCommand( cmd, ProcessCommand );
-			}
-
+            this.commandManager.RegisterCommandsFromTypeMethods(this);
 		}
 
-        ProcessCommandResult ProcessCommand( ProcessCommandContext context ) {
+        [CommandMethod("msgbox", "Shows message box")]
+        ProcessCommandResult MsgBoxCmd(ProcessCommandContext context)
+        {
+			string title = context.ReadStringOrDefault(null);
+            string message = context.ReadStringOrDefault(null);
 
-			string command = context.command;
-			string[] words = CommandManager.SplitCommandIntoArguments (command);
-			int numWords = words.Length ;
+			WindowManager.OpenMessageBox(title, message);
 
-			string response = "";
+            return ProcessCommandResult.Success;
+        }
 
-			if (words [0] == "msgbox") {
+        [CommandMethod("msgboxtest", "Runs test on message boxes")]
+        ProcessCommandResult MsgBoxTestCmd(ProcessCommandContext context)
+        {
+			// test message box
+			// create multiple message boxes with different sizes, text, title
 
-				var msgBox = WindowManager.OpenMessageBox ("some example text", false);
-				msgBox.Title = "Example message box";
+			Vector2[] sizes = new Vector2[]
+			{
+				new Vector2 (300, 100), new Vector2 (320, 200), new Vector2 (500, 300),
+				new Vector2 (200, 300), new Vector2 (800, 500),
+			};
 
-			} else if (words [0] == "modal_msgbox") {
+            int[] textLengths = new int[] { 20, 300 };
 
-				var msgBox = WindowManager.OpenMessageBox ("this is modal message box", true);
-				msgBox.Title = "Modal msg box";
+            foreach (Vector2 size in sizes)
+            {
+                foreach (int textLength in textLengths)
+                {
+                    string text = GenerateRandomString(textLength);
+                    var msgBox = WindowManager.OpenMessageBox(text, false);
+                    // use random title length
+                    msgBox.Title = GenerateRandomString(Random.Range(0, 30));
+                    // set random position on screen
+                    msgBox.SetRectangle(new Rect(new Vector2(Random.value * Screen.width, Random.value * Screen.height), size));
+                }
+            }
 
-			} else if (words [0] == "msgboxtest") {
+            return ProcessCommandResult.Success;
+        }
 
-				// test message box
-				// create multiple message boxes with different sizes, text, title
+        [CommandMethod("msgboxallclients", "Sends message box to all clients")]
+        ProcessCommandResult MsgBoxAllClientsCmd(ProcessCommandContext context)
+        {
+            NetworkStatus.ThrowIfNotOnServer();
 
-				Vector2[] sizes = new Vector2[] { new Vector2 (300, 100), new Vector2 (320, 200), new Vector2 (500, 300), 
-					new Vector2 (200, 300), new Vector2 (800, 500)
-				};
+            string title = context.ReadStringOrDefault(null);
+            string message = context.ReadStringOrDefault(null);
 
-				int[] textLengths = new int[]{ 20, 300 };
-
-				foreach (Vector2 size in sizes) {
-					foreach (int textLength in textLengths) {
-						string text = GenerateRandomString (textLength);
-						var msgBox = WindowManager.OpenMessageBox (text, false);
-						// use random title length
-                        msgBox.Title = GenerateRandomString (Random.Range (0, 30));
-						// set random position on screen
-						msgBox.SetRectangle (new Rect (new Vector2 (Random.value * Screen.width, Random.value * Screen.height), size));
-					}
-				}
-
-			} else if (words [0] == "msgboxallclients") {
-
-				NetworkStatus.ThrowIfNotOnServer();
-
-				if (numWords < 3) {
-					response += CommandManager.invalidSyntaxText ;
-				} else {
-
-					string title = words [1];
-					string text = CommandManager.GetRestOfTheCommand (command, 1);
-
-					foreach (var script in Player.GetComponentOnAllPlayers<Player2Windows> ()) {
-						script.DisplayMsgBoxOnClient( title, text );
-					}
-
-				}
-
-			}
-
-
-			return ProcessCommandResult.SuccessResponse(response);
-		}
-
+            foreach (var script in Player.GetComponentOnAllPlayers<Player2Windows>())
+				script.DisplayMsgBoxOnClient(title, message);
+            
+            return ProcessCommandResult.Success;
+        }
 
 		private static string GenerateRandomString( int length ) {
 
@@ -107,7 +95,5 @@ namespace UGameCore.Menu.Windows
 
 			return new string (charArray);
 		}
-
 	}
-
 }
