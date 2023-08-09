@@ -342,13 +342,23 @@ namespace UGameCore
             var arguments = new List<string>();
 
             command = command.Trim();
-
+            
             int argumentStartIndex = -1;
             char startingQuoteChar = (char)0;
+            bool lastCharWasEscape = false;
 
             for (int i = 0; i < command.Length; i++)
             {
                 char ch = command[i];
+
+                bool thisCharIsEscaped = lastCharWasEscape;
+                lastCharWasEscape = false;
+
+                if (!thisCharIsEscaped && ch == '\\')
+                {
+                    lastCharWasEscape = true;
+                    continue;
+                }
 
                 if (char.IsWhiteSpace(ch))
                 {
@@ -367,7 +377,7 @@ namespace UGameCore
                     continue;
                 }
 
-                if (ch == '\'' || ch == '\"')
+                if ((ch == '\'' || ch == '\"') && !thisCharIsEscaped)
                 {
                     if (ch == startingQuoteChar) // inside quotes, ending current argument
                     {
@@ -408,9 +418,49 @@ namespace UGameCore
             string remainingArgument = command.Substring(argumentStartIndex + 1, command.Length - argumentStartIndex - 1);
             arguments.Add(remainingArgument.Trim());
 
-            arguments.RemoveAll(arg => arg.Length == 0);
+            arguments.ReplaceEach(arg => EscapeQuotes(arg));
+
+            arguments.RemoveAll(string.IsNullOrWhiteSpace);
 
             return arguments.ToArray();
+        }
+
+        static string EscapeQuotes(string argument)
+        {
+            var list = new List<char>(argument);
+
+            bool lastCharWasEscapeChar = false;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                char ch = list[i];
+
+                bool thisCharIsEscaped = lastCharWasEscapeChar;
+                lastCharWasEscapeChar = false;
+
+                if (!thisCharIsEscaped && ch == '\\')
+                {
+                    lastCharWasEscapeChar = true;
+                    list[i] = (char)0; // do not include this char in final string
+                    continue;
+                }
+
+                if (thisCharIsEscaped)
+                {
+                    if (ch == 't')
+                        list[i] = '\t';
+                    else if (ch == 'n')
+                        list[i] = '\n';
+                    else if (ch == 'r')
+                        list[i] = '\r';
+                    else if (ch == '0')
+                        list[i] = '\0';
+                }
+            }
+
+            list.RemoveAll(ch => ch == 0); // remove all escape chars
+
+            return new string(list.ToArray());
         }
 
         public string CombineArguments(string[] arguments)
@@ -421,16 +471,19 @@ namespace UGameCore
 
             for (int i = 0; i < arguments.Length; i++)
             {
-                string arg = arguments[i];
+                string arg = arguments[i].Trim();
                 bool hasWhitespace = arg.Any(char.IsWhiteSpace);
                 
                 if (hasWhitespace)
                     sb.Append('\"');
-                sb.Append(arg);
+
+                sb.Append(hasWhitespace ? arg.Replace("\"", "\\\"") : arg);
+
                 if (hasWhitespace)
                     sb.Append('\"');
 
-                sb.Append(' ');
+                if (i != arguments.Length - 1)
+                    sb.Append(' ');
             }
 
             return sb.ToString();
