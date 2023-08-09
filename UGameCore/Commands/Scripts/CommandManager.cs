@@ -165,6 +165,11 @@ namespace UGameCore
                 string str = this.ReadString();
                 return float.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
             }
+
+            public Vector3 ReadVector3()
+            {
+                return new Vector3(this.ReadFloat(), this.ReadFloat(), this.ReadFloat());
+            }
         }
 
 
