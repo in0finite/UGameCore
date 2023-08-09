@@ -5,6 +5,7 @@ using UGameCore.Utilities;
 using Profiler = UnityEngine.Profiling.Profiler;
 using System.Linq;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace UGameCore.Menu
 {
@@ -44,9 +45,15 @@ namespace UGameCore.Menu
 			set
             {
                 this.consoleUIRoot.SetActive(value);
-				
-				// need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
+
 				if (value)
+                {
+                    this.consoleSubmitInputField.Select();
+                    this.consoleSubmitInputField.ActivateInputField();
+                }
+
+                // need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
+                if (value)
 					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleScrollView.GetRectTransform());
             }
         }
@@ -359,10 +366,20 @@ namespace UGameCore.Menu
 				? this.openKeyMobileAndConsole
 				: this.openKey;
 
-			if (Input.GetKeyDown(keyCode) && !F.UIHasFocus())
+			if (Input.GetKeyDown(keyCode)
+				&& (!F.UIHasFocus()
+					|| (this.consoleSubmitInputField.isFocused 
+						&& (this.consoleSubmitInputField.text.IsNullOrWhiteSpace() || this.consoleSubmitInputField.text[0] == (char)keyCode))))
 			{
-				this.IsOpened = ! this.IsOpened;
-			}
+				this.IsOpened = !this.IsOpened;
+
+                if (!this.IsOpened)
+                {
+                    this.consoleSubmitInputField.text = string.Empty;
+                    this.consoleSubmitInputField.DeactivateInputField();
+					EventSystem.current.SetSelectedGameObject(null);
+                }
+            }
 
 			// check for key events from input field
 			if (this.consoleSubmitInputField != null && this.consoleSubmitInputField.isFocused)
