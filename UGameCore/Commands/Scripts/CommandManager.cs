@@ -318,6 +318,13 @@ namespace UGameCore
             return command.Split(new string[] {" ", "\t"}, System.StringSplitOptions.RemoveEmptyEntries);
         }
 
+        public string CombineArguments(string[] arguments)
+        {
+            // TODO: add support for arguments that have spaces
+
+            return string.Join(' ', arguments);
+        }
+
         public static string GetRestOfTheCommand(string command, int argumentIndex)
         {
             if (argumentIndex < 0)

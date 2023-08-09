@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 2128493207871122006}
   - component: {fileID: 2882611135121461071}
   - component: {fileID: 7181606764621534023}
+  - component: {fileID: 3156885916540031385}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -240,3 +241,16 @@ MonoBehaviour:
   initialAngularVelocity: 360
   lifeTime: 0
   lifeTimeDynamic: 30
+--- !u!114 &3156885916540031385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737272855205376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1aa48a8521ed974fa9db52eb8947141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  commandManager: {fileID: 6743896830069084620}
