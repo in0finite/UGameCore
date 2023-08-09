@@ -75,6 +75,8 @@ namespace UGameCore.Menu
 		private readonly Queue<LogMessage> m_logMessages = new Queue<LogMessage>();
         private static List<LogMessage> s_logMessagesBufferList = new List<LogMessage>();
 
+		System.Text.StringBuilder m_displayTextStringBuilder = new System.Text.StringBuilder();
+
         private readonly Queue<ConsoleLogEntryComponent> m_pooledLogEntryComponents = new Queue<ConsoleLogEntryComponent>();
 
 		public ConsoleLogEntryComponent SelectedLogEntry { get; private set; }
@@ -195,13 +197,23 @@ namespace UGameCore.Menu
 		string GetDisplayText(string logStr, double time)
 		{
 			bool bLimited = false;
+			int numCharsToTake = 0;
 
-			// limit num characters
+            m_displayTextStringBuilder.Clear();
+			m_displayTextStringBuilder.Append("[");
+            m_displayTextStringBuilder.Append(F.FormatElapsedTime(time));
+            m_displayTextStringBuilder.Append("] ");
 
-			if (logStr.Length > this.maxCharsInLogMessage)
+            // limit num characters
+
+            if (logStr.Length > this.maxCharsInLogMessage)
             {
 				bLimited = true;
-                logStr = logStr[..Mathf.Max(0, this.maxCharsInLogMessage)];
+				numCharsToTake = Mathf.Max(0, this.maxCharsInLogMessage);
+            }
+			else
+			{
+				numCharsToTake = logStr.Length;
             }
 
             // limit num lines
@@ -211,7 +223,7 @@ namespace UGameCore.Menu
             for (int i = 0; i < this.numLinesToDisplayForLogMessage; i++)
             {
                 int newLineIndex = logStr.IndexOf('\n', lastIndexOfNewLine + 1);
-                if (newLineIndex < 0)
+                if (newLineIndex < 0 || newLineIndex >= this.maxCharsInLogMessage)
                 {
 					lastIndexOfNewLine = -1;
                     break;
@@ -224,13 +236,15 @@ namespace UGameCore.Menu
             if (lastIndexOfNewLine != -1)
             {
 				bLimited = true;
-                logStr = logStr[..lastIndexOfNewLine];
+				numCharsToTake = Mathf.Min(numCharsToTake, lastIndexOfNewLine);
             }
 
-			if (bLimited)
-				logStr += "  ...";
+			m_displayTextStringBuilder.Append(logStr, 0, numCharsToTake);
 
-            return $"[{F.FormatElapsedTime(time)}] {logStr}";
+            if (bLimited)
+                m_displayTextStringBuilder.Append("  ...");
+
+            return m_displayTextStringBuilder.ToString();
         }
 
 		public		void	ClearLog() {
