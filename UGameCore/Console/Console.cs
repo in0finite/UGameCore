@@ -385,7 +385,15 @@ namespace UGameCore.Console
 			
 		}
 
-		public		void	BrowseHistoryBackwards() {
+        public void MoveInputBoxCaretToEnd()
+        {
+            if (this.consoleUI.submitInputField != null)
+            {
+                this.consoleUI.submitInputField.MoveTextEnd(false);
+            }
+        }
+
+        public		void	BrowseHistoryBackwards() {
 
 			if (m_history.Count > 0) {
 				if (-1 == m_historyBrowserIndex)
@@ -397,8 +405,11 @@ namespace UGameCore.Console
 					m_historyBrowserIndex = 0;
 
 				if (m_historyBrowserIndex < m_history.Count)
-					SetInputBoxText (m_history [m_historyBrowserIndex]);
-			}
+                {
+                    SetInputBoxText (m_history [m_historyBrowserIndex]);
+                    MoveInputBoxCaretToEnd();
+                }
+            }
 
 		}
 
@@ -410,6 +421,7 @@ namespace UGameCore.Console
 					if (m_historyBrowserIndex >= m_history.Count)
 						m_historyBrowserIndex = m_history.Count - 1;
 					SetInputBoxText (m_history [m_historyBrowserIndex]);
+                    MoveInputBoxCaretToEnd();
 				}
 			}
 
