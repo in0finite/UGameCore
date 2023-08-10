@@ -1,0 +1,17 @@
+{
+    "name": "UGameCore.UI.Windows",
+    "rootNamespace": "UGameCore.UI.Windows",
+    "references": [
+        "GUID:df258f47b978d65448b18041180499ee",
+        "GUID:e2bff2fa8d032b63b9d3231c79d6019c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
