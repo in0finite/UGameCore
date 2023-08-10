@@ -475,10 +475,12 @@ namespace UGameCore.Console
                 ? this.openKeyMobileAndConsole
                 : this.openKey;
 
-            if (Input.GetKeyDown(keyCode)
-                && (!F.UIHasKeyboardFocus()
+            if (!Input.GetKeyDown(keyCode))
+                return;
+
+            if (!F.UIHasKeyboardFocus()
                     || (this.consoleUI.submitInputField.isFocused
-                        && (this.consoleUI.submitInputField.text.IsNullOrWhiteSpace() || this.consoleUI.submitInputField.text[0] == (char)keyCode))))
+                        && (this.consoleUI.submitInputField.text.IsNullOrWhiteSpace() || this.consoleUI.submitInputField.text[0] == (char)keyCode)))
             {
                 this.IsOpened = !this.IsOpened;
 
