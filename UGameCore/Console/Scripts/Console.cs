@@ -88,6 +88,7 @@ namespace UGameCore.Menu
 		public ConsoleLogEntryComponent SelectedLogEntry { get; private set; }
 
 		public Color selectedLogEntryColor = new Color(0.5f, 0.5f, 0.5f, 0.2f);
+		private Color m_originalLogEntryColor;
 
 		private readonly System.Diagnostics.Stopwatch m_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -127,6 +128,8 @@ namespace UGameCore.Menu
         void Start () {
 
             this.EnsureSerializableReferencesAssigned();
+
+			m_originalLogEntryColor = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
 
             if (this.consoleSubmitInputField != null) {
 				
@@ -586,7 +589,7 @@ namespace UGameCore.Menu
             logEntryComponent.transform.SetAsLastSibling();
             logEntryComponent.textComponent.text = logMessage.displayText;
 			logEntryComponent.textComponent.color = logMessage.logType == LogType.Log ? Color.white : (logMessage.logType == LogType.Warning ? Color.yellow : Color.red);
-			logEntryComponent.image.color = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
+			logEntryComponent.image.color = m_originalLogEntryColor;
             logEntryComponent.gameObject.SetActive(true);
             logEntryComponent.LogMessage = logMessage;
 
@@ -610,8 +613,7 @@ namespace UGameCore.Menu
             // restore color of previously selected entry
             if (this.SelectedLogEntry != null)
             {
-                Color originalColor = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
-                this.SelectedLogEntry.image.color = originalColor;
+                this.SelectedLogEntry.image.color = m_originalLogEntryColor;
             }
 
             this.SelectedLogEntry = logEntryComponent;
