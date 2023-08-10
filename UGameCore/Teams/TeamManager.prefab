@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 65799397896888169}
   - component: {fileID: 560029054427951245}
   - component: {fileID: 1482921502163290055}
-  - component: {fileID: 5493863083529345250}
-  - component: {fileID: 8459626454105168149}
   m_Layer: 0
   m_Name: TeamManager
   m_TagString: Untagged
@@ -76,35 +74,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88d781cd1d29f4eddaa80b2a9d4f0ff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5493863083529345250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8638369775290005618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bfa950e6e191408fbea09b786126e9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cancelButtonNormalizedRect:
-    serializedVersion: 2
-    x: 0.01
-    y: 0.01
-    width: 0.15
-    height: 0.075
---- !u!114 &8459626454105168149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8638369775290005618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df8fe274f52a40aebbdd7a32e4c93b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resetTeamOnSceneChange: 1
-  sendChooseTeamMessageIfFFAIsOn: 1

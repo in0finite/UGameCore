@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using System.Linq;
+using UGameCore.Utilities;
 
 namespace UGameCore {
-	
-	public class PlayerTeamChooser : NetworkBehaviour {
+
+    [RequireComponent(typeof(Player))]
+    public class PlayerTeamChooser : NetworkBehaviour {
 
 		private	Player	m_player = null ;
 
@@ -43,7 +44,7 @@ namespace UGameCore {
 
 
 		void Awake () {
-			m_player = GetComponent<Player> ();
+			m_player = this.GetComponentOrThrow<Player> ();
 		}
 
 		void Update () {

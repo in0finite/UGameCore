@@ -5,7 +5,8 @@ using System.Collections;
 using UGameCore.Utilities;
 
 namespace UGameCore.UI.Windows {
-	
+
+	[RequireComponent(typeof(Player))]
 	public class TeamChoose2Windows : MonoBehaviour {
 		
 		public	Rect	cancelButtonNormalizedRect = new Rect (0.01f, 0.01f, 0.15f, 0.075f);

@@ -2,7 +2,7 @@
 using UnityEngine;
 using static UGameCore.CommandManager;
 
-namespace UGameCore.Commands
+namespace UGameCore
 {
 
     public class TeamCommands : MonoBehaviour {
