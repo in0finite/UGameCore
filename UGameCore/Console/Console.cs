@@ -464,7 +464,7 @@ namespace UGameCore.Console
                 : this.openKey;
 
             if (Input.GetKeyDown(keyCode)
-                && (!F.UIHasFocus()
+                && (!F.UIHasKeyboardFocus()
                     || (this.consoleUI.submitInputField.isFocused
                         && (this.consoleUI.submitInputField.text.IsNullOrWhiteSpace() || this.consoleUI.submitInputField.text[0] == (char)keyCode))))
             {
