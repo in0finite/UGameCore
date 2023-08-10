@@ -6,7 +6,7 @@ using Profiler = UnityEngine.Profiling.Profiler;
 using System.Linq;
 using UnityEngine.EventSystems;
 
-namespace UGameCore.Menu
+namespace UGameCore.Console
 {
     public class Console : MonoBehaviour {
 
@@ -40,20 +40,20 @@ namespace UGameCore.Menu
 
 		public		bool	IsOpened
         {
-            get => this.consoleUIRoot.activeInHierarchy;
+            get => this.consoleUI.gameObject.activeInHierarchy;
 			set
             {
-                this.consoleUIRoot.SetActive(value);
+                this.consoleUI.gameObject.SetActive(value);
 
 				if (value)
                 {
-                    this.consoleSubmitInputField.Select();
-                    this.consoleSubmitInputField.ActivateInputField();
+                    this.consoleUI.submitInputField.Select();
+                    this.consoleUI.submitInputField.ActivateInputField();
                 }
 
                 // need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
                 if (value)
-					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleScrollView.GetRectTransform());
+					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleUI.logMessagesScrollView.GetRectTransform());
             }
         }
 
@@ -106,14 +106,9 @@ namespace UGameCore.Menu
 
 		public CommandManager commandManager;
 
+		public ConsoleUI consoleUI;
 		public GameObject logEntryPrefab;
 
-		public GameObject consoleUIRoot;
-        public ScrollRect	consoleScrollView;
-        public ScrollRect detailsScrollView;
-        public Button	consoleSubmitButton;
-        public InputField	consoleSubmitInputField;
-        
 
 
         private void OnEnable()
@@ -134,28 +129,28 @@ namespace UGameCore.Menu
 
 			m_originalLogEntryColor = this.logEntryPrefab.GetComponentOrThrow<ConsoleLogEntryComponent>().image.color;
 
-            if (this.consoleSubmitInputField != null) {
+            if (this.consoleUI.submitInputField != null) {
 				
 				// detect enter
-				this.consoleSubmitInputField.onSubmit.AddListener ((arg0) => {
+				this.consoleUI.submitInputField.onSubmit.AddListener ((arg0) => {
 					
 					// submit
-					SubmittedText( this.consoleSubmitInputField.text );
+					SubmittedText( this.consoleUI.submitInputField.text );
 
 					// clear input field
-					this.consoleSubmitInputField.text = "";
+					this.consoleUI.submitInputField.text = "";
 
 					// set focus to input field
-					this.consoleSubmitInputField.Select ();
-					this.consoleSubmitInputField.ActivateInputField ();
+					this.consoleUI.submitInputField.Select ();
+					this.consoleUI.submitInputField.ActivateInputField ();
 					
 				});
 
 				// register submit button handler
-				if (this.consoleSubmitButton != null) {
-					this.consoleSubmitButton.onClick.AddListener( () =>
+				if (this.consoleUI.submitButton != null) {
+					this.consoleUI.submitButton.onClick.AddListener( () =>
 						{
-							SubmittedText(this.consoleSubmitInputField.text);
+							SubmittedText(this.consoleUI.submitInputField.text);
 							SetInputBoxText ("");
 						} );
 				}
@@ -276,15 +271,15 @@ namespace UGameCore.Menu
 
 		private		void	ScrollToPredefined() {
 
-			if (this.consoleScrollView != null) {
-				this.consoleScrollView.verticalScrollbar.value = m_scrollToValue;
+			if (this.consoleUI.logMessagesScrollView != null) {
+				this.consoleUI.logMessagesScrollView.verticalScrollbar.value = m_scrollToValue;
 			}
 
 		}
 
         private void ScrollToDelayed(float value)
         {
-            if (this.consoleScrollView != null)
+            if (this.consoleUI.logMessagesScrollView != null)
             {
 				m_scrollToValue = value;
 				foreach (float delay in this.scrollBarUpdateDelays)
@@ -336,12 +331,12 @@ namespace UGameCore.Menu
         {
 			// auto-complete current command
 
-			int caretPosition = this.consoleSubmitInputField.caretPosition;
+			int caretPosition = this.consoleUI.submitInputField.caretPosition;
 
             if (caretPosition <= 0)
                 return;
 
-			string text = this.consoleSubmitInputField.text;
+			string text = this.consoleUI.submitInputField.text;
 
             string textBeforeCaret = text[..caretPosition];
 
@@ -363,8 +358,8 @@ namespace UGameCore.Menu
 
             string textAfterCaret = text[caretPosition..];
 
-            this.consoleSubmitInputField.text = exactCompletion + textAfterCaret;
-            this.consoleSubmitInputField.caretPosition = exactCompletion.Length;
+            this.consoleUI.submitInputField.text = exactCompletion + textAfterCaret;
+            this.consoleUI.submitInputField.caretPosition = exactCompletion.Length;
 
         }
 
@@ -392,8 +387,8 @@ namespace UGameCore.Menu
 
         public		void	SetInputBoxText( string text ) {
 
-			if (this.consoleSubmitInputField != null) {
-				this.consoleSubmitInputField.text = text;
+			if (this.consoleUI.submitInputField != null) {
+				this.consoleUI.submitInputField.text = text;
 			}
 			
 		}
@@ -434,7 +429,7 @@ namespace UGameCore.Menu
 			this.UpdateOpenClose();
 
 			// check for key events from input field
-			if (this.consoleSubmitInputField != null && this.consoleSubmitInputField.isFocused)
+			if (this.consoleUI.submitInputField != null && this.consoleUI.submitInputField.isFocused)
 			{
 				if (Input.GetKeyDown(KeyCode.UpArrow))
 				{
@@ -454,7 +449,7 @@ namespace UGameCore.Menu
 			this.UpdateLogMessages();
 			Profiler.EndSample();
 
-			this.detailsScrollView.gameObject.SetActive(this.IsDetailsAreaOpened);
+			this.consoleUI.detailsScrollView.gameObject.SetActive(this.IsDetailsAreaOpened);
 
             if (m_forceUIUpdateNextFrame && this.IsOpened)
             {
@@ -478,15 +473,15 @@ namespace UGameCore.Menu
 
             if (Input.GetKeyDown(keyCode)
                 && (!F.UIHasFocus()
-                    || (this.consoleSubmitInputField.isFocused
-                        && (this.consoleSubmitInputField.text.IsNullOrWhiteSpace() || this.consoleSubmitInputField.text[0] == (char)keyCode))))
+                    || (this.consoleUI.submitInputField.isFocused
+                        && (this.consoleUI.submitInputField.text.IsNullOrWhiteSpace() || this.consoleUI.submitInputField.text[0] == (char)keyCode))))
             {
                 this.IsOpened = !this.IsOpened;
 
                 if (!this.IsOpened)
                 {
-                    this.consoleSubmitInputField.text = string.Empty; // open-key will remain in InputField if we don't set this
-                    this.consoleSubmitInputField.DeactivateInputField();
+                    this.consoleUI.submitInputField.text = string.Empty; // open-key will remain in InputField if we don't set this
+                    this.consoleUI.submitInputField.DeactivateInputField();
                     if (EventSystem.current != null)
                         EventSystem.current.SetSelectedGameObject(null); // have to do this, otherwise InputField remains focused
                 }
@@ -598,7 +593,7 @@ namespace UGameCore.Menu
             // try take from pool
             if (null == logEntryComponent && !m_pooledLogEntryComponents.TryDequeue(out logEntryComponent))
             {
-                logEntryComponent = this.logEntryPrefab.InstantiateAsUIElement(this.consoleScrollView.content)
+                logEntryComponent = this.logEntryPrefab.InstantiateAsUIElement(this.consoleUI.logMessagesScrollView.content)
                     .GetComponentOrThrow<ConsoleLogEntryComponent>();
 
                 logEntryComponent.eventsPickup.onPointerClick += (ev) => LogEntryOnPointerClick(logEntryComponent, ev);
@@ -643,7 +638,7 @@ namespace UGameCore.Menu
 			this.IsDetailsAreaOpened = this.SelectedLogEntry != null;
 			if (this.SelectedLogEntry != null)
 			{
-				var detailsInputField = this.detailsScrollView.content.GetComponentInChildrenOrThrow<InputField>();
+				var detailsInputField = this.consoleUI.detailsScrollView.content.GetComponentInChildrenOrThrow<InputField>();
 				detailsInputField.text = GetDetailsText(this.SelectedLogEntry.LogMessage);
                 // need to rebuild layout for InputField, because it's not done automatically
                 LayoutRebuilder.MarkLayoutForRebuild(detailsInputField.GetRectTransform());

@@ -2,7 +2,7 @@ using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UGameCore.Menu
+namespace UGameCore.Console
 {
     public class ConsoleLogEntryComponent : MonoBehaviour
     {

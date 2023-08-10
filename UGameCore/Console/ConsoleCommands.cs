@@ -1,9 +1,8 @@
-﻿using UGameCore.Menu;
-using UGameCore.Utilities;
+﻿using UGameCore.Utilities;
 using UnityEngine;
 using static UGameCore.CommandManager;
 
-namespace UGameCore
+namespace UGameCore.Console
 {
 
     public class ConsoleCommands : MonoBehaviour

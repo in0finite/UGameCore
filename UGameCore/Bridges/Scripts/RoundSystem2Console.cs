@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UGameCore.RoundManagement;
-using UGameCore.Menu;
 using UGameCore.Utilities;
 
 namespace UGameCore
@@ -8,7 +7,7 @@ namespace UGameCore
 
     public class RoundSystem2Console : MonoBehaviour {
 
-        public Console console;
+        public Console.Console console;
 
 
         void Start () {
