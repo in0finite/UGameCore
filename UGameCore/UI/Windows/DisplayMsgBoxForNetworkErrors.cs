@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace UGameCore.Menu.Windows {
+namespace UGameCore.UI.Windows
+{
 
 	/// <summary>
 	/// Detects network errors based on logs, and displays message box.

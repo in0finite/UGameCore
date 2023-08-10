@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections;
 using UGameCore.Utilities;
 
-namespace UGameCore.Menu.Windows {
+namespace UGameCore.UI.Windows {
 	
 	public class TeamChoose2Windows : MonoBehaviour {
 		

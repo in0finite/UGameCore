@@ -2,7 +2,7 @@ using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UGameCore
+namespace UGameCore.UI.Windows
 {
     public class MessageBox : MonoBehaviour
     {

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-namespace UGameCore.Menu.Windows {
+namespace UGameCore.UI.Windows
+{
 
 	public class DisplayMsgBoxWhenFailedToJoinGame : MonoBehaviour
 	{

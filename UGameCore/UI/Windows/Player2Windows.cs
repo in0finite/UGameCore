@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
+﻿namespace UGameCore.UI.Windows
+{
 
-namespace UGameCore.Menu.Windows {
-	
-	public class Player2Windows : NetworkBehaviour {
+    public class Player2Windows : NetworkBehaviour {
 
 
 		void OnDisconnectedByServer( string description ) {

@@ -3,7 +3,7 @@ using UnityEngine;
 using static UGameCore.CommandManager;
 using Random = UnityEngine.Random;
 
-namespace UGameCore.Menu.Windows
+namespace UGameCore.UI.Windows
 {
 
     public class WindowCommands : MonoBehaviour {

@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using UGameCore.Utilities;
 
-namespace UGameCore.Menu.Windows {
+namespace UGameCore.UI.Windows
+{
 
 	[DisallowMultipleComponent]
 	public class Window : MonoBehaviour

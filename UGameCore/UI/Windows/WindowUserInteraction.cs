@@ -3,7 +3,7 @@ using System.Collections;
 using UGameCore.Utilities;
 using UnityEngine;
 
-namespace UGameCore.Menu.Windows
+namespace UGameCore.UI.Windows
 {
     /// <summary>
     /// Implements user interaction through windows (message boxes).
