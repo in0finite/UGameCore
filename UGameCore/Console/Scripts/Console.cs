@@ -515,13 +515,19 @@ namespace UGameCore.Menu
             if (0 == numNewlyAdded)
 				return;
 
-			foreach (var logMessage in s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)))
+            Profiler.BeginSample("Enqueue new log messages", this);
+
+            foreach (var logMessage in s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)))
 			{
 				logMessage.displayText = GetDisplayText(logMessage.text, logMessage.time);
                 m_logMessages.Enqueue(logMessage);
             }
 
+            Profiler.EndSample();
+
             // limit number of log messages
+
+            Profiler.BeginSample("Limit number of log messages", this);
 
             while (m_logMessages.Count > this.maxNumLogMessages)
 			{
@@ -529,17 +535,23 @@ namespace UGameCore.Menu
 				ReleaseLogMessage(logMessage);
             }
 
-			// update UI
+            Profiler.EndSample();
 
-			if (m_forceUIUpdateNextFrame) // no need to update here, because it will be rebuilt
+            // update UI
+
+            if (m_forceUIUpdateNextFrame) // no need to update here, because it will be rebuilt
 				return;
+
+			Profiler.BeginSample("CreateUIForLogMessage", this);
 
 			foreach (var logMessage in s_logMessagesBufferList.TakeLast(Mathf.Min(numNewlyAdded, this.maxNumLogMessages)))
 			{
                 CreateUIForLogMessage(logMessage);
             }
 
-			this.ScrollToDelayed(0f);
+            Profiler.EndSample();
+
+            this.ScrollToDelayed(0f);
 
 			s_logMessagesBufferList.Clear();
         }
