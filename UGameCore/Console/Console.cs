@@ -44,16 +44,8 @@ namespace UGameCore.Console
 			set
             {
                 this.consoleUI.gameObject.SetActive(value);
-
 				if (value)
-                {
-                    this.consoleUI.submitInputField.Select();
-                    this.consoleUI.submitInputField.ActivateInputField();
-                }
-
-                // need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
-                if (value)
-					LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleUI.logMessagesScrollView.GetRectTransform());
+					this.OnConsoleOpened();
             }
         }
 
@@ -649,5 +641,14 @@ namespace UGameCore.Console
 		{
 			return logMessage.text + "\n\n" + logMessage.stackTrace;
 		}
+
+		void OnConsoleOpened()
+		{
+            this.consoleUI.submitInputField.Select();
+            this.consoleUI.submitInputField.ActivateInputField();
+            
+            // need to immediately rebuild layout, otherwise scrollbars may return to top, even if we assign their values
+            LayoutRebuilder.ForceRebuildLayoutImmediate(this.consoleUI.logMessagesScrollView.GetRectTransform());
+        }
     }
 }
