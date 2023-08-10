@@ -64,6 +64,9 @@ namespace UGameCore.Menu
         private float m_scrollToValue = 0f;
 		public float[] scrollBarUpdateDelays = new float[] { 0.05f, 0.1f };
 
+        [Tooltip("Auto open/close console when open key is pressed")]
+        public bool autoOpenConsole = true;
+
         [Tooltip("Key which is used to open/close console")]
         public	KeyCode	openKey = KeyCode.BackQuote;
 
@@ -464,7 +467,10 @@ namespace UGameCore.Menu
 
         void UpdateOpenClose()
 		{
-            // open/close console
+			// open/close console
+
+			if (!this.autoOpenConsole)
+				return;
 
             KeyCode keyCode = Application.isMobilePlatform || Application.isConsolePlatform
                 ? this.openKeyMobileAndConsole
