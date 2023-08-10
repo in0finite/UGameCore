@@ -3113,6 +3113,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 567795010}
     m_Modifications:
+    - target: {fileID: 560029054427951245, guid: 9be99a54568a732418ea49606c97b54e, type: 3}
+      propertyPath: commandManager
+      value: 
+      objectReference: {fileID: 876209869}
     - target: {fileID: 8638369775290005618, guid: 9be99a54568a732418ea49606c97b54e, type: 3}
       propertyPath: m_Name
       value: TeamManager
