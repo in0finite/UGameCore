@@ -1935,11 +1935,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 314217410576642497, guid: 1c81c35b5d0af477daa7d1e27d6bd2d0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -481
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 314217410576642497, guid: 1c81c35b5d0af477daa7d1e27d6bd2d0, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -448.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 314217410576642497, guid: 1c81c35b5d0af477daa7d1e27d6bd2d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2269,7 +2269,7 @@ PrefabInstance:
     - target: {fileID: 114257916812501816, guid: 2f5c7642358a54440be3bc6cd6ab72c0, type: 3}
       propertyPath: windowsCanvas
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1792078486}
     - target: {fileID: 941685940269140029, guid: 2f5c7642358a54440be3bc6cd6ab72c0, type: 3}
       propertyPath: commandManager
       value: 
@@ -2610,7 +2610,7 @@ GameObject:
   - component: {fileID: 1792078485}
   - component: {fileID: 1792078484}
   m_Layer: 0
-  m_Name: ConsoleCanvas
+  m_Name: MainCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2698,7 +2698,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 20
   m_TargetDisplay: 0
 --- !u!1001 &1908675454
 PrefabInstance:
