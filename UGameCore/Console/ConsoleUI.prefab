@@ -1463,6 +1463,7 @@ GameObject:
   - component: {fileID: 2451637887748468735}
   - component: {fileID: 5314100877551879125}
   - component: {fileID: 7169233493429895680}
+  - component: {fileID: 2601147081199970595}
   m_Layer: 5
   m_Name: ConsoleUI
   m_TagString: Untagged
@@ -1598,6 +1599,22 @@ MonoBehaviour:
   updateAnchors: 1
   updateOffset: 0
   updateAnchoredPosition: 0
+--- !u!114 &2601147081199970595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5019265763978468269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055feed5f823182499ecf5594f87284d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logMessagesScrollView: {fileID: 8301373456802288835}
+  detailsScrollView: {fileID: 5574351799101525015}
+  submitButton: {fileID: 4492380097370532992}
+  submitInputField: {fileID: 8509858087897297365}
 --- !u!1 &5099272827492697162
 GameObject:
   m_ObjectHideFlags: 0

@@ -63,12 +63,8 @@ MonoBehaviour:
   ignoreMessages: []
   ignoreMessagesThatStartWith: []
   commandManager: {fileID: 0}
+  consoleUI: {fileID: 0}
   logEntryPrefab: {fileID: 3892949753433482773, guid: 698751ced92458342a1c63d1b54cc616, type: 3}
-  consoleUIRoot: {fileID: 0}
-  consoleScrollView: {fileID: 0}
-  detailsScrollView: {fileID: 0}
-  consoleSubmitButton: {fileID: 0}
-  consoleSubmitInputField: {fileID: 0}
 --- !u!114 &3063360371131665849
 MonoBehaviour:
   m_ObjectHideFlags: 0
