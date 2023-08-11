@@ -65,37 +65,6 @@ namespace UGameCore
 
 		}
 		
-		void OnGUI () {
-
-
-			// Set font and controls size based on screen size, platform, etc. It's done here because screen size can
-			// be changed during runtime.
-			{
-				GUIStyle[] styles = new GUIStyle[] { GUI.skin.label, GUI.skin.button, GUI.skin.box,
-					GUI.skin.textArea, GUI.skin.textField };
-				float fontSizeModifier = 1 / 50.0f;
-				#if UNITY_ANDROID
-				fontSizeModifier = 1 / 25.0f ;
-				#endif
-				foreach (GUIStyle s in styles) {
-					s.fontSize = Mathf.RoundToInt (Mathf.Min (Screen.width, Screen.height) * fontSizeModifier);
-				}
-
-				#if UNITY_ANDROID
-				float scrollbarSize = Mathf.Min (Screen.width, Screen.height) / 600.0f * 20 ;
-				float scrollbarThumbSize = Mathf.Min (Screen.width, Screen.height) / 600.0f * 19 ;
-				GUI.skin.verticalScrollbar.fixedWidth = scrollbarSize;
-				GUI.skin.verticalScrollbarThumb.fixedWidth = scrollbarThumbSize;
-				GUI.skin.horizontalScrollbar.fixedHeight = scrollbarSize;
-				GUI.skin.horizontalScrollbarThumb.fixedHeight = scrollbarThumbSize;
-
-				GUI.skin.toggle.fixedHeight = Mathf.Min (Screen.width, Screen.height) / 600.0f * 25 ;
-				GUI.skin.toggle.fontSize = Mathf.RoundToInt (Mathf.Min (Screen.width, Screen.height) / 37.5f);
-				#endif
-			}
-
-		}
-
 
 		public	static	bool	CanGameObjectsReadUserInput() {
 			return m_forbidInputHandlers.TrueForAll( f => f.CanGameObjectsReadInput() );
