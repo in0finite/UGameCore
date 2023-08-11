@@ -13,6 +13,9 @@ namespace UGameCore
         public float lifeTime = 0f;
         public float lifeTimeDynamic = 30f;
 
+        [Tooltip("Material to apply to created game objects")]
+        public Material material;
+
         const string kSyntax = "([float scale])  or  ([float scaleX], [float scaleY], [float scaleZ])";
 
 
@@ -37,6 +40,9 @@ namespace UGameCore
             float destroyTime = bDynamic ? this.lifeTimeDynamic : this.lifeTime;
             if (destroyTime > 0f)
                 Destroy(go, destroyTime);
+
+            if (this.material != null)
+                go.GetComponentOrThrow<MeshRenderer>().sharedMaterial = this.material;
 
             Rigidbody rigidbody = null;
             if (bDynamic)
