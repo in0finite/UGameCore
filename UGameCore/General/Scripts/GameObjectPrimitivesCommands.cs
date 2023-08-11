@@ -78,6 +78,13 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
+        [CommandMethod("cylinder", "Creates static cylinder", syntax = kSyntax)]
+        ProcessCommandResult CylinderCmd(ProcessCommandContext context)
+        {
+            CreatePrimitive(context, PrimitiveType.Cylinder, false);
+            return ProcessCommandResult.Success;
+        }
+
         [CommandMethod("cube_dynamic", "Creates dynamic cube", syntax = kSyntax)]
         ProcessCommandResult CubeDynamicCmd(ProcessCommandContext context)
         {
@@ -89,6 +96,13 @@ namespace UGameCore
         ProcessCommandResult SphereDynamicCmd(ProcessCommandContext context)
         {
             CreatePrimitive(context, PrimitiveType.Sphere, true);
+            return ProcessCommandResult.Success;
+        }
+
+        [CommandMethod("cylinder_dynamic", "Creates dynamic cylinder", syntax = kSyntax)]
+        ProcessCommandResult CylinderDynamicCmd(ProcessCommandContext context)
+        {
+            CreatePrimitive(context, PrimitiveType.Cylinder, true);
             return ProcessCommandResult.Success;
         }
     }
