@@ -160,14 +160,20 @@ namespace UGameCore
             public double? lastTimeExecutedCommand;
 
             /// <summary>
-            /// All arguments, including command.
+            /// All arguments, including command itself.
             /// </summary>
             public string[] arguments;
 
+            /// <summary>
+            /// Number of arguments, including command itself.
+            /// </summary>
             public int NumArguments => this.arguments.Length;
 
             public int currentArgumentIndex = 1;
 
+            /// <summary>
+            /// Read next command argument as string.
+            /// </summary>
             public string ReadString()
             {
                 if (this.currentArgumentIndex >= this.NumArguments)
@@ -178,6 +184,9 @@ namespace UGameCore
                 return arg;
             }
 
+            /// <summary>
+            /// Read next command argument as string, or if it's not available, return specified default value.
+            /// </summary>
             public string ReadStringOrDefault(string defaultValue)
             {
                 if (this.currentArgumentIndex >= this.NumArguments)
@@ -186,18 +195,27 @@ namespace UGameCore
                 return this.ReadString();
             }
 
+            /// <summary>
+            /// Read next command argument as int.
+            /// </summary>
             public int ReadInt()
             {
                 string str = this.ReadString();
                 return int.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            /// <summary>
+            /// Read next command argument as float.
+            /// </summary>
             public float ReadFloat()
             {
                 string str = this.ReadString();
                 return float.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            /// <summary>
+            /// Read next command argument as Vector3.
+            /// </summary>
             public Vector3 ReadVector3()
             {
                 return new Vector3(this.ReadFloat(), this.ReadFloat(), this.ReadFloat());
