@@ -145,6 +145,11 @@ namespace UGameCore
             public string command;
 
             /// <summary>
+            /// Command that should be processed, without arguments.
+            /// </summary>
+            public string commandOnly { get; internal set; }
+
+            /// <summary>
             /// Does the executor have server permissions ?
             /// </summary>
             public bool hasServerPermissions;
@@ -162,7 +167,7 @@ namespace UGameCore
             /// <summary>
             /// All arguments, including command itself.
             /// </summary>
-            public string[] arguments;
+            public string[] arguments { get; internal set; }
 
             /// <summary>
             /// Number of arguments, including command itself.
@@ -623,6 +628,7 @@ namespace UGameCore
                     return ProcessCommandResult.LimitInterval(commandInfo.limitInterval);
             }
 
+            context.commandOnly = commandInfo.command;
             context.arguments = arguments;
 
             return commandInfo.commandHandler(context);
@@ -680,6 +686,7 @@ namespace UGameCore
             if (null == commandInfo.autoCompletionHandler)
                 return;
 
+            context.commandOnly = commandInfo.command;
             context.arguments = arguments;
 
             var result = commandInfo.autoCompletionHandler(context);
