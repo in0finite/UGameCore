@@ -59,6 +59,8 @@ MonoBehaviour:
   maxNumPooledLogMessages: 100
   numLinesToDisplayForLogMessage: 3
   maxCharsInLogMessage: 250
+  maxCharsInDetailsMessage: 4000
+  maxCharsInDetailsStackTrace: 1000
   selectedLogEntryColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.2}
   ignoreMessages: []
   ignoreMessagesThatStartWith: []
