@@ -70,6 +70,8 @@ namespace UGameCore.Console
 
 		public volatile int numLinesToDisplayForLogMessage = 3;
         public volatile int maxCharsInLogMessage = 250;
+        public int maxCharsInDetailsMessage = 4000;
+        public int maxCharsInDetailsStackTrace = 1000;
 
         private readonly	Utilities.ConcurrentQueue<LogMessage>	m_threadedBuffer = new ConcurrentQueue<LogMessage>();
         
@@ -653,7 +655,12 @@ namespace UGameCore.Console
 
 		string GetDetailsText(LogMessage logMessage)
 		{
-			return logMessage.text + "\n\n" + logMessage.stackTrace;
+            this.maxCharsInDetailsMessage = Mathf.Max(this.maxCharsInDetailsMessage, 0);
+            this.maxCharsInDetailsStackTrace = Mathf.Max(this.maxCharsInDetailsStackTrace, 0);
+
+            return logMessage.text.SubstringCountClamped(this.maxCharsInDetailsMessage)
+                + "\n\n"
+                + logMessage.stackTrace.SubstringCountClamped(this.maxCharsInDetailsStackTrace);
 		}
 
 		void OnConsoleOpened()
