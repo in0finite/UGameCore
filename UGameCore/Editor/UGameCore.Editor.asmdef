@@ -1,0 +1,18 @@
+{
+    "name": "UGameCore.Editor",
+    "rootNamespace": "UGameCore.Editor",
+    "references": [
+        "GUID:df258f47b978d65448b18041180499ee"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
