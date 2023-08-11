@@ -287,8 +287,6 @@ namespace UGameCore.Console
 
 			Debug.Log ( "> " + textToProcess );
 
-			this.HandleTextSubmitted(textToProcess);
-			
 			if (!textToProcess.IsNullOrWhiteSpace()) {
 				// add this command to list of executed commands
 				m_history.Add (textToProcess);
@@ -300,7 +298,9 @@ namespace UGameCore.Console
 			// reset history browsing
 			m_historyBrowserIndex = -1;
 
-		}
+            this.HandleTextSubmitted(textToProcess);
+
+        }
 
 		void HandleTextSubmitted(string text)
 		{
