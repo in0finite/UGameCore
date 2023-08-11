@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 2882611135121461071}
   - component: {fileID: 7181606764621534023}
   - component: {fileID: 3156885916540031385}
+  - component: {fileID: 1451788661763733416}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -196,8 +197,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6af8a562335945b09e6210dde0aa0f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forbiddenCommands: []
-  m_registerHelpCommand: 1
+  maxNumCharactersInCommand: 300
+  m_forbiddenCommandsList: []
 --- !u!114 &2128493207871122006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +252,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1aa48a8521ed974fa9db52eb8947141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  commandManager: {fileID: 6743896830069084620}
+--- !u!114 &1451788661763733416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737272855205376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9221311ad11bc7d4a8ec86dc3826d5a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   commandManager: {fileID: 6743896830069084620}

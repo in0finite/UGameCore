@@ -108,6 +108,9 @@ namespace UGameCore
             }
         }
 
+        /// <summary>
+        /// Result of a command processing.
+        /// </summary>
         public class ProcessCommandResult
         {
             public int exitCode;
@@ -131,6 +134,9 @@ namespace UGameCore
                 => new ProcessCommandResult() { exitCode = 0, response = exactMatch, autoCompletions = autoCompletions != null ? new List<string>(autoCompletions) : null };
         }
 
+        /// <summary>
+        /// Context in which the command is processed.
+        /// </summary>
         public class ProcessCommandContext
         {
             /// <summary>
