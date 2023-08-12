@@ -176,6 +176,11 @@ namespace UGameCore
 
             public int currentArgumentIndex = 1;
 
+            public bool HasNextArgument()
+            {
+                return this.currentArgumentIndex < this.NumArguments;
+            }
+
             /// <summary>
             /// Read next command argument as string.
             /// </summary>

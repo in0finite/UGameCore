@@ -112,5 +112,14 @@ namespace UGameCore
 
             return ProcessCommandResult.Success;
         }
+
+        [CommandMethod("args_print", "Prints arguments 1 line each")]
+        ProcessCommandResult ArgsPrintCmd(ProcessCommandContext context)
+        {
+            string response = string.Empty;
+            while (context.HasNextArgument())
+                response += context.ReadString() + "\n";
+            return ProcessCommandResult.SuccessResponse(response);
+        }
     }
 }
