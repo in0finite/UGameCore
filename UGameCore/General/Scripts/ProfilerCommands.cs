@@ -93,7 +93,7 @@ namespace UGameCore
             Debug.Log(sb.ToString());
         }
 
-        [CommandMethod("profiler_list", "List all available profiler categories")]
+        [CommandMethod("profiler_list", "List all available profiler categories", maxNumArguments = 0)]
         ProcessCommandResult ProfilerListCmd(ProcessCommandContext context)
         {
             var availableStatHandles = new List<ProfilerRecorderHandle>();
@@ -108,7 +108,7 @@ namespace UGameCore
             return ProcessCommandResult.SuccessResponse(sb.ToString());
         }
 
-        [CommandMethod("profiler_category", "List all available profiler stats in given category")]
+        [CommandMethod("profiler_category", "List all available profiler stats in given category", exactNumArguments = 1)]
         ProcessCommandResult ProfilerCategoryCmd(ProcessCommandContext context)
         {
             string categoryInput = context.ReadString();
@@ -128,7 +128,7 @@ namespace UGameCore
             return ProcessCommandResult.SuccessResponse(sb.ToString());
         }
 
-        [CommandMethod("profiler_category_capture", "Capture all profiler stats in given category")]
+        [CommandMethod("profiler_category_capture", "Capture all profiler stats in given category", exactNumArguments = 1)]
         ProcessCommandResult ProfilerCategoryCaptureCmd(ProcessCommandContext context)
         {
             string categoryInput = context.ReadString();
