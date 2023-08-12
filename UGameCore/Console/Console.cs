@@ -287,12 +287,15 @@ namespace UGameCore.Console
 
 			Debug.Log ( "> " + textToProcess );
 
-			if (!textToProcess.IsNullOrWhiteSpace()) {
-				// add this command to list of executed commands
-				m_history.Add (textToProcess);
-				if (m_history.Count > 100) {
-					m_history.RemoveRange (0, 20);
-				}
+			if (!textToProcess.IsNullOrWhiteSpace())
+            {
+                // add this command to list of executed commands
+                if (m_history.Count == 0 || !m_history.Last().Equals(textToProcess, System.StringComparison.Ordinal))
+                {
+                    m_history.Add(textToProcess);
+                    if (m_history.Count > 100)
+                        m_history.RemoveRange(0, 20);
+                }
 			}
 
 			// reset history browsing
