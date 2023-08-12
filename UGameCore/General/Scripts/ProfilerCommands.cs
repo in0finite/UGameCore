@@ -15,11 +15,12 @@ namespace UGameCore
         public CommandManager commandManager;
 
         List<RecorderInfo> m_profilerRecorders = new List<RecorderInfo>();
+        List<RecorderInfo> m_nonSortedProfilerRecorders = new List<RecorderInfo>();
 
         class RecorderInfo
         {
             public ProfilerRecorder recorder;
-            public ProfilerRecorderDescription desc;
+            public string name;
             public int numFramesLeft;
         }
 
@@ -33,43 +34,63 @@ namespace UGameCore
 
         void Update()
         {
-            StringBuilder sb = null;
-            
-            m_profilerRecorders.RemoveAll(_ => _.numFramesLeft <= 0);
+            UpdateList(m_profilerRecorders, true);
+            UpdateList(m_nonSortedProfilerRecorders, false);
+        }
 
-            foreach (RecorderInfo info in m_profilerRecorders)
+        void UpdateList(List<RecorderInfo> recorderList, bool bSort)
+        {
+            recorderList.RemoveAll(_ => _.numFramesLeft <= 0);
+
+            List<(double, ProfilerMarkerDataUnit, string)> valuesToLog = null;
+
+            foreach (RecorderInfo info in recorderList)
             {
                 info.numFramesLeft--;
 
                 if (info.numFramesLeft > 0)
                     continue;
 
-                sb ??= new StringBuilder();
+                valuesToLog ??= new List<(double, ProfilerMarkerDataUnit, string)>();
 
-                double value = info.recorder.CurrentValueAsDouble;
-                if (info.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
-                    value /= (1024 * 1024);
-                else if (info.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
-                    value /= (1000 * 1000);
-
-                sb.Append(info.desc.Name);
-                sb.Append(" :  ");
-                sb.Append(value);
-                sb.Append("  [");
-                if (info.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
-                    sb.Append("MB");
-                else if (info.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
-                    sb.Append("ms");
-                else
-                    sb.Append(info.recorder.UnitType.ToString());
-                sb.Append("]\n");
+                valuesToLog.Add((info.recorder.CurrentValueAsDouble, info.recorder.UnitType, info.name));
 
                 info.recorder.Stop();
                 info.recorder.Dispose();
             }
 
-            if (sb != null)
-                Debug.Log(sb.ToString());
+            if (valuesToLog == null)
+                return;
+
+            if (bSort)
+                valuesToLog.SortBy(_ => -_.Item1);
+
+            var sb = new StringBuilder();
+
+            foreach (var valueInfo in valuesToLog)
+            {
+                double value = valueInfo.Item1;
+                ProfilerMarkerDataUnit unitType = valueInfo.Item2;
+
+                if (unitType == ProfilerMarkerDataUnit.Bytes)
+                    value /= (1024 * 1024);
+                else if (unitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                    value /= (1000 * 1000);
+
+                sb.Append(valueInfo.Item3);
+                sb.Append(" :  ");
+                sb.Append(value);
+                sb.Append("  [");
+                if (unitType == ProfilerMarkerDataUnit.Bytes)
+                    sb.Append("MB");
+                else if (unitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                    sb.Append("ms");
+                else
+                    sb.Append(unitType.ToString());
+                sb.Append("]\n");
+            }
+
+            Debug.Log(sb.ToString());
         }
 
         [CommandMethod("profiler_list", "List all available profiler categories")]
@@ -130,7 +151,7 @@ namespace UGameCore
                     1,
                     ProfilerRecorderOptions.StartImmediately | ProfilerRecorderOptions.Default);
 
-                m_profilerRecorders.Add(new RecorderInfo { recorder = recorder, desc = desc, numFramesLeft = 2 });
+                m_profilerRecorders.Add(new RecorderInfo { recorder = recorder, name = desc.Name, numFramesLeft = 2 });
             }
 
             return ProcessCommandResult.Success;
@@ -161,6 +182,46 @@ namespace UGameCore
                 outExactCompletion = this.commandManager.CombineArguments(context.commandOnly, outExactCompletion);
 
             return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
+        }
+
+        [CommandMethod("profiler_summary", "Capture summary of profiler stats", maxNumArguments = 0)]
+        ProcessCommandResult ProfilerSummarizeCmd(ProcessCommandContext context)
+        {
+            var list = new List<(ProfilerCategory, string)>()
+            {
+                (ProfilerCategory.Internal, "Semaphore.WaitForSignal"),
+                (ProfilerCategory.Internal, "Main Thread"),
+                (ProfilerCategory.Internal, "Idle"),
+
+                (ProfilerCategory.Render, "CPU Total Frame Time"),
+                (ProfilerCategory.Render, "CPU Main Thread Frame Time"),
+                (ProfilerCategory.Render, "CPU Render Thread Frame Time"),
+                (ProfilerCategory.Render, "Render Textures Bytes"),
+                (ProfilerCategory.Render, "Render Textures Count"),
+                (ProfilerCategory.Render, "Visible Skinned Meshes Count"),
+
+                (ProfilerCategory.Physics, "Physics.Processing"),
+
+                (ProfilerCategory.Memory, "Total Reserved Memory"),
+                (ProfilerCategory.Memory, "Total Used Memory"),
+                (ProfilerCategory.Memory, "Texture Memory"),
+                (ProfilerCategory.Memory, "Texture Count"),
+                (ProfilerCategory.Memory, "Gfx Reserved Memory"),
+                (ProfilerCategory.Memory, "GC Reserved Memory"),
+                (ProfilerCategory.Memory, "GC Used Memory"),
+                (ProfilerCategory.Memory, "Mesh Memory"),
+                (ProfilerCategory.Memory, "Mesh Count"),
+                (ProfilerCategory.Memory, "Physics Used Memory"),
+                (ProfilerCategory.Memory, "Game Object Count"),
+            };
+
+            foreach (var item in list)
+            {
+                var recorder = ProfilerRecorder.StartNew(item.Item1, item.Item2);
+                m_nonSortedProfilerRecorders.Add(new RecorderInfo { recorder = recorder, name = item.Item2, numFramesLeft = 2 });
+            }
+
+            return ProcessCommandResult.Success;
         }
     }
 }
