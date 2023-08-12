@@ -383,9 +383,13 @@ namespace UGameCore
             // abcd"abc"abc
             // abcd" abcd" abcd
             // abcd "abcd"abcd
+            // abcd "a  |
+            // abcd ""
+            // abcd " "
 
             var arguments = new List<string>();
 
+            // trim is fine here, because arguments can not have whitespaces at start/end without using quotes
             command = command.Trim();
             
             int argumentStartIndex = -1;
@@ -411,7 +415,7 @@ namespace UGameCore
                     {
                         // cut argument here
                         string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                        arguments.Add(argument.Trim());
+                        arguments.Add(argument.Trim()); // not sure if Trim() is needed here, but keep it just in case
                         argumentStartIndex = i;
                         continue;
                     }
@@ -431,7 +435,7 @@ namespace UGameCore
                             // whitespace is after this char, end current argument
 
                             string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                            arguments.Add(argument.Trim());
+                            arguments.Add(argument); // do not Trim() here, arguments are allowed to have whitespaces at start/end
                             argumentStartIndex = i;
                             startingQuoteChar = (char)0;
 
@@ -464,18 +468,21 @@ namespace UGameCore
                     continue;
                 }
 
-                // skip this character, he will be part of current argument
+                // normal character, skip it, he will be part of current argument
 
                 continue;
             }
 
             // add the remaining argument
             string remainingArgument = command.Substring(argumentStartIndex + 1, command.Length - argumentStartIndex - 1);
-            arguments.Add(remainingArgument.Trim());
+            // here we only need to trim from end, because argument may have quotes
+            // but because the command was trimmed at beginning, we don't need to do it
+            arguments.Add(remainingArgument);
 
             arguments.ReplaceEach(arg => EscapeQuotes(arg));
 
-            arguments.RemoveAll(string.IsNullOrWhiteSpace);
+            // do not remove empty strings, they are valid arguments
+            //arguments.RemoveAll(string.IsNullOrWhiteSpace);
 
             return arguments.ToArray();
         }
@@ -518,13 +525,13 @@ namespace UGameCore
             return new string(list.ToArray());
         }
 
-        public string CombineArguments(string[] arguments)
+        public string CombineArguments(params string[] arguments)
         {
             var sb = new System.Text.StringBuilder();
 
             for (int i = 0; i < arguments.Length; i++)
             {
-                string arg = arguments[i].Trim();
+                string arg = arguments[i]; // don't trim, arguments are allowed to have whitespaces at start/end
                 bool hasWhitespace = arg.Any(char.IsWhiteSpace);
                 
                 if (hasWhitespace)
