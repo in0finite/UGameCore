@@ -14,8 +14,14 @@ namespace UGameCore
     {
         public CommandManager commandManager;
 
-        List<(ProfilerRecorder recorder, ProfilerRecorderDescription desc)> m_profilerRecorders = 
-            new List<(ProfilerRecorder, ProfilerRecorderDescription)>();
+        List<RecorderInfo> m_profilerRecorders = new List<RecorderInfo>();
+
+        class RecorderInfo
+        {
+            public ProfilerRecorder recorder;
+            public ProfilerRecorderDescription desc;
+            public int numFramesLeft;
+        }
 
 
         void Start()
@@ -31,31 +37,36 @@ namespace UGameCore
             if (m_profilerRecorders.Count > 0)
                 sb = new StringBuilder();
 
-            foreach (var recorder in m_profilerRecorders)
+            m_profilerRecorders.RemoveAll(_ => _.numFramesLeft <= 0);
+
+            foreach (RecorderInfo info in m_profilerRecorders)
             {
-                double value = recorder.recorder.CurrentValueAsDouble;
-                if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
+                info.numFramesLeft--;
+
+                if (info.numFramesLeft > 0)
+                    continue;
+
+                double value = info.recorder.CurrentValueAsDouble;
+                if (info.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
                     value /= (1024 * 1024);
-                else if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                else if (info.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
                     value /= (1000 * 1000);
 
-                sb.Append(recorder.desc.Name);
+                sb.Append(info.desc.Name);
                 sb.Append(" :  ");
                 sb.Append(value);
                 sb.Append("  [");
-                if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
+                if (info.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
                     sb.Append("MB");
-                else if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                else if (info.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
                     sb.Append("ms");
                 else
-                    sb.Append(recorder.recorder.UnitType.ToString());
+                    sb.Append(info.recorder.UnitType.ToString());
                 sb.Append("]\n");
 
-                recorder.recorder.Stop();
-                recorder.recorder.Dispose();
+                info.recorder.Stop();
+                info.recorder.Dispose();
             }
-
-            m_profilerRecorders.Clear();
 
             if (sb != null)
                 Debug.Log(sb.ToString());
@@ -119,7 +130,7 @@ namespace UGameCore
                     1,
                     ProfilerRecorderOptions.StartImmediately | ProfilerRecorderOptions.Default);
 
-                m_profilerRecorders.Add((recorder, desc));
+                m_profilerRecorders.Add(new RecorderInfo { recorder = recorder, desc = desc, numFramesLeft = 2 });
             }
 
             return ProcessCommandResult.Success;
