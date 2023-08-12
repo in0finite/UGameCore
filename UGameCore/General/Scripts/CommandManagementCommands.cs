@@ -63,15 +63,13 @@ namespace UGameCore
 
             var possibleCompletions = new List<string>();
 
-            //return this.commandManager.AutoCompleteCommand(, out string outExactCompletion, possibleCompletions);
-
             string cmd = context.ReadString();
 
             CommandManager.DoAutoCompletion(
                 cmd, this.commandManager.RegisteredCommands, out string outExactCompletion, possibleCompletions);
 
             if (outExactCompletion != null)
-                outExactCompletion = "help " + outExactCompletion;
+                outExactCompletion = this.commandManager.CombineArguments("help", outExactCompletion);
 
             return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
         }
