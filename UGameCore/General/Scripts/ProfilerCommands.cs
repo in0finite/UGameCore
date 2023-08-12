@@ -36,12 +36,19 @@ namespace UGameCore
                 double value = recorder.recorder.CurrentValueAsDouble;
                 if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
                     value /= (1024 * 1024);
+                else if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                    value /= (1000 * 1000);
 
                 sb.Append(recorder.desc.Name);
                 sb.Append(" :  ");
                 sb.Append(value);
                 sb.Append("  [");
-                sb.Append(recorder.recorder.UnitType != ProfilerMarkerDataUnit.Bytes ? recorder.recorder.UnitType.ToString() : "MB");
+                if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
+                    sb.Append("MB");
+                else if (recorder.recorder.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds)
+                    sb.Append("ms");
+                else
+                    sb.Append(recorder.recorder.UnitType.ToString());
                 sb.Append("]\n");
 
                 recorder.recorder.Stop();
@@ -102,6 +109,9 @@ namespace UGameCore
                 .Where(_ => _.Category.Name.Equals(categoryInput, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
+            if (descs.Length == 0)
+                return ProcessCommandResult.Error($"Category {categoryInput} not found");
+
             foreach (ProfilerRecorderDescription desc in descs)
             {
                 var recorder = new ProfilerRecorder(
@@ -137,7 +147,7 @@ namespace UGameCore
                 input, categories, out string outExactCompletion, possibleCompletions);
 
             if (outExactCompletion != null)
-                outExactCompletion = context.commandOnly + " " + outExactCompletion;
+                outExactCompletion = this.commandManager.CombineArguments(context.commandOnly, outExactCompletion);
 
             return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
         }
