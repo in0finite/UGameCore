@@ -34,9 +34,7 @@ namespace UGameCore
         void Update()
         {
             StringBuilder sb = null;
-            if (m_profilerRecorders.Count > 0)
-                sb = new StringBuilder();
-
+            
             m_profilerRecorders.RemoveAll(_ => _.numFramesLeft <= 0);
 
             foreach (RecorderInfo info in m_profilerRecorders)
@@ -45,6 +43,8 @@ namespace UGameCore
 
                 if (info.numFramesLeft > 0)
                     continue;
+
+                sb ??= new StringBuilder();
 
                 double value = info.recorder.CurrentValueAsDouble;
                 if (info.recorder.UnitType == ProfilerMarkerDataUnit.Bytes)
