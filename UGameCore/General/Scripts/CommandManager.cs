@@ -420,7 +420,9 @@ namespace UGameCore
                     {
                         // cut argument here
                         string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                        arguments.Add(argument.Trim()); // not sure if Trim() is needed here, but keep it just in case
+                        argument = argument.Trim(); // not sure if Trim() is needed here, but keep it just in case
+                        if (argument.Length > 0) // only add it if not empty, because a whitespace outside of quotes should not be an argument
+                            arguments.Add(argument);
                         argumentStartIndex = i;
                         continue;
                     }
