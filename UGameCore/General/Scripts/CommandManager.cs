@@ -41,6 +41,8 @@ namespace UGameCore
             public string command;
             public string description;
             public string syntax;
+            public sbyte maxNumArguments = -1;
+            public sbyte minNumArguments = -1;
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
             public float limitInterval;
@@ -76,6 +78,8 @@ namespace UGameCore
             public string command;
             public string description;
             public string syntax;
+            public sbyte? maxNumArguments;
+            public sbyte? minNumArguments;
             public System.Func<ProcessCommandContext, ProcessCommandResult> commandHandler;
             public bool allowToRunWithoutServerPermissions;
             public bool runOnlyOnServer;
@@ -321,6 +325,8 @@ namespace UGameCore
                         command = attr.command,
                         description = attr.description,
                         syntax = attr.syntax,
+                        minNumArguments = attr.minNumArguments >= 0 ? attr.minNumArguments : null,
+                        maxNumArguments = attr.maxNumArguments >= 0 ? attr.maxNumArguments : null,
                         allowToRunWithoutServerPermissions = attr.allowToRunWithoutServerPermissions,
                         runOnlyOnServer = attr.runOnlyOnServer,
                         limitInterval = attr.limitInterval,
@@ -640,6 +646,19 @@ namespace UGameCore
             {
                 if (commandInfo.limitInterval > 0 && Time.timeAsDouble - context.lastTimeExecutedCommand.Value < commandInfo.limitInterval)
                     return ProcessCommandResult.LimitInterval(commandInfo.limitInterval);
+            }
+
+            if (commandInfo.minNumArguments.HasValue && commandInfo.maxNumArguments.HasValue && arguments.Length - 1 != commandInfo.minNumArguments.Value)
+                return ProcessCommandResult.Error($"Command requires exactly {commandInfo.minNumArguments.Value} arguments");
+
+            if (commandInfo.minNumArguments.HasValue && arguments.Length - 1 < commandInfo.minNumArguments.Value)
+                return ProcessCommandResult.Error($"Command requires at least {commandInfo.minNumArguments.Value} arguments");
+
+            if (commandInfo.maxNumArguments.HasValue && arguments.Length - 1 > commandInfo.maxNumArguments.Value)
+            {
+                if (commandInfo.maxNumArguments.Value == 0)
+                    return ProcessCommandResult.Error("Command does not accept any arguments");
+                return ProcessCommandResult.Error($"Command can not have more than {commandInfo.maxNumArguments.Value} arguments");
             }
 
             context.commandOnly = commandInfo.command;
