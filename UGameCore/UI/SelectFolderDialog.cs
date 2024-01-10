@@ -11,8 +11,11 @@ namespace UGameCore.UI
     {
         [Serializable]
         public class FolderSelectedEvent : UnityEvent<string> { }
+        [Serializable]
+        public class FileSelectedEvent : UnityEvent<string> { }
 
-        public FolderSelectedEvent onSelect = new FolderSelectedEvent();
+        public FolderSelectedEvent onFolderSelect = new();
+        public FileSelectedEvent onFileSelect = new();
 
         public Text titleText;
 
@@ -33,13 +36,21 @@ namespace UGameCore.UI
         public Color selectedColor;
         Color m_nonSelectedColor;
 
-        public string SelectedItemText { get; private set; }
+        public bool allowFiles = false;
+        public bool allowFolders = true;
+
+        public bool IsFileSelected { get; private set; } = false;
+        public bool IsFolderSelected { get; private set; } = false;
         public Text SelectedTextComponent { get; private set; }
+
         public string CurrentFolder { get; private set; }
 
         public string initialFolder;
 
         public SerializablePair<string, string>[] additionalFoldersInHeader = Array.Empty<SerializablePair<string, string>>();
+
+        public string folderSearchPattern = "*";
+        public string fileSearchPattern = "*";
 
 
         private void Start()
@@ -75,15 +86,31 @@ namespace UGameCore.UI
 
         void OnSelectPressed()
         {
-            if (this.destroyOnSelect)
-                F.DestroyEvenInEditMode(this.gameObject);
-            this.onSelect.Invoke(this.CurrentFolder);
+            if (this.IsFileSelected && this.allowFiles)
+            {
+                string fileName = this.SelectedTextComponent.text;
+
+                if (this.destroyOnSelect)
+                    F.DestroyEvenInEditMode(this.gameObject);
+
+                this.onFileSelect.Invoke(Path.Combine(this.CurrentFolder, fileName));
+            }
+            else if (this.allowFolders)
+            {
+                if (this.destroyOnSelect)
+                    F.DestroyEvenInEditMode(this.gameObject);
+
+                this.onFolderSelect.Invoke(this.CurrentFolder);
+            }
         }
 
         void OnCancelPressed()
         {
             F.DestroyEvenInEditMode(this.gameObject);
-            this.onSelect.Invoke(null);
+            if (this.allowFolders)
+                this.onFolderSelect.Invoke(null);
+            if (this.allowFiles)
+                this.onFileSelect.Invoke(null);
         }
 
         void OnInputFieldSubmit(string text)
@@ -100,13 +127,19 @@ namespace UGameCore.UI
             text.gameObject.GetOrAddComponent<UIEventsPickup>().onPointerClick += _ => this.ChangeCurrentFolder(directory);
         }
 
-        public void AddToFolderList(string item)
+        public Text AddToListView(
+            string item,
+            Action<Text> onSingleClick,
+            Action<Text> onDoubleClick)
         {
             var go = this.folderListItemPrefab.InstantiateAsUIElement(this.folderListContainer);
             go.name = item;
             var text = go.GetComponentInChildrenOrThrow<Text>();
             text.text = item;
-            text.gameObject.GetOrAddComponent<UIEventsPickup>().onPointerClick += _ => this.OnItemClicked(text);
+            var pickup = text.gameObject.GetOrAddComponent<UIEventsPickup>();
+            pickup.onPointerDoubleClick += ev => onDoubleClick(text);
+            pickup.onPointerClick += ev => onSingleClick(text);
+            return text;
         }
 
         public void ChangeCurrentFolder(string folder)
@@ -118,7 +151,9 @@ namespace UGameCore.UI
                 this.SelectedTextComponent.color = m_nonSelectedColor;
 
             this.CurrentFolder = folder;
-            this.SelectedItemText = null;
+
+            this.IsFileSelected = false;
+            this.IsFolderSelected = false;
             this.SelectedTextComponent = null;
 
             this.currentFolderInputField.text = folder;
@@ -126,20 +161,30 @@ namespace UGameCore.UI
             this.PopulateFolderList();
         }
 
-        void ChangeSelectedItem(Text text)
+        void ChangeSelectedItem(Text textComponent, bool isFile)
         {
             if (this.SelectedTextComponent != null)
                 this.SelectedTextComponent.color = m_nonSelectedColor;
 
-            this.SelectedTextComponent = text;
-            this.SelectedItemText = Path.Combine(this.CurrentFolder, text.text);
-            text.color = this.selectedColor;
+            this.IsFileSelected = isFile;
+            this.IsFolderSelected = !isFile;
+            this.SelectedTextComponent = textComponent;
+            
+            textComponent.color = this.selectedColor;
         }
 
-        void OnItemClicked(Text text)
+        void OnFolderDoubleClicked(string folder)
         {
-            string newFolder = Path.Combine(this.CurrentFolder, text.text);
+            string newFolder = Path.Combine(this.CurrentFolder, folder);
             this.ChangeCurrentFolder(newFolder);
+        }
+
+        void OnFileDoubleClicked(Text text)
+        {
+            this.IsFileSelected = true;
+            this.IsFolderSelected = false;
+            this.SelectedTextComponent = text;
+            this.OnSelectPressed();
         }
 
         void PopulateFolderList()
@@ -149,10 +194,21 @@ namespace UGameCore.UI
             if (!Directory.Exists(this.CurrentFolder))
                 return;
 
-            var subFolders = Directory.EnumerateDirectories(this.CurrentFolder);
-            foreach (string subFolder in subFolders)
+            var subFolders = Directory.EnumerateDirectories(this.CurrentFolder, this.folderSearchPattern);
+            foreach (string subFolderPath in subFolders)
             {
-                this.AddToFolderList(Path.GetFileName(subFolder));
+                string subFolder = Path.GetFileName(subFolderPath);
+                this.AddToListView(subFolder, t => this.ChangeSelectedItem(t, false), t => this.OnFolderDoubleClicked(subFolder));
+            }
+
+            if (this.allowFiles)
+            {
+                var files = Directory.EnumerateFiles(this.CurrentFolder, this.fileSearchPattern);
+                foreach (string filePath in files)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    this.AddToListView(fileName, t => this.ChangeSelectedItem(t, true), t => this.OnFileDoubleClicked(t));
+                }
             }
         }
 
