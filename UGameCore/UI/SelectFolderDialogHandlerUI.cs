@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace UGameCore.UI
 {
-    public class SelectFolderDialogHandlerUI : MonoBehaviour, ISelectFolderDialogHandler
+    public class SelectFolderDialogHandlerUI : MonoBehaviour, ISelectFolderDialog, ISelectFileDialog
     {
         public GameObject selectFolderDialogPrefab;
         public Transform dialogParent;
@@ -18,35 +18,53 @@ namespace UGameCore.UI
             this.EnsureSerializableReferencesAssigned();
         }
 
-        public IEnumerator SelectAsync(Ref<string> resultRef, string title, string folder, string defaultName)
+        IEnumerator ISelectFolderDialog.SelectAsync(
+            Ref<string> resultRef, string title, string folder, string defaultName)
+        {
+            return this.ShowDialogAsync(resultRef, title, folder, defaultName, null, false);
+        }
+
+        IEnumerator ISelectFileDialog.SelectAsync(
+            Ref<string> resultRef, string title, string directory, string extension)
+        {
+            return this.ShowDialogAsync(resultRef, title, directory, null, extension, true);
+        }
+
+        IEnumerator ShowDialogAsync(
+            Ref<string> resultRef, string title, string folder, string defaultName, string extension, bool isFile)
         {
             if (!Application.isPlaying)
             {
 #if UNITY_EDITOR
-                resultRef.value = UnityEditor.EditorUtility.OpenFolderPanel(title, folder, defaultName);
+                if (isFile)
+                    resultRef.value = UnityEditor.EditorUtility.OpenFilePanel(title, folder, extension);
+                else
+                    resultRef.value = UnityEditor.EditorUtility.OpenFolderPanel(title, folder, defaultName);
 #endif
                 yield break;
             }
 
             GameObject go = this.selectFolderDialogPrefab.InstantiateAsUIElement(this.dialogParent);
 
-            var folderDialog = go.GetComponentOrThrow<SelectFolderDialog>();
-            folderDialog.initialFolder = folder;
-            folderDialog.titleText.text = title;
-            folderDialog.additionalFoldersInHeader = folderDialog.additionalFoldersInHeader.Concat(this.additionalFoldersInHeader).ToArray();
-            
-            string selectedFolder = null;
-            folderDialog.onSelect.AddListener((str) => selectedFolder = str);
+            var dialog = go.GetComponentOrThrow<SelectFolderDialog>();
+            dialog.initialFolder = folder;
+            dialog.titleText.text = title;
+            dialog.additionalFoldersInHeader = dialog.additionalFoldersInHeader.Concat(this.additionalFoldersInHeader).ToArray();
+            dialog.allowFiles = isFile;
+            dialog.allowFolders = !isFile;
+            if (!extension.IsNullOrWhiteSpace())
+                dialog.fileSearchPattern = "*." + extension;
 
-            while (folderDialog != null)
+            string selectedItem = null;
+            if (isFile)
+                dialog.onFileSelect.AddListener((str) => selectedItem = str);
+            else
+                dialog.onFolderSelect.AddListener((str) => selectedItem = str);
+
+            while (dialog != null)
                 yield return null;
 
-            resultRef.value = selectedFolder;
-        }
-
-        public string Select(string title, string folder, string defaultName)
-        {
-            throw new NotSupportedException("Can not select folder synchronously");
+            resultRef.value = selectedItem;
         }
     }
 }
