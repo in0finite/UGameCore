@@ -3,7 +3,10 @@ using UnityEngine.UI;
 
 namespace UGameCore.Utilities
 {
-	public class RedirectedLayoutElement : MonoBehaviour, ILayoutElement
+    /// <summary>
+    /// <see cref="ILayoutElement"/> that can use layout properties from another object.
+    /// </summary>
+    public class RedirectedLayoutElement : MonoBehaviour, ILayoutElement
 	{
 
 		public	GameObject	layoutObject = null;

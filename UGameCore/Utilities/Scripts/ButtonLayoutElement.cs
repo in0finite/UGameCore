@@ -3,7 +3,10 @@ using UnityEngine.UI;
 
 namespace UGameCore.Utilities
 {
-	public class ButtonLayoutElement : MonoBehaviour, ILayoutElement
+    /// <summary>
+    /// Makes <see cref="Button"/> a <see cref="ILayoutElement"/> by retrieving layout properties from it's <see cref="Text"/> component.
+    /// </summary>
+    public class ButtonLayoutElement : MonoBehaviour, ILayoutElement
 	{
 
 		private	ILayoutElement	m_redirectedLayoutElement { get { return this.GetComponentInChildren<Text>(); } }
