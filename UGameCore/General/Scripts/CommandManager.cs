@@ -495,7 +495,7 @@ namespace UGameCore
             // but because the command was trimmed at beginning, we don't need to do it
             arguments.Add(remainingArgument);
 
-            arguments.ReplaceEach(arg => EscapeQuotes(arg));
+            arguments.ReplaceEach(arg => UnescapeArgument(arg));
 
             // do not remove empty strings, they are valid arguments
             //arguments.RemoveAll(string.IsNullOrWhiteSpace);
@@ -503,27 +503,27 @@ namespace UGameCore
             return arguments.ToArray();
         }
 
-        static string EscapeQuotes(string argument)
+        static string UnescapeArgument(string argument)
         {
             var list = new List<char>(argument);
 
-            bool lastCharWasEscapeChar = false;
+            bool lastCharWasUnescapeChar = false;
 
             for (int i = 0; i < list.Count; i++)
             {
                 char ch = list[i];
 
-                bool thisCharIsEscaped = lastCharWasEscapeChar;
-                lastCharWasEscapeChar = false;
+                bool thisCharIsUnescaped = lastCharWasUnescapeChar;
+                lastCharWasUnescapeChar = false;
 
-                if (!thisCharIsEscaped && ch == '\\')
+                if (!thisCharIsUnescaped && ch == '\\')
                 {
-                    lastCharWasEscapeChar = true;
+                    lastCharWasUnescapeChar = true;
                     list[i] = (char)0; // do not include this char in final string
                     continue;
                 }
 
-                if (thisCharIsEscaped)
+                if (thisCharIsUnescaped)
                 {
                     if (ch == 't')
                         list[i] = '\t';
@@ -536,7 +536,7 @@ namespace UGameCore
                 }
             }
 
-            list.RemoveAll(ch => ch == 0); // remove all escape chars
+            list.RemoveAll(ch => ch == 0); // remove all unescape chars
 
             return new string(list.ToArray());
         }
