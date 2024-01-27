@@ -168,20 +168,7 @@ namespace UGameCore
                 .Select(_ => ProfilerRecorderHandle.GetDescription(_).Category.Name)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            if (context.NumArguments <= 1)
-                return ProcessCommandResult.AutoCompletion(null, categories);
-
-            string input = context.ReadString();
-
-            var possibleCompletions = new List<string>();
-
-            CommandManager.DoAutoCompletion(
-                input, categories, out string outExactCompletion, possibleCompletions);
-
-            if (outExactCompletion != null)
-                outExactCompletion = this.commandManager.CombineArguments(context.commandOnly, outExactCompletion);
-
-            return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
+            return this.commandManager.ProcessCommandAutoCompletion(context, categories);
         }
 
         [CommandMethod("profiler_summary", "Capture summary of profiler stats", maxNumArguments = 0)]

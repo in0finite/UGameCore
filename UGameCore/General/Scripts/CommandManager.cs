@@ -732,7 +732,7 @@ namespace UGameCore
                 outPossibleCompletions.AddRange(result.autoCompletions);
         }
 
-        public static void DoAutoCompletion(
+        static void DoAutoCompletion(
             string input,
             IEnumerable<string> availableOptions,
             out string outExactCompletion,
@@ -806,6 +806,28 @@ namespace UGameCore
             // common prefix is not equal to input (it's shorter) - expand it
             // auto-complete the input into common prefix
             outExactCompletion = commonPrefix;
+        }
+
+        public ProcessCommandResult ProcessCommandAutoCompletion(
+            ProcessCommandContext context, IEnumerable<string> availableOptions)
+        {
+            if (context.NumArguments <= 1)
+            {
+                // no option specified
+                // list all available options
+                return ProcessCommandResult.AutoCompletion(null, availableOptions);
+            }
+
+            // already has an option specified
+            string category = context.ReadString();
+            var possibleCompletions = new List<string>();
+            CommandManager.DoAutoCompletion(
+                category, availableOptions, out string exactCompletion, possibleCompletions);
+
+            if (exactCompletion != null)
+                exactCompletion = this.CombineArguments(context.commandOnly, exactCompletion);
+
+            return ProcessCommandResult.AutoCompletion(exactCompletion, possibleCompletions);
         }
     }
 }

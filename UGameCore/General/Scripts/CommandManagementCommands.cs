@@ -58,20 +58,11 @@ namespace UGameCore
         [CommandAutoCompletionMethod("help")]
         ProcessCommandResult HelpCmdAutoComplete(ProcessCommandContext context)
         {
+            // don't auto-complete with all commands
             if (context.NumArguments <= 1)
                 return ProcessCommandResult.AutoCompletion(null, null);
 
-            var possibleCompletions = new List<string>();
-
-            string cmd = context.ReadString();
-
-            CommandManager.DoAutoCompletion(
-                cmd, this.commandManager.RegisteredCommands, out string outExactCompletion, possibleCompletions);
-
-            if (outExactCompletion != null)
-                outExactCompletion = this.commandManager.CombineArguments("help", outExactCompletion);
-
-            return ProcessCommandResult.AutoCompletion(outExactCompletion, possibleCompletions);
+            return this.commandManager.ProcessCommandAutoCompletion(context, this.commandManager.RegisteredCommands);
         }
 
         [CommandMethod("command_remove", "Removes a command", syntax = "(string commandName)")]
