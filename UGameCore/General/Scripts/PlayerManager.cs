@@ -73,20 +73,28 @@ namespace UGameCore
 
 		}
 
-		public	static	bool	IsValidPlayerName( string name ) {
-
-			if ( name.Length < GetMinimumNickLength() || name.Length > GetMaxmimumNickLength() ) {
+		public	static	bool	IsValidPlayerName( string name )
+		{
+			try
+			{
+				ValidatePlayerName(name);
+				return true;
+            }
+			catch
+			{
 				return false;
 			}
-
-			if (name.Contains ("<"))
-				return false;
-			if (name.Contains (">"))
-				return false;
-
-
-			return true;
 		}
+
+		public	static	void	ValidatePlayerName( string name )
+		{
+            if (name.Length < GetMinimumNickLength() || name.Length > GetMaxmimumNickLength())
+				throw new System.ArgumentException($"Player name must be between {GetMinimumNickLength()} and {GetMaxmimumNickLength()} characters long");
+            
+			string unallowedChars = "<>";
+            if (name.IndexOfAny(unallowedChars.ToCharArray()) >= 0)
+                throw new System.ArgumentException($"Player name can not contain '{unallowedChars}' characters");
+        }
 
 		/// This function does not check if string is valid. You should do it before calling it.
 		public	static	string	CheckPlayerNameAndChangeItIfItExists( string name ) {

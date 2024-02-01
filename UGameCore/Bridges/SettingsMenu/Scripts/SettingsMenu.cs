@@ -1,26 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UGameCore.Menu {
-	
-	public class SettingsMenu : MonoBehaviour {
+namespace UGameCore.Menu
+{
 
-		public	class Entry
+    public class SettingsMenu : MonoBehaviour {
+
+        public enum CVarDisplayType
+        {
+            IntegerSlider = 1,
+            IntegerTextBox,
+            FloatSlider,
+            FloatTextBox,
+            String,
+            Boolean,
+            None
+        }
+
+        public	class Entry
 		{
 			public Transform child = null;
 			public ICanvasElement control = null;
 			public Text label = null;
-			public CVar cvar = null;
-			public object editedValue = null;
+			public ConfigVar cvar = null;
+			public ConfigVarValue editedValue;
 
 			//internal Color originalImageColor = Color.white;
 		}
 
 
-		private	RectTransform	settingsMenuScrollViewContent = null;
+		public CVarManager configVarManager;
+
+        private	RectTransform	settingsMenuScrollViewContent = null;
 
 		public	GameObject	inputFieldPrefab = null;
 		public	GameObject	sliderPrefab = null;
@@ -45,13 +58,12 @@ namespace UGameCore.Menu {
 
 		}
 
-		void Start () {
+		void Start()
+		{
+			this.EnsureSerializableReferencesAssigned();
 
-			CVarManager.onProcessedConfiguration += () => {
-				this.GenerateSettingsMenuBasedOnCVars ();
-				UpdateMenuBasedOnCVars ();
-			};
-
+            this.GenerateSettingsMenuBasedOnCVars();
+            UpdateMenuBasedOnCVars();
 		}
 
 		private	void	GenerateSettingsMenuBasedOnCVars() {
@@ -179,12 +191,15 @@ namespace UGameCore.Menu {
 
 			i = 0;
 
-			foreach (var cvar in CVarManager.CVars) {
-				Entry entry = new Entry ();
+			foreach (var pair in singleton.configVarManager.ConfigVars)
+			{
+				ConfigVar cvar = pair.Value;
+
+                Entry entry = new Entry ();
 
 				entry.cvar = cvar;
 
-				var cvarValue = CVarManager.GetCVarValue (cvar);
+				ConfigVarValue cvarValue = cvar.GetValue();
 
 				//	var childLabel = singleton.settingsMenuScrollViewContent.transform.GetChild (i);
 				Transform childControl = null;
@@ -193,16 +208,16 @@ namespace UGameCore.Menu {
 				if (create) {
 					// create label
 					label = CreateChild (singleton.labelPrefab, singleton.settingsMenuScrollViewContent.transform).GetComponentInChildren<Text> ();
-					label.text = cvar.displayName;
+					label.text = cvar.FinalSerializationName;
 				} else {
 					// elements are already created => we can obtain them from transform
 					label = singleton.settingsMenuScrollViewContent.transform.GetChild (i).GetComponentInChildren<Text>();
 					childControl = singleton.settingsMenuScrollViewContent.transform.GetChild (i + 1);
 				}
 
-				i += 3;	// also skip empty space
+				i += 3; // also skip empty space
 
-				object editedValue = null;
+                ConfigVarValue editedValue = default;
 
 				var displayType = SettingsMenu.GetCVarDisplayType (cvar);
 
@@ -210,14 +225,16 @@ namespace UGameCore.Menu {
 
 					InputField inputField = null;
 
+					StringConfigVar stringConfigVar = (StringConfigVar)cvar;
+
 					if (create) {
 						// create input field
 
 						childControl = CreateChild (singleton.inputFieldPrefab, singleton.settingsMenuScrollViewContent.transform).transform;
 
 						inputField = childControl.GetComponentInChildren<InputField> ();
-						if (cvar.maxLength > 0) {
-							inputField.characterLimit = cvar.maxLength;
+						if (stringConfigVar.maxNumCharacters > 0) {
+							inputField.characterLimit = stringConfigVar.maxNumCharacters;
 						}
 						switch (displayType) {
 						case CVarDisplayType.FloatTextBox:
@@ -232,7 +249,7 @@ namespace UGameCore.Menu {
 					inputField = childControl.GetComponentInChildren<InputField> ();
 
 					if (update) {
-						inputField.text = cvarValue.ToString ();
+						inputField.text = cvar.SaveValueToString(cvarValue);
 					}
 
 					entry.control = inputField;
@@ -240,17 +257,17 @@ namespace UGameCore.Menu {
 					// get current value
 					switch (displayType) {
 					case CVarDisplayType.String:
-						editedValue = inputField.text;
+						editedValue.ReferenceValue = inputField.text;
 						break;
 					case CVarDisplayType.FloatTextBox:
 						float floatValue;
 						if (float.TryParse (inputField.text, out floatValue))
-							editedValue = floatValue;
+							editedValue.Union16Value.Part1.FloatValuePart1 = floatValue;
 						break;
 					case CVarDisplayType.IntegerTextBox:
 						int intValue;
 						if (int.TryParse (inputField.text, out intValue))
-							editedValue = intValue;
+							editedValue.Union16Value.Part1.IntValuePart1 = intValue;
 						break;
 					}
 
@@ -263,14 +280,20 @@ namespace UGameCore.Menu {
 
 						childControl = CreateChild (singleton.sliderPrefab, singleton.settingsMenuScrollViewContent.transform).transform;
 
-						slider = childControl.GetComponentInChildren<Slider> ();
-						slider.minValue = cvar.minValue;
-						slider.maxValue = cvar.maxValue;
+						var floatConfigVar = cvar as FloatConfigVar;
+                        var intConfigVar = cvar as IntConfigVar;
+
+                        float minValue = floatConfigVar?.MinValue.Value ?? intConfigVar.MinValue.Value;
+                        float maxValue = floatConfigVar?.MaxValue.Value ?? intConfigVar.MaxValue.Value;
+
+                        slider = childControl.GetComponentInChildren<Slider> ();
+						slider.minValue = minValue;
+						slider.maxValue = maxValue;
 						slider.wholeNumbers = (displayType == CVarDisplayType.IntegerSlider);
 
 						// add script for updating label
 						var updater = slider.gameObject.AddComponent<SettingsMenuSliderLabelUpdate> ();
-						updater.cvarName = cvar.displayName;
+						updater.cvarName = cvar.FinalSerializationName;
 						updater.label = label;
 					}
 
@@ -279,12 +302,12 @@ namespace UGameCore.Menu {
 					if (update) {
 						
 						if (displayType == CVarDisplayType.FloatSlider)
-							slider.value = (float)cvarValue;
+							slider.value = cvarValue.Union16Value.Part1.FloatValuePart1;
 						else
-							slider.value = (int)cvarValue;
+							slider.value = cvarValue.Union16Value.Part1.IntValuePart1;
 
 						// also add current value to label
-						label.text = cvar.displayName + " : " + cvarValue.ToString ();
+						label.text = cvar.FinalSerializationName + " : " + cvar.SaveValueToString(cvarValue);
 					}
 
 					entry.control = slider;
@@ -292,10 +315,10 @@ namespace UGameCore.Menu {
 					// get current value
 					switch (displayType) {
 					case CVarDisplayType.FloatSlider:
-						editedValue = (float)slider.value;
+						editedValue.Union16Value.Part1.FloatValuePart1 = slider.value;
 						break;
 					case CVarDisplayType.IntegerSlider:
-						editedValue = (int)slider.value;
+						editedValue.Union16Value.Part1.IntValuePart1 = (int)slider.value;
 						break;
 					}
 
@@ -309,19 +332,19 @@ namespace UGameCore.Menu {
 						label.text = "";
 						label.rectTransform.SetNormalizedRectAndAdjustAnchors( Rect.zero );
 
-						childControl.GetComponentInChildren<Text> ().text = " " + cvar.displayName;
+						childControl.GetComponentInChildren<Text> ().text = " " + cvar.FinalSerializationName;
 					}
 
 					var toggle = childControl.GetComponentInChildren<Toggle> ();
 
 					if (update) {
-						toggle.isOn = (bool)cvarValue;
+						toggle.isOn = cvarValue.Union16Value.Part1.BoolValue;
 					}
 
 					entry.control = toggle;
 
 					// get current value
-					editedValue = toggle.isOn ;
+					editedValue.Union16Value.Part1.BoolValue = toggle.isOn;
 
 				}
 
@@ -347,126 +370,15 @@ namespace UGameCore.Menu {
 
 		}
 
-
-		void OnGUI() {
-
-//			if ("" == this.settingsMenuName)
-//				return;
-//			
-//			if (this.settingsMenuName != Menu.MenuController.singleton.canvasIndex)
-//				return;
-			
-		//	this.DrawOptionsMenu ();
-
-		}
-
-		private	void	DrawOptionsMenu() {
-
-			int areaWidth = Screen.width / 7 * 3 ;	// 90 (640), 200 (1366), 270 (1920)
-			int areaHeight = Screen.height / 2;	// 240 (480), 380 (768), 540 (1080)
-			int buttonHeight = (int) (35.0f * Screen.height / 650.0f / 1.5f ) ;
-			int x = Screen.width / 2 - areaWidth / 2;
-			int y = Screen.height / 2 - areaHeight / 2;
-
-
-			// Draw box as background.
-			int box_offset_x = 30;
-			int box_offset_y = 20;
-			GUI.Box( new Rect( x - box_offset_x, y - box_offset_y, areaWidth + 2 * box_offset_x, areaHeight + 2 * box_offset_y ), "OPTIONS MENU" );
-
-
-			GUILayout.BeginArea (new Rect ( x, y, areaWidth, areaHeight));
-
-
-			this.optionsMenuScrollBarPosition = GUILayout.BeginScrollView (this.optionsMenuScrollBarPosition);
-
-			// display controls to edit cvars
-
-			var cvarsToChange = new List<CVar> ();
-			var changedValues = new List<object> ();
-
-			foreach (var cvar in CVarManager.CVars) {
-				
-				// display name
-				string s = cvar.displayName ;
-				if( s.Length < 1 )
-					s = cvar.name ;
-				GUILayout.Label( s );
-
-				var currentCvarValue = CVarManager.GetCVarValue (cvar);
-				object editedValue = null;
-
-				var displayType = SettingsMenu.GetCVarDisplayType (cvar);
-				if( displayType == CVarDisplayType.String ) {
-
-					editedValue = GUILayout.TextField( (string) currentCvarValue, cvar.maxLength );
-
-				} else if( displayType == CVarDisplayType.FloatSlider ) {
-
-					// display current value
-					GUILayout.Label( currentCvarValue.ToString() );
-					// display slider
-					editedValue = GUILayout.HorizontalSlider( (float) currentCvarValue, cvar.minValue, cvar.maxValue );
-				}
-
-				// compare with current value
-				if (!currentCvarValue.Equals (editedValue)) {
-					// value is changed
-					cvarsToChange.Add(cvar);
-					changedValues.Add (editedValue);
-				}
-
-			}
-
-			GUILayout.EndScrollView ();
-
-			GUILayout.Space (20);
-
-			GUILayout.BeginHorizontal ();
-
-			// OK button
-			//	if (GUILayout.Button ("Save", GUILayout.Width (50), GUILayout.Height (20))) {
-			if (GUIUtils.ButtonWithCalculatedSize("Save")) {
-				
-			}
-
-			// Cancel button
-			//	if (GUILayout.Button ("Cancel", GUILayout.Width (60), GUILayout.Height (20))) {
-			if (GUIUtils.ButtonWithCalculatedSize("Cancel")) {
-				// populate options window with current settings, and exit options menu.
-
-			//	CVarManager.ReadCVarsFromPlayerPrefs ();
-
-				MenuManager.singleton.OpenParentMenu ();
-			}
-
-			GUILayout.FlexibleSpace ();
-
-			//	if (GUILayout.Button ("Reset to defaults", GUILayout.Width (100), GUILayout.Height (20))) {
-			if (GUIUtils.ButtonWithCalculatedSize("Reset to defaults")) {
-
-			//	CVarManager.ResetAllCVarsToDefaultValues ();
-
-			//	this.UpdateMenuBasedOnCVars ();
-
-			}
-
-			GUILayout.EndHorizontal ();
-
-
-			GUILayout.EndArea ();
-
-		}
-
 		/// <summary>
 		/// Returns list of indexes of values which are not valid. Returns empty list if all values are correct.
 		/// </summary>
-		public	static	List<int>	AreSettingsValid( List<CVar> cvars, List<object> values ) {
+		public	static	List<int>	AreSettingsValid( List<ConfigVar> cvars, List<ConfigVarValue> values ) {
 
 			var	invalidValuesIndexes = new List<int> ();
 
 			for (int i=0; i < cvars.Count ; i++) {
-				if (!CVarManager.IsCVarValueValid (cvars [i], values [i])) {
+				if (!singleton.configVarManager.IsCVarValueValid (cvars [i], values [i])) {
 					invalidValuesIndexes.Add (i);
 				}
 			}
@@ -496,37 +408,47 @@ namespace UGameCore.Menu {
 
 		}
 
-		public	static CVarDisplayType	GetCVarDisplayType( CVar cvar ) {
-
+		public static CVarDisplayType GetCVarDisplayType(ConfigVar cvar)
+		{
 			CVarDisplayType displayType = CVarDisplayType.None;
 
-			if (cvar.cvarType == typeof(string)) {
-				
+			if (cvar is StringConfigVar)
+			{
 				displayType = CVarDisplayType.String;
-
-			} else if (cvar.cvarType == typeof(float) || cvar.cvarType == typeof(int)) {
-				
-				if (cvar.minValue != float.MinValue && cvar.maxValue != float.MaxValue) {
+			}
+			else if (cvar is IntConfigVar intConfigVar)
+			{
+				if (intConfigVar.MinValue.HasValue && intConfigVar.MaxValue.HasValue)
+				{
 					// there is limit on the number -> use slider
-					if (cvar.cvarType == typeof(float))
-						displayType = CVarDisplayType.FloatSlider;
-					else
-						displayType = CVarDisplayType.IntegerSlider;
-				} else {
-					// there is no limit on the number -> use text box
-					if (cvar.cvarType == typeof(float))
-						displayType = CVarDisplayType.FloatTextBox;
-					else
-						displayType = CVarDisplayType.IntegerTextBox;
+					displayType = CVarDisplayType.IntegerSlider;
 				}
-			} else if (cvar.cvarType == typeof(bool)) {
+				else
+				{
+					// there is no limit on the number -> use text box
+					displayType = CVarDisplayType.IntegerTextBox;
+				}
+			}
+            else if (cvar is FloatConfigVar floatConfigVar)
+            {
+                if (floatConfigVar.MinValue.HasValue && floatConfigVar.MaxValue.HasValue)
+                {
+                    // there is limit on the number -> use slider
+                    displayType = CVarDisplayType.FloatSlider;
+                }
+                else
+                {
+                    // there is no limit on the number -> use text box
+                    displayType = CVarDisplayType.FloatTextBox;
+                }
+            }
+            else if (cvar is BoolConfigVar)
+			{
 				// toggle
-				displayType = CVarDisplayType.Boolean ;
+				displayType = CVarDisplayType.Boolean;
 			}
 
 			return displayType;
 		}
-
 	}
-
 }

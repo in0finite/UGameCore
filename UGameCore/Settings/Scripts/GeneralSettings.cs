@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using UGameCore.Utilities;
+using UnityEngine;
 
 namespace UGameCore.Settings {
 
-	public class GeneralSettings : MonoBehaviour {
+	public class GeneralSettings : MonoBehaviour, IConfigVarRegistrator {
 
 		private	static	GeneralSettings	singleton = null;
 
@@ -69,111 +70,125 @@ namespace UGameCore.Settings {
 		void Awake() {
 
 			singleton = this;
-
-
-			CVarManager.onAddCVars += this.AddCvars;
-
 		}
 
-		void AddCvars() {
+        public void Register(IConfigVarRegistrator.Context context)
+        {
+            ConfigVar cvar = new StringConfigVar()
+            {
+                SerializationName = "nick",
+                GetValueCallback = () => new ConfigVarValue { StringValue = Nick },
+                SetValueCallback = (arg) => Nick = arg.StringValue,
+                ValidateCallback = (arg) => PlayerManager.ValidatePlayerName(arg.StringValue),
+                DefaultValue = new ConfigVarValue { StringValue = Nick },
+            };
 
-			CVar cvar = new CVar ();
+            context.ConfigVars.Add(cvar);
 
-			cvar.name = "nick";
-			cvar.getValue = () => Nick;
-			cvar.setValue = (arg) => Nick = (string) arg;
-			cvar.isValid = (arg) => PlayerManager.IsValidPlayerName ( (string) arg );
+            cvar = new IntConfigVar()
+            {
+                SerializationName = "fps_max",
+                MinValue = 5,
+                MaxValue = 1000,
+                GetValueCallbackInt = () => Fps_max,
+                SetValueCallbackInt = (arg) => Fps_max = arg,
+                DefaultValueInt = Fps_max,
+            };
 
-			CVarManager.AddCVar (cvar);
+            context.ConfigVars.Add(cvar);
 
-			cvar = new CVar ();
-			cvar.name = "fps_max";
-			cvar.minValue = 1;
-			cvar.maxValue = 100;
-			cvar.getValue = () => Fps_max;
-			cvar.setValue = (arg) => Fps_max = (int) arg;
+            if (this.registerInputCvars)
+            {
+                cvar = new FloatConfigVar()
+                {
+                    SerializationName = "mouse_sensitivity_x",
+                    MinValue = 0,
+                    MaxValue = 2000,
+                    GetValueCallbackFloat = () => Mouse_sensitivity_x,
+                    SetValueCallbackFloat = (arg) => Mouse_sensitivity_x = arg,
+                    DefaultValueFloat = Mouse_sensitivity_x,
+                };
 
-			CVarManager.AddCVar (cvar);
+                context.ConfigVars.Add(cvar);
 
-			if (this.registerInputCvars) {
+                cvar = new FloatConfigVar()
+                {
+                    SerializationName = "mouse_sensitivity_y",
+                    MinValue = 0,
+                    MaxValue = 2000,
+                    GetValueCallbackFloat = () => Mouse_sensitivity_y,
+                    SetValueCallbackFloat = (arg) => Mouse_sensitivity_y = arg,
+                    DefaultValueFloat = Mouse_sensitivity_y,
+                };
 
-				cvar = new CVar ();
-				cvar.name = "mouse_sensitivity_x";
-				cvar.minValue = 0;
-				cvar.maxValue = 2000;
-				cvar.getValue = () => Mouse_sensitivity_x;
-				cvar.setValue = (arg) => Mouse_sensitivity_x = (float)arg;
+                context.ConfigVars.Add(cvar);
 
-				CVarManager.AddCVar (cvar);
+                cvar = new FloatConfigVar()
+                {
+                    Description = "Accelerometer minimum horizontal value",
+                    MinValue = 0,
+                    MaxValue = 1,
+                    GetValueCallbackFloat = () => MinAccHorizontalValue,
+                    SetValueCallbackFloat = (arg) => MinAccHorizontalValue = arg,
+                    DefaultValueFloat = MinAccHorizontalValue,
+                };
 
-				cvar = new CVar ();
-				cvar.name = "mouse_sensitivity_y";
-				cvar.minValue = 0;
-				cvar.maxValue = 2000;
-				cvar.getValue = () => Mouse_sensitivity_y;
-				cvar.setValue = (arg) => Mouse_sensitivity_y = (float)arg;
+                context.ConfigVars.Add(cvar);
 
-				CVarManager.AddCVar (cvar);
+                cvar = new FloatConfigVar()
+                {
+                    Description = "Accelerometer minimum vertical value",
+                    MinValue = 0,
+                    MaxValue = 1,
+                    GetValueCallbackFloat = () => MinAccVerticalValue,
+                    SetValueCallbackFloat = (arg) => MinAccVerticalValue = arg,
+                    DefaultValueFloat = MinAccVerticalValue,
+                };
 
-				cvar = new CVar ();
-				cvar.name = "Accelerometer minimum horizontal value";
-				cvar.minValue = 0;
-				cvar.maxValue = 1;
-				cvar.getValue = () => MinAccHorizontalValue;
-				cvar.setValue = (arg) => MinAccHorizontalValue = (float)arg;
+                context.ConfigVars.Add(cvar);
 
-				CVarManager.AddCVar (cvar);
+                cvar = new FloatConfigVar()
+                {
+                    Description = "Accelerometer vertical offset",
+                    MinValue = 0,
+                    MaxValue = 1,
+                    GetValueCallbackFloat = () => AccVerticalOffset,
+                    SetValueCallbackFloat = (arg) => AccVerticalOffset = arg,
+                    DefaultValueFloat = AccVerticalOffset,
+                };
 
-				cvar = new CVar ();
-				cvar.name = "Accelerometer minimum vertical value";
-				cvar.minValue = 0;
-				cvar.maxValue = 1;
-				cvar.getValue = () => MinAccVerticalValue;
-				cvar.setValue = (arg) => MinAccVerticalValue = (float)arg;
+                context.ConfigVars.Add(cvar);
+            }
+        }
 
-				CVarManager.AddCVar (cvar);
+        //		void	OnCVarChanged( CVar cvar ) {
+        //			
+        //			var newValue = CVarManager.GetCVarValue (cvar);
+        //
+        //
+        //			if ("fps_max" == cvar.name) {
+        //				
+        //				GameManager.singleton.SetMaximumFps ((int)(float)newValue, false);
+        //
+        //			} else if ("nick" == cvar.name) {
+        //				// Nick is changed.
+        //				// Update it on server.
+        //				if (NetworkStatus.IsClientConnected ()) {
+        //					Player.local.ChangeNickOnServer ( (string) newValue );
+        //				}
+        //			}
+        //
+        //		}
 
-				cvar = new CVar ();
-				cvar.name = "Accelerometer vertical offset";
-				cvar.minValue = 0;
-				cvar.maxValue = 1;
-				cvar.getValue = () => AccVerticalOffset;
-				cvar.setValue = (arg) => AccVerticalOffset = (float)arg;
+        //		bool	OnValidateCVar( CVar cvar, object value ) {
+        //			
+        //			if ("nick" == cvar.name) {
+        //				return PlayerManager.IsValidPlayerName ((string)value);
+        //			}
+        //
+        //			return true;
+        //		}
 
-				CVarManager.AddCVar (cvar);
-
-			}
-
-		}
-
-//		void	OnCVarChanged( CVar cvar ) {
-//			
-//			var newValue = CVarManager.GetCVarValue (cvar);
-//
-//
-//			if ("fps_max" == cvar.name) {
-//				
-//				GameManager.singleton.SetMaximumFps ((int)(float)newValue, false);
-//
-//			} else if ("nick" == cvar.name) {
-//				// Nick is changed.
-//				// Update it on server.
-//				if (NetworkStatus.IsClientConnected ()) {
-//					Player.local.ChangeNickOnServer ( (string) newValue );
-//				}
-//			}
-//
-//		}
-
-//		bool	OnValidateCVar( CVar cvar, object value ) {
-//			
-//			if ("nick" == cvar.name) {
-//				return PlayerManager.IsValidPlayerName ((string)value);
-//			}
-//
-//			return true;
-//		}
-
-	}
+    }
 
 }

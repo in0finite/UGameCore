@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using UGameCore.Utilities;
+using UnityEngine;
 
 namespace UGameCore.Settings {
 
-	public class TeamSettings : MonoBehaviour
+	public class TeamSettings : MonoBehaviour, IConfigVarRegistrator
 	{
 
 		private	static	bool	FFA { get { return TeamManager.IsFreeForAllModeOn (); } set { TeamManager.SetFreeForAllMode (value); } }
@@ -10,31 +11,28 @@ namespace UGameCore.Settings {
 		private	static	bool	FriendlyFire { get { return TeamManager.IsFriendlyFireOn (); } set { TeamManager.singleton.isFriendlyFireOn = value; } }
 
 
-		void Awake() {
-			CVarManager.onAddCVars += this.AddCVars;
-		}
+        void IConfigVarRegistrator.Register(IConfigVarRegistrator.Context context)
+        {
+            var cvar = new BoolConfigVar()
+            {
+                SerializationName = "FFA",
+                GetValueCallback = () => new ConfigVarValue { BoolValue = FFA },
+                SetValueCallback = (arg) => FFA = arg.BoolValue,
+                DefaultValueBool = FFA,
+            };
 
-		void AddCVars() {
+            context.ConfigVars.Add(cvar);
 
-			CVar cvar = new CVar ();
+            cvar = new BoolConfigVar()
+            {
+                SerializationName = "friendly_fire",
+                GetValueCallback = () => new ConfigVarValue { BoolValue = FriendlyFire },
+                SetValueCallback = (arg) => FriendlyFire = arg.BoolValue,
+                DefaultValueBool = FriendlyFire,
+            };
 
-			cvar.name = "FFA";
-			cvar.getValue = () => FFA;
-			cvar.setValue = (arg) => FFA = (bool) arg;
-
-			CVarManager.AddCVar (cvar);
-
-			cvar = new CVar ();
-
-			cvar.name = "Friendly fire";
-			cvar.getValue = () => FriendlyFire;
-			cvar.setValue = (arg) => FriendlyFire = (bool) arg;
-
-			CVarManager.AddCVar (cvar);
-
-		}
-
-
-	}
+            context.ConfigVars.Add(cvar);
+        }
+    }
 }
 

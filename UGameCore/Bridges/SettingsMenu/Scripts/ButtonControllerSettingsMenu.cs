@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,16 +24,16 @@ namespace UGameCore.Menu {
 
 			// Obtain all values from menu and see which ones changed.
 
-			var cvarsToChange = new List<CVar> ();
-			var changedValues = new List<object> ();
+			var cvarsToChange = new List<ConfigVar> ();
+			var changedValues = new List<ConfigVarValue> ();
 			var changedValuesIndexes = new List<int> ();
 
 			int i = 0;
 			foreach (var entry in SettingsMenu.GetEntries ()) {
 
-				var cvar = entry.cvar;
-				var currentCvarValue = CVarManager.GetCVarValue (cvar);
-				var editedValue = entry.editedValue;
+                ConfigVar cvar = entry.cvar;
+                ConfigVarValue currentCvarValue = cvar.GetValue();
+				ConfigVarValue editedValue = entry.editedValue;
 
 				// compare with current value
 				if (!currentCvarValue.Equals (editedValue)) {
@@ -64,49 +65,51 @@ namespace UGameCore.Menu {
 
 			} else {
 
-				// settings are correct
+                // settings are correct
 
-				// apply new values
+                // apply new values
 
-				//					foreach (CVar cvar in CVarManager.CVars) {
-				//
-				//						if( cvar.isInsideCfg ) {
-				//							bool isChanged = false ;
-				//
-				//							if( cvar.displayType == CVarDisplayType.String ) {
-				//								if( PlayerPrefs.GetString( cvar.cfgName ) != cvar.currentString ) {
-				//									isChanged = true ;
-				//
-				//									cvarsToChange.Add (cvar);
-				//									changedValues.Add (cvar.currentString);
-				//								//	CVarManager.ChangeCVarValue( cvar, var.currentString);
-				//								}
-				//
-				//							//	PlayerPrefs.SetString( var.name, var.currentString );
-				//
-				//							} else if( cvar.displayType == CVarDisplayType.FloatSlider ) {
-				//								if( PlayerPrefs.GetFloat( cvar.cfgName ) != cvar.currentFloat ) {
-				//									isChanged = true ;
-				//
-				//									cvarsToChange.Add (cvar);
-				//									changedValues.Add (cvar.currentFloat);
-				//								//	CVarManager.ChangeCVarValue( cvar, var.currentFloat);
-				//								}
-				//
-				//							//	PlayerPrefs.SetFloat( var.name, var.currentFloat );
-				//							}
-				//
-				//						}
-				//
-				//					}
+                //					foreach (CVar cvar in CVarManager.CVars) {
+                //
+                //						if( cvar.isInsideCfg ) {
+                //							bool isChanged = false ;
+                //
+                //							if( cvar.displayType == CVarDisplayType.String ) {
+                //								if( PlayerPrefs.GetString( cvar.cfgName ) != cvar.currentString ) {
+                //									isChanged = true ;
+                //
+                //									cvarsToChange.Add (cvar);
+                //									changedValues.Add (cvar.currentString);
+                //								//	CVarManager.ChangeCVarValue( cvar, var.currentString);
+                //								}
+                //
+                //							//	PlayerPrefs.SetString( var.name, var.currentString );
+                //
+                //							} else if( cvar.displayType == CVarDisplayType.FloatSlider ) {
+                //								if( PlayerPrefs.GetFloat( cvar.cfgName ) != cvar.currentFloat ) {
+                //									isChanged = true ;
+                //
+                //									cvarsToChange.Add (cvar);
+                //									changedValues.Add (cvar.currentFloat);
+                //								//	CVarManager.ChangeCVarValue( cvar, var.currentFloat);
+                //								}
+                //
+                //							//	PlayerPrefs.SetFloat( var.name, var.currentFloat );
+                //							}
+                //
+                //						}
+                //
+                //					}
 
-				CVarManager.ChangeCVars (cvarsToChange.ToArray (), changedValues.ToArray ());
+                CVarManager cVarManager = SettingsMenu.singleton.configVarManager;
 
-				CVarManager.SaveCVarsToDisk ();
+                cVarManager.ChangeCVars (cvarsToChange.ToArray (), changedValues.ToArray ());
+
+                cVarManager.SaveConfigVars();
 
 				string str = "Successfully saved " + cvarsToChange.Count + " cvars: ";
 				foreach (var cvar in cvarsToChange) {
-					str += cvar.name + " ";
+					str += cvar.FinalSerializationName + " ";
 				}
 				Debug.Log (str);
 
