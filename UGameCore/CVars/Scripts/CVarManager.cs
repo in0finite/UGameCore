@@ -95,10 +95,10 @@ namespace UGameCore
 					continue;
 
 				string valueStr = m_configProvider.GetProperty(pair.Key);
-				if (valueStr == null)
+				if (valueStr == null && !configVar.ApplyDefaultValueWhenNotPresentInConfig)
 					continue;
 
-                F.RunExceptionSafe(() => configVar.SetValue(configVar.LoadValueFromString(valueStr)));
+                F.RunExceptionSafe(() => configVar.SetValue(valueStr == null ? configVar.DefaultValue : configVar.LoadValueFromString(valueStr)));
             }
 
             Debug.Log($"Loaded config vars [{m_configVars.Count}]");
