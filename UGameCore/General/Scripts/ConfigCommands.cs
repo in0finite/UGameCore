@@ -71,5 +71,12 @@ namespace UGameCore
             m_configProvider.Save();
             return ProcessCommandResult.Success;
         }
+
+        [CommandMethod("config_clear", "Remove all properties from config")]
+        ProcessCommandResult Clear(ProcessCommandContext context)
+        {
+            m_configProvider.Clear();
+            return ProcessCommandResult.Success;
+        }
     }
 }
