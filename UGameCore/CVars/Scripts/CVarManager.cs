@@ -2,6 +2,7 @@
 using UnityEngine;
 using UGameCore.Utilities;
 using System.Linq;
+using static UGameCore.CommandManager;
 
 namespace UGameCore
 {
@@ -11,6 +12,7 @@ namespace UGameCore
     public class CVarManager : MonoBehaviour
 	{
 		IConfigProvider m_configProvider;
+		CommandManager m_commandManager;
 
         private readonly Dictionary<string, ConfigVar>	m_configVars = new(System.StringComparer.OrdinalIgnoreCase);
 		public	IReadOnlyDictionary<string, ConfigVar>	ConfigVars => m_configVars;
@@ -23,7 +25,8 @@ namespace UGameCore
 		{
 			var provider = this.GetComponentOrThrow<System.IServiceProvider>();
             m_configProvider = provider.GetRequiredService<IConfigProvider>();
-			this.LoadConfigVars();
+            m_commandManager = provider.GetRequiredService<CommandManager>();
+            this.LoadConfigVars();
 		}
 
 		public void ChangeCVars(ConfigVar[] cvarsToChange, ConfigVarValue[] newValues)
@@ -78,8 +81,7 @@ namespace UGameCore
 			{
 				F.RunExceptionSafe(() =>
 				{
-                    this.ValidateConfigVarName(configVar.FinalSerializationName);
-                    m_configVars.Add(configVar.FinalSerializationName, configVar);
+					this.RegisterConfigVar(configVar);
                 });
             }
 
@@ -101,6 +103,21 @@ namespace UGameCore
 
             Debug.Log($"Loaded config vars [{m_configVars.Count}]");
 		}
+
+		public void RegisterConfigVar(ConfigVar configVar)
+		{
+            this.ValidateConfigVarName(configVar.FinalSerializationName);
+
+			m_commandManager.RegisterCommand(new CommandManager.CommandInfo
+			{
+				command = configVar.FinalSerializationName,
+				description = configVar.Description,
+				exactNumArguments = 1,
+                commandHandler = this.ProcessCommand,
+            });
+
+            m_configVars.Add(configVar.FinalSerializationName, configVar);
+        }
 
         void ValidateConfigVarName(string serializationName)
 		{
@@ -128,5 +145,18 @@ namespace UGameCore
 		{
 			m_configProvider.Save();
 		}
+
+        ProcessCommandResult ProcessCommand(ProcessCommandContext context)
+        {
+			ConfigVar configVar = m_configVars[context.commandOnly];
+
+			string valueStr = context.ReadStringOrDefault(null);
+			if (string.IsNullOrWhiteSpace(valueStr))
+                return ProcessCommandResult.SuccessResponse(configVar.SaveValueToString(configVar.GetValue()));
+
+			this.SetConfigVarValueWithConfigUpdate(configVar, configVar.LoadValueFromString(valueStr));
+
+            return ProcessCommandResult.Success;
+        }
     }
 }
