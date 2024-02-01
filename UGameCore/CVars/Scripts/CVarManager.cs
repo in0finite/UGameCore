@@ -79,10 +79,7 @@ namespace UGameCore
 
 			foreach (ConfigVar configVar in context.ConfigVars)
 			{
-				F.RunExceptionSafe(() =>
-				{
-					this.RegisterConfigVar(configVar);
-                });
+				F.RunExceptionSafe(() => this.RegisterConfigVar(configVar));
             }
 
 			// assign config var values from config
@@ -114,6 +111,7 @@ namespace UGameCore
 				description = configVar.Description,
 				exactNumArguments = 1,
                 commandHandler = this.ProcessCommand,
+				autoCompletionHandler = this.ProcessCommandAutoCompletion,
             });
 
             m_configVars.Add(configVar.FinalSerializationName, configVar);
@@ -157,6 +155,21 @@ namespace UGameCore
 			this.SetConfigVarValueWithConfigUpdate(configVar, configVar.LoadValueFromString(valueStr));
 
             return ProcessCommandResult.Success;
+        }
+
+        ProcessCommandResult ProcessCommandAutoCompletion(ProcessCommandContext context)
+		{
+			// only auto-complete if configvar's value is not given
+			if (context.NumArguments > 1)
+				return ProcessCommandResult.AutoCompletion(null, null);
+
+            ConfigVar configVar = m_configVars[context.commandOnly];
+
+            string valueStr = configVar.SaveValueToString(configVar.GetValue());
+
+            return ProcessCommandResult.AutoCompletion(
+				m_commandManager.CombineArguments(context.commandOnly, valueStr),
+				null);
         }
     }
 }
