@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UGameCore.Utilities;
 
 namespace UGameCore
 {
@@ -19,12 +20,15 @@ namespace UGameCore
 
 	public class GameManager : MonoBehaviour {
 		
+		public System.IServiceProvider ServiceProvider { get; private set; }
+
 
 		void	Awake() {
 
 			if (null == singleton)
 				singleton = this;
 
+			this.ServiceProvider = this.GetSingleComponentOrThrow<System.IServiceProvider>();
 		}
 
 		void Start () {
