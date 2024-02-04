@@ -110,7 +110,7 @@ namespace UGameCore
 			{
 				command = configVar.FinalSerializationName,
 				description = configVar.Description,
-				exactNumArguments = 1,
+				maxNumArguments = 2,
                 commandHandler = this.ProcessCommand,
 				autoCompletionHandler = this.ProcessCommandAutoCompletion,
             });
