@@ -63,19 +63,20 @@ namespace UGameCore
         {
 			var registrators = new List<IConfigVarRegistrator>();
             var tempRegistrators = new List<IConfigVarRegistrator>();
+
             foreach (GameObject go in this.scanMyself ? new[] { this.gameObject }.Concat(this.objectsToScan) : this.objectsToScan)
 			{
 				go.GetComponentsInChildren(tempRegistrators);
 				registrators.AddRange(tempRegistrators);
-			}
+            }
 
 			var context = new IConfigVarRegistrator.Context();
             foreach (IConfigVarRegistrator registrator in registrators)
             {
-				registrator.Register(context);
+				F.RunExceptionSafe(() => registrator.Register(context));
             }
 
-			m_configVars.Clear();
+            m_configVars.Clear();
 
 			foreach (ConfigVar configVar in context.ConfigVars)
 			{
