@@ -23,7 +23,7 @@ namespace UGameCore.Utilities
 
 		public	static	void	SendMessageToAllMonoBehaviours( string msg, params object[] arguments ) {
 
-			var objects = UnityEngine.Object.FindObjectsOfType<MonoBehaviour> ();
+			var objects = UnityEngine.Object.FindObjectsByType<MonoBehaviour> (FindObjectsSortMode.InstanceID);
 
 			foreach (var obj in objects) {
 				obj.InvokeExceptionSafe (msg, arguments);
@@ -65,7 +65,7 @@ namespace UGameCore.Utilities
 
 		public	static	T	FindObjectOfTypeOrLogError<T>() where T : Component {
 
-			var obj = UnityEngine.Object.FindObjectOfType<T> ();
+			var obj = UnityEngine.Object.FindFirstObjectByType<T>();
 
 			if (null == obj) {
 				Debug.LogError ("Object of type " + typeof(T).ToString() + " can not be found." );

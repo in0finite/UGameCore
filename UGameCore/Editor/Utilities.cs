@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
-using UGameCore.Menu;
-using System.Linq;
 using UGameCore.Utilities;
 
-namespace UGameCore.Editor {
+namespace UGameCore.Editor
+{
 
-	public static class Utilities {
+    public static class Utilities {
 
 		public	static	string	menusContainerName = "MenusContainer" ;
 		public	static	string	modulesContainerName = "uGameCore" ;
@@ -49,7 +48,7 @@ namespace UGameCore.Editor {
 			if (null == go.GetComponent<DontDestroyOnLoad> ())
 				go.AddComponent<DontDestroyOnLoad> ();
 
-			var objects = Object.FindObjectsOfType<T> ();
+			var objects = Object.FindObjectsByType<T>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID);
 
 			int count = 0;
 			foreach (var obj in objects) {
@@ -64,9 +63,9 @@ namespace UGameCore.Editor {
 
 		public	static	void	UnGroupObjects<T>() where T : Component {
 
-			var objects = Object.FindObjectsOfType<T> ();
+			var objects = Object.FindObjectsByType<T>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID);
 
-			int count = 0;
+            int count = 0;
 			foreach (var obj in objects) {
 				obj.transform.SetParent (null, true);
 				count++;
@@ -79,7 +78,7 @@ namespace UGameCore.Editor {
 
 		public	static	T	FindSingletonOrThrow<T>() where T : MonoBehaviour {
 
-			var obj = Object.FindObjectOfType<T> ();
+			var obj = Object.FindFirstObjectByType<T>();
 			if (null == obj)
 				throw new ObjectNotFoundException ("Failed to find singleton of type " + typeof(T));
 

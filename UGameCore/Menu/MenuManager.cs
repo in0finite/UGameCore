@@ -188,7 +188,7 @@ namespace UGameCore.Menu
 
 		public	static	Menu[]	GetAllMenus() {
 
-			return FindObjectsOfType<Menu> ();
+			return FindObjectsByType<Menu>(FindObjectsSortMode.InstanceID);
 
 		}
 

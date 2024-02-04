@@ -7,7 +7,7 @@ namespace UGameCore.Tests
         protected T GetSingleObject<T>()
             where T : Component
         {
-            T[] objects = Object.FindObjectsOfType<T>();
+            T[] objects = Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
             
             if (objects.Length == 0)
                 throw new System.InvalidOperationException($"Object of type {typeof(T).Name} not found");

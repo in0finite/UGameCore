@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-namespace UGameCore {
-	
-	public class PlayingObjectSpawner : MonoBehaviour {
+namespace UGameCore
+{
+
+    public class PlayingObjectSpawner : MonoBehaviour {
 
 		public	GameObject	playingObjectPrefab = null ;
 
@@ -121,7 +121,7 @@ namespace UGameCore {
 			
 			int	playerTeamIndex = TeamManager.singleton.teams.IndexOf (player.Team);
 
-			var spawnPositions = FindObjectsOfType<SpawnPoint>();
+			var spawnPositions = FindObjectsByType<SpawnPoint>(FindObjectsSortMode.InstanceID);
 
 			for (int count = 0, i = Random.Range (0, spawnPositions.Length);
 				count < spawnPositions.Length; count++, i = (i + 1) % spawnPositions.Length) {

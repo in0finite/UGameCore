@@ -24,7 +24,7 @@ namespace UGameCore.Utilities {
 
 		public	static	GameObject	FindGameObjectForWhichToAttachScripts () {
 
-			var scripts = UnityEngine.Object.FindObjectsOfType<ModuleScriptsGameObject> ();
+			var scripts = UnityEngine.Object.FindObjectsByType<ModuleScriptsGameObject>(FindObjectsSortMode.InstanceID);
 
 			if (scripts.Length > 1) {
 				throw new Exception ("There are multiple scripts of type " + typeof(ModuleScriptsGameObject).ToString() );
@@ -74,7 +74,7 @@ namespace UGameCore.Utilities {
 				// if yes, skip him
 				// otherwise, attach him
 
-				var objects = UnityEngine.Object.FindObjectsOfType( moduleScriptType );
+				var objects = UnityEngine.Object.FindObjectsByType(moduleScriptType, FindObjectsSortMode.InstanceID);
 				if (objects.Length > 0)	// already exists
 					continue;
 

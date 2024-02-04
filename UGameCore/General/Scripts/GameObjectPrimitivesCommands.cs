@@ -59,7 +59,7 @@ namespace UGameCore
 
             if (bDynamic)
             {
-                rigidbody.velocity = this.initialVelocity * cam.transform.forward;
+                rigidbody.linearVelocity = this.initialVelocity * cam.transform.forward;
                 rigidbody.angularVelocity = Mathf.Deg2Rad * this.initialAngularVelocity * Random.onUnitSphere;
             }
         }
