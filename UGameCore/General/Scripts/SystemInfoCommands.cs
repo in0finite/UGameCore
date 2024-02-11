@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text;
 using UGameCore.Utilities;
 using UnityEngine;
 using static UGameCore.CommandManager;
@@ -26,6 +27,18 @@ namespace UGameCore
             string response = string.Join("\n", props.Select(p => p.Name + ": " + p.GetValue(null)));
 
             return ProcessCommandResult.SuccessResponse(response);
+        }
+
+        [CommandMethod("version", "Displays version of application")]
+        ProcessCommandResult VersionCmd(ProcessCommandContext context)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"App version: {Application.version}");
+            sb.AppendLine($"Unity version: {Application.unityVersion}");
+            sb.AppendLine($"Company name: {Application.companyName}");
+            sb.AppendLine($"Product name: {Application.productName}");
+            
+            return ProcessCommandResult.SuccessResponse(sb.ToString());
         }
     }
 }
