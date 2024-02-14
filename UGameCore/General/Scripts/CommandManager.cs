@@ -236,6 +236,16 @@ namespace UGameCore
             {
                 return new Vector3(this.ReadFloat(), this.ReadFloat(), this.ReadFloat());
             }
+
+            /// <summary>
+            /// Read next command argument as Enum.
+            /// </summary>
+            public T ReadEnum<T>()
+                where T : struct, System.Enum
+            {
+                string str = this.ReadString();
+                return System.Enum.Parse<T>(str, true);
+            }
         }
 
 
