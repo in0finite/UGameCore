@@ -668,6 +668,9 @@ namespace UGameCore.Console
 
 		void OnConsoleOpened()
 		{
+            // brint to top
+            this.consoleUI.transform.SetAsLastSibling();
+
             this.consoleUI.submitInputField.Select();
             this.consoleUI.submitInputField.ActivateInputField();
             
