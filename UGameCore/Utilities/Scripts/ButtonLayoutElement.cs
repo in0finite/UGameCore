@@ -9,12 +9,15 @@ namespace UGameCore.Utilities
     public class ButtonLayoutElement : MonoBehaviour, ILayoutElement
 	{
 
-		private	ILayoutElement	m_redirectedLayoutElement { get { return this.GetComponentInChildren<Text>(); } }
-		public	int	extraWidth = 4;
+        private ILayoutElement m_redirectedLayoutElement => this.GetComponentInChildren<Text>();
+        public	int	extraWidth = 4;
 		public	int	extraHeight = 4;
 
+		public bool overridePriority = false;
+		public int priority = 1;
 
-		public void CalculateLayoutInputHorizontal ()
+
+        public void CalculateLayoutInputHorizontal ()
 		{
 			m_redirectedLayoutElement.CalculateLayoutInputHorizontal ();
 		}
@@ -24,48 +27,20 @@ namespace UGameCore.Utilities
 			m_redirectedLayoutElement.CalculateLayoutInputVertical ();
 		}
 
-		public float minWidth {
-			get {
-				return m_redirectedLayoutElement.minWidth;
-			}
-		}
+        public float minWidth => m_redirectedLayoutElement.minWidth;
 
-		public float preferredWidth {
-			get {
-				return m_redirectedLayoutElement.preferredWidth + this.extraWidth;
-			}
-		}
+        public float preferredWidth => m_redirectedLayoutElement.preferredWidth + this.extraWidth;
 
-		public float flexibleWidth {
-			get {
-				return m_redirectedLayoutElement.flexibleWidth;
-			}
-		}
+        public float flexibleWidth => m_redirectedLayoutElement.flexibleWidth;
 
-		public float minHeight {
-			get {
-				return m_redirectedLayoutElement.minHeight;
-			}
-		}
+        public float minHeight => m_redirectedLayoutElement.minHeight;
 
-		public float preferredHeight {
-			get {
-				return m_redirectedLayoutElement.preferredHeight + this.extraHeight;
-			}
-		}
+        public float preferredHeight => m_redirectedLayoutElement.preferredHeight + this.extraHeight;
 
-		public float flexibleHeight {
-			get {
-				return m_redirectedLayoutElement.flexibleHeight;
-			}
-		}
+        public float flexibleHeight => m_redirectedLayoutElement.flexibleHeight;
 
-		public int layoutPriority {
-			get {
-				return m_redirectedLayoutElement.layoutPriority;
-			}
-		}
+        public int layoutPriority => overridePriority ? priority : m_redirectedLayoutElement.layoutPriority;
 
-	}
+    }
 }
 
