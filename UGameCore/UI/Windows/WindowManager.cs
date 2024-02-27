@@ -213,7 +213,7 @@ namespace UGameCore.UI.Windows
 		public Rect GetRectForWindow(int width, int height)
 		{
             Rect rect = GetCenteredRect(width / (float)Screen.width, height / (float)Screen.height);
-            rect.center += UnityEngine.Random.insideUnitCircle * 100;
+            rect.center += UnityEngine.Random.insideUnitCircle * new Vector2(Screen.width, Screen.height) * 0.05f;
 
             // convert from screen coordinates to scaled (Canvas) coordinates
             Vector2 scaleFactor = this.windowsCanvas.GetRectTransform().GetScaleFactorFromCanvas();
