@@ -187,15 +187,23 @@ namespace UGameCore
 
 		}
 
+		public static Vector2 GetScaleFactorFromCanvas(this RectTransform rectTransform)
+		{
+			var canvas = rectTransform.GetComponentInParent<Canvas>();
+			return canvas != null ? canvas.transform.localScale : Vector2.one;
+        }
+
 		public	static	void	AnchorsToCorners( this RectTransform rectTransform ) {
 
 			RectTransform t = rectTransform;
 			RectTransform pt = rectTransform.parent as RectTransform;
 
-			Vector2 newAnchorsMin = new Vector2(t.anchorMin.x + t.offsetMin.x / pt.rect.width,
-				t.anchorMin.y + t.offsetMin.y / pt.rect.height);
-			Vector2 newAnchorsMax = new Vector2(t.anchorMax.x + t.offsetMax.x / pt.rect.width,
-				t.anchorMax.y + t.offsetMax.y / pt.rect.height);
+			Rect parentRect = pt.rect;
+            
+            Vector2 newAnchorsMin = new Vector2(t.anchorMin.x + t.offsetMin.x / parentRect.width,
+				t.anchorMin.y + t.offsetMin.y / parentRect.height);
+			Vector2 newAnchorsMax = new Vector2(t.anchorMax.x + t.offsetMax.x / parentRect.width,
+				t.anchorMax.y + t.offsetMax.y / parentRect.height);
 
 			t.anchorMin = newAnchorsMin;
 			t.anchorMax = newAnchorsMax;

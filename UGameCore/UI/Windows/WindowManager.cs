@@ -213,8 +213,13 @@ namespace UGameCore.UI.Windows
 		public Rect GetRectForWindow(int width, int height)
 		{
             Rect rect = GetCenteredRect(width / (float)Screen.width, height / (float)Screen.height);
-            rect.position += UnityEngine.Random.insideUnitCircle * 100;
-			return rect;
+            rect.center += UnityEngine.Random.insideUnitCircle * 100;
+
+            // convert from screen coordinates to scaled (Canvas) coordinates
+            Vector2 scaleFactor = this.windowsCanvas.GetRectTransform().GetScaleFactorFromCanvas();
+			rect.center /= scaleFactor;
+			
+            return rect;
         }
 
 		void AddCloseButton(Window window)
