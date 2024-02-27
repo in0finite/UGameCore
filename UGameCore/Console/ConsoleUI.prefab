@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 2074931801267060464}
   - component: {fileID: 8301373456802288835}
   - component: {fileID: 4564614276408524882}
+  - component: {fileID: 1933614567782511361}
   m_Layer: 5
   m_Name: Log messages scroll view
   m_TagString: Untagged
@@ -240,6 +241,22 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: 1
   m_LayoutPriority: 5
+--- !u!114 &1933614567782511361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593191734116070437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddeaf114918635b4eb8bae093915fc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateAnchors: 1
+  updateOffset: 0
+  updateAnchoredPosition: 0
+  transformToDrag: {fileID: 314217410576642497}
 --- !u!1 &668536553053290426
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,7 +1328,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7285316198801589194}
   m_HandleRect: {fileID: 5289571591672918782}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1582,6 +1599,7 @@ MonoBehaviour:
   updateAnchors: 1
   updateOffset: 0
   updateAnchoredPosition: 0
+  transformToDrag: {fileID: 0}
 --- !u!114 &2601147081199970595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1797,7 +1815,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5807105076238739907}
   m_HandleRect: {fileID: 5953887996557141994}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2591,6 +2609,7 @@ GameObject:
   - component: {fileID: 844720227801242177}
   - component: {fileID: 5574351799101525015}
   - component: {fileID: 6937637725849295161}
+  - component: {fileID: 5581366859015176743}
   m_Layer: 5
   m_Name: Details scroll view
   m_TagString: Untagged
@@ -2708,3 +2727,19 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &5581366859015176743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8891755227772264877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddeaf114918635b4eb8bae093915fc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateAnchors: 1
+  updateOffset: 0
+  updateAnchoredPosition: 0
+  transformToDrag: {fileID: 314217410576642497}
