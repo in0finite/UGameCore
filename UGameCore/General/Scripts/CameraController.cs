@@ -1,19 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 
 
-namespace UGameCore {
-	
-	public class CameraController : NetworkBehaviour {
+namespace UGameCore
+{
+
+    public class CameraController : NetworkBehaviour {
+
+		public Spectator spectator;
 
 
-		// Use this for initialization
-		protected virtual void Start () {
-		
-
-		}
-		
-		// Update is called once per frame
 		void Update () {
 		
 			if (null == Camera.main)
@@ -22,7 +17,7 @@ namespace UGameCore {
 			if (null == Player.local)
 				return;
 
-			if (Player.local.GetControllingGameObject () == this.gameObject || Spectator.GetSpectatingGameObject () == this.gameObject) {
+			if (Player.local.GetControllingGameObject () == this.gameObject || spectator.CurrentlySpectatedObject == this.gameObject) {
 				this.UpdateCamera ();
 			}
 

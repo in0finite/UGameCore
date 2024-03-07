@@ -1,156 +1,109 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-
+using UGameCore.Utilities;
+using UnityEngine.Events;
 
 namespace UGameCore
 {
+    public class Spectator : MonoBehaviour
+	{
+		public List<Component> SpectatableObjects = new();
+        public Component CurrentlySpectatedObject { get; private set; } = null;
 
-
-    public class Spectator : MonoBehaviour {
-
-		private	static	List<Player>	m_spectatableObjects = new List<Player> ();
-		private	static	Player	m_currentlySpectatedObject = null;
-	//	public	static	Player	CurrentlySpectatedObject { get { return this.m_currentlySpectatedObject; } }
-
-
-
-		// Use this for initialization
-		void Start () {
-
-
+		public struct SpectatedObjectChangedEvent
+		{
+			public Component newObject;
 		}
-		
-		// Update is called once per frame
-		void Update () {
-		
-			if (!NetworkStatus.IsServerStarted && !NetworkStatus.IsClientConnected()) {
-				m_currentlySpectatedObject = null;
-				return;
-			}
 
+		public UnityEvent<SpectatedObjectChangedEvent> OnSpectatedObjectChanged;
 
-			if (NetworkStatus.IsClient ()) {
-				if (Player.local != null) {
-					if (Player.local.GetControllingGameObject () != null) {
-						// controlling object is alive
-						// set watched object to null
-						m_currentlySpectatedObject = null;
-					} else {
-						// controlling object is not alive
-						if (null == m_currentlySpectatedObject || null == m_currentlySpectatedObject.GetControllingGameObject ()) {
-							// we are not spectating anyone
-							// find object for spectating
-							FindObjectForSpectating (0);
-						} else {
-							// we are spectating someone
-
-						}
-					}
-				} else {
-					// we are on client, and there is no local player
-					m_currentlySpectatedObject = null;
-				}
-			} else if (NetworkStatus.IsServer) {
-				// we are on dedicated server
-
-				if (null == m_currentlySpectatedObject || null == m_currentlySpectatedObject.GetControllingGameObject()) {
-					// we are not spectating anyone
-					// find object for spectating
-					FindObjectForSpectating (0);
-				}
-
-			}
-
-
-			// just in case
-			if (m_currentlySpectatedObject) {
-				if (!m_currentlySpectatedObject.GetControllingGameObject ()) {
-					// controlling game object of spectated player is dead
-					m_currentlySpectatedObject = null;
-				}
-			}
-
+		public enum DirectionChange
+		{
+			Random = 0,
+			Next = 1,
+			Previous = 2,
 		}
 
 
-		/// <summary>
-		/// direction: 0 - random, 1 - find next object in list, -1 - find previous object in list
-		/// </summary>
-		public	static	void	FindObjectForSpectating( int direction ) {
-			
-			// find spectatable objects
-			m_spectatableObjects = new List<Player> (PlayerManager.players.Where (p => p.IsAlive()));
+		public void FindObjectForSpectating(DirectionChange direction)
+		{
+			SpectatableObjects.RemoveDeadObjects();
 
-			if (0 == m_spectatableObjects.Count)
+			if (0 == SpectatableObjects.Count)
 				return;
-
-			direction = Math.Sign (direction);
 
 			// find index of currently spectated object
 			int index = -1 ;
-			if (m_currentlySpectatedObject != null) {
-				index = m_spectatableObjects.IndexOf (m_currentlySpectatedObject);
+			if (CurrentlySpectatedObject != null)
+			{
+				index = SpectatableObjects.IndexOf(CurrentlySpectatedObject);
 			}
 
-			m_currentlySpectatedObject = null;
+			var oldObject = CurrentlySpectatedObject;
+			CurrentlySpectatedObject = null;
 
-			if (index != -1) {
+			if (index != -1)
+			{
 				// object found in list
 
-				if (0 == direction) {
-					FindRandomObjectForSpectating ();
-				} else if (-1 == direction) {
+				if (DirectionChange.Random == direction)
+				{
+					FindRandomObjectForSpectating();
+				}
+				else if (DirectionChange.Previous == direction)
+				{
 					int newIndex = index - 1;
 					if (newIndex < 0)
-						newIndex = m_spectatableObjects.Count - 1;
-					m_currentlySpectatedObject = m_spectatableObjects [newIndex];
-				} else if (1 == direction) {
-					int newIndex = index + 1;
-					if (newIndex >= m_spectatableObjects.Count)
-						newIndex = 0;
-					m_currentlySpectatedObject = m_spectatableObjects [newIndex];
+						newIndex = SpectatableObjects.Count - 1;
+					CurrentlySpectatedObject = SpectatableObjects[newIndex];
 				}
-
-			} else {
+				else if (DirectionChange.Next == direction)
+				{
+					int newIndex = index + 1;
+					if (newIndex >= SpectatableObjects.Count)
+						newIndex = 0;
+					CurrentlySpectatedObject = SpectatableObjects[newIndex];
+				}
+			}
+			else
+			{
 				// object not found in list
 				// find random object
 
-				FindRandomObjectForSpectating ();
+				FindRandomObjectForSpectating();
 			}
 
-
+			// notify
+			if (oldObject != CurrentlySpectatedObject)
+				OnSpectatedObjectChanged.Invoke(new SpectatedObjectChangedEvent { newObject = CurrentlySpectatedObject });
 		}
 
-		private	static	void	FindRandomObjectForSpectating() {
-
-			if (0 == m_spectatableObjects.Count)
+		void FindRandomObjectForSpectating()
+		{
+			if (0 == SpectatableObjects.Count)
 				return;
 
-			foreach( var index in GetRandomIndicesInCollection(m_spectatableObjects.Count)) {
-
-				var obj = m_spectatableObjects [index];
-				if (obj.GetControllingGameObject() != null) {
-					m_currentlySpectatedObject = obj;
+			foreach(int index in GetRandomIndicesInCollection(SpectatableObjects.Count))
+			{
+                Component obj = SpectatableObjects[index];
+				if (obj != null)
+				{
+					CurrentlySpectatedObject = obj;
 					break;
 				}
-
 			}
-
-
 		}
 
-		private	static	IEnumerable<int>	GetRandomIndicesInCollection( int collectionLength ) {
-
+		IEnumerable<int> GetRandomIndicesInCollection(int collectionLength)
+		{
 			if (0 == collectionLength)
 				yield break;
 
-			int startIndex = UnityEngine.Random.Range (0, collectionLength);
+			int startIndex = UnityEngine.Random.Range(0, collectionLength);
 
 			for (int i = startIndex, count = 0, adder = 0; count < collectionLength;
-				count++, adder++, i += (count % 2 == 0 ? adder : -adder)) {
-
+				count++, adder++, i += (count % 2 == 0 ? adder : -adder))
+			{
 				int index = i;
 				if (index < 0)
 					index = collectionLength - (-index);
@@ -159,29 +112,18 @@ namespace UGameCore
 
 				yield return index;
 			}
-
 		}
 
-		public	static	bool	IsSpectating() {
+		public void SetSpectatedObject(Component obj)
+		{
+			if (CurrentlySpectatedObject == obj)
+				return;
 
-			if (null == m_currentlySpectatedObject)
-				return false;
-			
-			return m_currentlySpectatedObject.GetControllingGameObject() != null;
+			CurrentlySpectatedObject = obj;
 
-		}
+            OnSpectatedObjectChanged.Invoke(new SpectatedObjectChangedEvent { newObject = CurrentlySpectatedObject });
+        }
 
-		public	static	GameObject	GetSpectatingGameObject() {
-
-			if (null == m_currentlySpectatedObject)
-				return null;
-
-			return m_currentlySpectatedObject.GetControllingGameObject();
-		}
-
-
-	}
-
-
+        public bool IsSpectating => CurrentlySpectatedObject != null;
+    }
 }
-

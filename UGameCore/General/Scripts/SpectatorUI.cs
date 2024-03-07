@@ -1,12 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace UGameCore
 {
-	public class SpectatorUI : MonoBehaviour
+    public class SpectatorUI : MonoBehaviour
 	{
-
+		public Spectator spectator;
 		public	Canvas	spectatorCanvas = null;
 		public	Text	spectatingObjectText = null;
 		public	Button	goPreviousButton = null;
@@ -18,25 +17,25 @@ namespace UGameCore
 			// add button handlers
 
 			if (goPreviousButton != null) {
-				goPreviousButton.onClick.AddListener (() => { Spectator.FindObjectForSpectating( -1 ); });
+				goPreviousButton.onClick.AddListener (() => { spectator.FindObjectForSpectating( Spectator.DirectionChange.Previous ); });
 			}
 
 			if (goNextButton != null) {
-				goNextButton.onClick.AddListener (() => { Spectator.FindObjectForSpectating( 1 ); });
+				goNextButton.onClick.AddListener (() => { spectator.FindObjectForSpectating( Spectator.DirectionChange.Next ); });
 			}
 
 		}
 
 		void Update() {
 
-			this.spectatorCanvas.enabled = Spectator.IsSpectating ();
+			this.spectatorCanvas.enabled = spectator.IsSpectating;
 
 			if (this.spectatorCanvas.enabled) {
 				// update text based on spectated object
 
 				string text = "";
 
-				var co = Spectator.GetSpectatingGameObject ().GetComponent<ControllableObject> ();
+				var co = spectator.CurrentlySpectatedObject.GetComponent<ControllableObject> ();
 				if (co != null) {
 					var player = co.playerOwner;
 					if (player != null) {
