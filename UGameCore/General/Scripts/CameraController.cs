@@ -4,7 +4,7 @@
 namespace UGameCore
 {
 
-    public class CameraController : NetworkBehaviour {
+    public class CameraController : MonoBehaviour {
 
 		public Spectator spectator;
 
@@ -17,7 +17,8 @@ namespace UGameCore
 			if (null == Player.local)
 				return;
 
-			if (Player.local.GetControllingGameObject () == this.gameObject || spectator.CurrentlySpectatedObject == this.gameObject) {
+			if (Player.local.GetControllingGameObject () == this.gameObject 
+				|| (spectator.CurrentlySpectatedObject != null && spectator.CurrentlySpectatedObject.gameObject == this.gameObject)) {
 				this.UpdateCamera ();
 			}
 
