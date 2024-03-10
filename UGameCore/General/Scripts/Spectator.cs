@@ -8,9 +8,10 @@ namespace UGameCore
     public class Spectator : MonoBehaviour
 	{
 		public List<Component> SpectatableObjects = new();
-        public Component CurrentlySpectatedObject { get; private set; } = null;
+        public Component CurrentlySpectatedObject { get; private set; }
+        public Spectatable CurrentlySpectatedObjectAsSpectatable { get; private set; }
 
-		public struct SpectatedObjectChangedEvent
+        public struct SpectatedObjectChangedEvent
 		{
 			public Component newObject;
 		}
@@ -41,6 +42,7 @@ namespace UGameCore
 
 			var oldObject = CurrentlySpectatedObject;
 			CurrentlySpectatedObject = null;
+			CurrentlySpectatedObjectAsSpectatable = null;
 
 			if (index != -1)
 			{
@@ -72,6 +74,10 @@ namespace UGameCore
 
 				FindRandomObjectForSpectating();
 			}
+
+			CurrentlySpectatedObjectAsSpectatable = CurrentlySpectatedObject != null
+				? CurrentlySpectatedObject.GetComponent<Spectatable>()
+				: null;
 
 			// notify
 			if (oldObject != CurrentlySpectatedObject)
@@ -120,6 +126,7 @@ namespace UGameCore
 				return;
 
 			CurrentlySpectatedObject = obj;
+			CurrentlySpectatedObjectAsSpectatable = obj != null ? obj.GetComponent<Spectatable>() : null;
 
             OnSpectatedObjectChanged.Invoke(new SpectatedObjectChangedEvent { newObject = CurrentlySpectatedObject });
         }
