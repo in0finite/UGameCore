@@ -98,8 +98,6 @@ namespace UGameCore
 
                 F.RunExceptionSafe(() => configVar.SetValue(valueStr == null ? configVar.DefaultValue : configVar.LoadValueFromString(valueStr)));
             }
-
-            Debug.Log($"Loaded config vars [{m_configVars.Count}]");
 		}
 
 		public void RegisterConfigVar(ConfigVar configVar)

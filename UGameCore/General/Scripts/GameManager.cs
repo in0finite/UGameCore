@@ -35,8 +35,6 @@ namespace UGameCore
 			
 			this.fpsStopwatch.Start ();
 
-			Debug.Log (Utilities.Utilities.GetAssetName() + " started");
-
 		}
 
 		void Update () {
