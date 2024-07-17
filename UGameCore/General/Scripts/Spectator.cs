@@ -11,19 +11,38 @@ namespace UGameCore
         public Component CurrentlySpectatedObject { get; private set; }
         public Spectatable CurrentlySpectatedObjectAsSpectatable { get; private set; }
 
+        public bool IsSpectating => CurrentlySpectatedObject != null;
+
+        public int SpectateMode { get; private set; } = 0;
+
         public struct SpectatedObjectChangedEvent
 		{
-			public Component newObject;
-		}
+			public Component NewObject;
+            public Component OldObject;
+			public Context Context;
+        }
 
 		public UnityEvent<SpectatedObjectChangedEvent> OnSpectatedObjectChanged;
+        public UnityEvent<SpectatedObjectChangedEvent> OnSpectatingModeChanged;
 
-		public enum DirectionChange
+        public enum DirectionChange
 		{
 			Random = 0,
 			Next = 1,
 			Previous = 2,
 		}
+
+		public struct Context
+		{
+			public Spectator Spectator;
+			public readonly int SpectateMode => this.Spectator.SpectateMode;
+
+			public Context(Spectator spectator)
+			{
+				this.Spectator = spectator;
+			}
+        }
+
 
 
 		public void FindObjectForSpectating(DirectionChange direction)
@@ -40,9 +59,7 @@ namespace UGameCore
 				index = SpectatableObjects.IndexOf(CurrentlySpectatedObject);
 			}
 
-			var oldObject = CurrentlySpectatedObject;
-			CurrentlySpectatedObject = null;
-			CurrentlySpectatedObjectAsSpectatable = null;
+			Component newObject = null;
 
 			if (index != -1)
 			{
@@ -57,47 +74,40 @@ namespace UGameCore
 					int newIndex = index - 1;
 					if (newIndex < 0)
 						newIndex = SpectatableObjects.Count - 1;
-					CurrentlySpectatedObject = SpectatableObjects[newIndex];
+                    newObject = SpectatableObjects[newIndex];
 				}
 				else if (DirectionChange.Next == direction)
 				{
 					int newIndex = index + 1;
 					if (newIndex >= SpectatableObjects.Count)
 						newIndex = 0;
-					CurrentlySpectatedObject = SpectatableObjects[newIndex];
+                    newObject = SpectatableObjects[newIndex];
 				}
 			}
 			else
 			{
-				// object not found in list
-				// find random object
+                // object not found in list
+                // find random object
 
-				FindRandomObjectForSpectating();
+                newObject = FindRandomObjectForSpectating();
 			}
 
-			CurrentlySpectatedObjectAsSpectatable = CurrentlySpectatedObject != null
-				? CurrentlySpectatedObject.GetComponent<Spectatable>()
-				: null;
-
-			// notify
-			if (oldObject != CurrentlySpectatedObject)
-				OnSpectatedObjectChanged.Invoke(new SpectatedObjectChangedEvent { newObject = CurrentlySpectatedObject });
+			SetSpectatedObject(newObject);
 		}
 
-		void FindRandomObjectForSpectating()
+		Component FindRandomObjectForSpectating()
 		{
 			if (0 == SpectatableObjects.Count)
-				return;
+				return null;
 
 			foreach(int index in GetRandomIndicesInCollection(SpectatableObjects.Count))
 			{
                 Component obj = SpectatableObjects[index];
 				if (obj != null)
-				{
-					CurrentlySpectatedObject = obj;
-					break;
-				}
+					return obj;
 			}
+
+			return null;
 		}
 
 		IEnumerable<int> GetRandomIndicesInCollection(int collectionLength)
@@ -125,12 +135,60 @@ namespace UGameCore
 			if (CurrentlySpectatedObject == obj)
 				return;
 
-			CurrentlySpectatedObject = obj;
+			Component oldObject = CurrentlySpectatedObject;
+			Spectatable oldObjectAsSpectatable = CurrentlySpectatedObjectAsSpectatable;
+
+            CurrentlySpectatedObject = obj;
 			CurrentlySpectatedObjectAsSpectatable = obj != null ? obj.GetComponent<Spectatable>() : null;
 
-            OnSpectatedObjectChanged.Invoke(new SpectatedObjectChangedEvent { newObject = CurrentlySpectatedObject });
+			NotifySpectatedObjectChanged(oldObject, oldObjectAsSpectatable);
         }
 
-        public bool IsSpectating => CurrentlySpectatedObject != null;
+        Context CreateContext()
+		{
+			return new Context { Spectator = this };
+		}
+
+        void NotifySpectatedObjectChanged(Component oldObject, Spectatable oldObjectAsSpectatable)
+		{
+			if (oldObject == CurrentlySpectatedObject)
+				return;
+
+			// note that any of below invoked events can change currently spectated object
+
+			var ev = new SpectatedObjectChangedEvent
+			{
+				NewObject = CurrentlySpectatedObject,
+				OldObject = oldObject,
+				Context = CreateContext(),
+			};
+
+            OnSpectatedObjectChanged.Invoke(ev);
+
+			if (oldObjectAsSpectatable != null
+				&& oldObjectAsSpectatable != CurrentlySpectatedObjectAsSpectatable) // make sure it has not became active in the meantime
+                oldObjectAsSpectatable.OnStoppedSpectating?.Invoke(ev);
+
+            if (CurrentlySpectatedObjectAsSpectatable != null)
+                CurrentlySpectatedObjectAsSpectatable.OnStartedSpectating?.Invoke(ev);
+        }
+
+        public void SetSpectateMode(int newSpectateMode)
+		{
+			if (newSpectateMode == this.SpectateMode)
+				return;
+
+			this.SpectateMode = newSpectateMode;
+
+			this.OnSpectatingModeChanged.Invoke(new SpectatedObjectChangedEvent
+			{
+				Context = this.CreateContext(),
+				OldObject = this.CurrentlySpectatedObject,
+				NewObject = this.CurrentlySpectatedObject,
+			});
+
+            if (this.CurrentlySpectatedObjectAsSpectatable != null)
+                this.CurrentlySpectatedObjectAsSpectatable.OnSpectatingModeChanged?.Invoke(this.CreateContext());
+        }
     }
 }

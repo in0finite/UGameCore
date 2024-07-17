@@ -10,15 +10,23 @@ namespace UGameCore
         public Vector3 positionOffsetLocalSpace;
         public Vector3 rotationEulerOffset;
 
-        public Func<(Vector3 pos, Quaternion rot)> PositionAndRotationFunc { get; set; }
+        public Component owner;
+
+        public Func<Spectator.Context, PositionAndRotation> GetPositionAndRotation { get; set; }
+        public Func<Spectator.Context, bool> RequiresCrosshair { get; set; } = (ctx) => false;
+        public Func<Spectator.Context, float?> GetFieldOfView { get; set; } = (ctx) => null;
+        public Func<Spectator.Context, bool> RequiresScopeImage { get; set; } = (ctx) => false;
+        public Action<Spectator.SpectatedObjectChangedEvent> OnStartedSpectating { get; set; }
+        public Action<Spectator.SpectatedObjectChangedEvent> OnStoppedSpectating { get; set; }
+        public Action<Spectator.Context> OnSpectatingModeChanged { get; set; }
 
 
         Spectatable()
         {
-            this.PositionAndRotationFunc = this.GetPositionAndRotationDefault;
+            this.GetPositionAndRotation = this.GetPositionAndRotationDefault;
         }
 
-        public (Vector3 pos, Quaternion rot) GetPositionAndRotationDefault()
+        public PositionAndRotation GetPositionAndRotationDefault(Spectator.Context context)
         {
             this.transform.GetPositionAndRotation(out Vector3 pos, out Quaternion rot);
 
@@ -28,7 +36,7 @@ namespace UGameCore
             if (this.positionOffsetLocalSpace != Vector3.zero)
                 pos += rot.TransformDirection(this.positionOffsetLocalSpace);
 
-            return (pos, rot);
+            return new PositionAndRotation(pos, rot);
         }
     }
 }
