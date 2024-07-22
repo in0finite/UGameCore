@@ -107,7 +107,7 @@ namespace UGameCore
 			m_commandManager.RegisterCommand(new CommandManager.CommandInfo
 			{
 				command = configVar.FinalSerializationName,
-				description = configVar.Description,
+				description = configVar.Description + " " + configVar.GetAdditionalDescription(),
 				maxNumArguments = 1,
                 commandHandler = this.ProcessCommand,
 				autoCompletionHandler = this.ProcessCommandAutoCompletion,
@@ -149,7 +149,7 @@ namespace UGameCore
 
 			string valueStr = context.ReadStringOrDefault(null);
 			if (string.IsNullOrWhiteSpace(valueStr))
-                return ProcessCommandResult.SuccessResponse(configVar.SaveValueToString(configVar.GetValue()));
+                return ProcessCommandResult.SuccessResponse(configVar.DescribeValue(configVar.GetValue()) + "\r\nDescription: " + configVar.Description + " " + configVar.GetAdditionalDescription());
 
 			this.SetConfigVarValueWithConfigUpdate(configVar, configVar.LoadValueFromString(valueStr));
 
