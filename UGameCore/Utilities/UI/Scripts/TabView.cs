@@ -4,37 +4,24 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 
-namespace UGameCore.Utilities.UI {
-	
-	public class TabView : MonoBehaviour {
+namespace UGameCore.Utilities.UI
+{
+    [DisallowMultipleComponent]
+    public class TabView : MonoBehaviour {
 		
-
-	//	private	RectTransform	m_rectTransform = null;
-	//	public	RectTransform	rectTransform { get { return m_rectTransform; } private set { m_rectTransform = value; } }
-		public	RectTransform	rectTransform { get { return this.GetComponent<RectTransform>(); } }
+		RectTransform	rectTransform { get { return this.GetRectTransform(); } }
 
 		[SerializeField]	private	List<Tab>	m_tabs = new List<Tab>();
 
-		public List<Tab> TabsInChildren { get {
-				var tabs = new List<Tab> (this.transform.childCount / 2);
-				foreach (Transform child in this.transform) {
-					var tab = child.GetComponent<Tab> ();
-					if (tab != null)
-						tabs.Add (tab);
-				}
-				return tabs;
-			}
-		}
+        public Tab[] TabsInChildren => this.gameObject.GetFirstLevelChildrenSingleComponent<Tab>().ToArray();
 
-		/// <summary>
-		/// List of tabs. You can modify it as you wish, but you need to manually update TabView.
-		/// </summary>
-		public	List<Tab>	GetTabsList() { return m_tabs; }
+        /// <summary>
+        /// List of tabs. You can modify it as you wish, but you need to manually update TabView.
+        /// </summary>
+        public List<Tab> GetTabsList() => m_tabs;
 
-		public	int	NumTabs { get { return m_tabs.Count; } }
-
-		private	Tab m_activeTab = null;
-		public Tab ActiveTab { get { return this.m_activeTab; } }
+        private	Tab m_activeTab = null;
+		public Tab ActiveTab => m_activeTab;
 
 
 	//	public	Func<string, RectTransform>	createTabPanelFunction ;
@@ -42,10 +29,6 @@ namespace UGameCore.Utilities.UI {
 
 	//	public	Action<RectTransform>	setTabButtonPositionFunction ;
 	//	public	Action<RectTransform>	setTabPanelPositionFunction ;
-
-		public	Action<Tab>	activateTabFunction ;
-		public	Action<Tab>	deactivateTabFunction ;
-
 
 		public	event Action<Tab>	onTabAdded = delegate {};
 		public	event Action	onSwitchedTab = delegate {};
@@ -83,9 +66,6 @@ namespace UGameCore.Utilities.UI {
 		//	createTabButtonFunction = CreateTabButton;
 		//	setTabButtonPositionFunction = SetPositionOfTabButton;
 		//	setTabPanelPositionFunction = SetPositionOfTabPanel;
-			activateTabFunction = ActivateTab;
-			deactivateTabFunction = DeactivateTab;
-
 		}
 
 		/// <summary>
@@ -307,44 +287,46 @@ namespace UGameCore.Utilities.UI {
 
 		public	void	SwitchTab (Tab newActiveTab) {
 
-			if (newActiveTab == m_activeTab)
-				return;
-			
-			foreach( var tab in m_tabs.WhereAlive () ) {
+			// deactivate other tabs
+			foreach (Tab tab in m_tabs)
+			{
+				if (tab != null && tab != newActiveTab)
+				{
+					if (tab.RootObject != null)
+					{
+						tab.RootObject.gameObject.SetActive(false);
+						MySetDirty(tab.RootObject.gameObject);
+					}
 
-				if (tab == newActiveTab) {
-					// this is the new active tab
-					// activate new tab
-					activateTabFunction (tab);
-				} else {
-					// this is not the active tab
-					// deactivate it
-					deactivateTabFunction (tab);
-				}
+					if (tab.buttonImageComponent != null)
+                        tab.buttonImageComponent.color = tab.originalButtonColor;
+                }
 			}
+
+            if (newActiveTab == m_activeTab)
+                return;
+
+			// activate new tab
+            if (newActiveTab != null)
+            {
+				if (newActiveTab.RootObject != null)
+				{
+                    newActiveTab.RootObject.gameObject.SetActive(true);
+                    MySetDirty(newActiveTab.RootObject.gameObject);
+                }
+
+				if (newActiveTab.buttonImageComponent != null)
+                    newActiveTab.buttonImageComponent.color = this.activeTabColor;
+            }
 
 			m_activeTab = newActiveTab;
 
-			Utilities.InvokeEventExceptionSafe (this.onSwitchedTab);
+			// notify
 
-		}
-
-		public	static	void	ActivateTab (Tab tab) {
-			tab.panel.gameObject.SetActive (true);
-			tab.buttonImageComponent.color = tab.tabView.activeTabColor;
-
-			MySetDirty (tab.panel.gameObject);
-			MySetDirty (tab.buttonImageComponent);
-		}
-
-		public	static	void	DeactivateTab (Tab tab) {
-			tab.panel.gameObject.SetActive (false);
-			tab.buttonImageComponent.color = tab.originalButtonColor;
-
-			MySetDirty (tab.panel.gameObject);
-			MySetDirty (tab.buttonImageComponent);
-		}
-
+            this.onSwitchedTab.InvokeEventExceptionSafe();
+			if (newActiveTab != null)
+				newActiveTab.OnTabActivated?.Invoke();
+        }
 
 		public	void	ApplyTabsFromList () {
 

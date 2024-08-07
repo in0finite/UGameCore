@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UGameCore.Utilities.UI;
+using System.Linq;
 
-namespace UGameCore.Editor {
-	
-	[CustomEditor(typeof(TabView))]
+namespace UGameCore.Editor
+{
+
+    [CustomEditor(typeof(TabView))]
 	[CanEditMultipleObjects]
 	public class TabViewInspector : UnityEditor.Editor
 	{
@@ -25,10 +27,15 @@ namespace UGameCore.Editor {
 
 				foreach(TabView tabView in this.targets) {
 					var list = tabView.GetTabsList ();
-					list.Clear ();
-					list.AddRange( tabView.TabsInChildren );
-				//	tabView.ApplyTabsFromList ();
-					UGameCore.Utilities.Utilities.MarkObjectAsDirty( tabView );
+					var newList = tabView.TabsInChildren;
+
+					if (list.SequenceEqual(newList))
+						continue;
+
+					list.Clear();
+					list.AddRange(newList);
+					
+					UGameCore.Utilities.Utilities.MarkObjectAsDirty(tabView);
 				}
 
 			}

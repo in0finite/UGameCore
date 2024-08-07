@@ -2,7 +2,8 @@
     "name": "UGameCore",
     "rootNamespace": "UGameCore",
     "references": [
-        "GUID:e2bff2fa8d032b63b9d3231c79d6019c"
+        "GUID:e2bff2fa8d032b63b9d3231c79d6019c",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
