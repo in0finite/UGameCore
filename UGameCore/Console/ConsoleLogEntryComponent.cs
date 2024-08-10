@@ -1,12 +1,13 @@
 using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace UGameCore.Console
 {
     public class ConsoleLogEntryComponent : MonoBehaviour
     {
-        public Text textComponent;
+        public TextMeshProUGUI textComponent;
         public Image image;
         public UIEventsPickup eventsPickup;
 
