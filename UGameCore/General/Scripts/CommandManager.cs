@@ -501,9 +501,12 @@ namespace UGameCore
 
             // add the remaining argument
             string remainingArgument = command.Substring(argumentStartIndex + 1, command.Length - argumentStartIndex - 1);
-            // here we only need to trim from end, because argument may have quotes
-            // but because the command was trimmed at beginning, we don't need to do it
-            arguments.Add(remainingArgument);
+            if (remainingArgument.Length > 0)
+            {
+                // here we only need to trim from end, because argument may have quotes
+                // but because the command was trimmed at beginning, we don't need to do it
+                arguments.Add(remainingArgument);
+            }
 
             arguments.ReplaceEach(arg => UnescapeArgument(arg));
 
@@ -558,14 +561,17 @@ namespace UGameCore
             for (int i = 0; i < arguments.Length; i++)
             {
                 string arg = arguments[i]; // don't trim, arguments are allowed to have whitespaces at start/end
+
+                bool isEmpty = arg.Length == 0;
                 bool hasWhitespace = arg.Any(char.IsWhiteSpace);
-                
-                if (hasWhitespace)
+                bool needsQuotes = isEmpty || hasWhitespace;
+
+                if (needsQuotes)
                     sb.Append('\"');
 
-                sb.Append(hasWhitespace ? arg.Replace("\"", "\\\"") : arg);
+                sb.Append(needsQuotes ? arg.Replace("\"", "\\\"") : arg);
 
-                if (hasWhitespace)
+                if (needsQuotes)
                     sb.Append('\"');
 
                 if (i != arguments.Length - 1)

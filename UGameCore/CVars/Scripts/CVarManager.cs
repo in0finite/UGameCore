@@ -147,10 +147,12 @@ namespace UGameCore
         {
 			ConfigVar configVar = m_configVars[context.commandOnly];
 
+			bool hasValue = context.HasNextArgument();
 			string valueStr = context.ReadStringOrDefault(null);
-			if (string.IsNullOrWhiteSpace(valueStr))
-                return ProcessCommandResult.SuccessResponse(configVar.DescribeValue(configVar.GetValue()) + "\r\nDescription: " + configVar.Description + " " + configVar.GetAdditionalDescription());
 
+			if (!hasValue)
+				return ProcessCommandResult.SuccessResponse(configVar.DescribeValue(configVar.GetValue()) + "\r\nDescription: " + configVar.Description + " " + configVar.GetAdditionalDescription());
+			
 			this.SetConfigVarValueWithConfigUpdate(configVar, configVar.LoadValueFromString(valueStr));
 
             return ProcessCommandResult.Success;
