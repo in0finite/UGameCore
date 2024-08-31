@@ -294,7 +294,11 @@ namespace UGameCore
                 where T : struct, System.Enum
             {
                 string str = this.ReadString();
-                return System.Enum.Parse<T>(str, true);
+                T value = System.Enum.Parse<T>(str, true);
+                if (!System.Enum.IsDefined(typeof(T), value))
+                    throw new System.ArgumentException($"Specified {typeof(T).Name} value is not valid: {value}");
+                return value;
+            }
 
             public T? ReadNullableEnum<T>()
                 where T : struct, System.Enum
