@@ -32,7 +32,7 @@ namespace UGameCore
             if (context.NumArguments == 2)
                 scale = context.ReadFloat() * Vector3.one;
             else if (context.NumArguments == 4)
-                scale = context.ReadVector3();
+                scale = context.ReadVector3As3Floats();
 
             var go = GameObject.CreatePrimitive(primitiveType);
             go.transform.localScale = scale;

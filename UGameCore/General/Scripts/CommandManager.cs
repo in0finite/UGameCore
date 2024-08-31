@@ -187,17 +187,31 @@ namespace UGameCore
                 return this.currentArgumentIndex < this.NumArguments;
             }
 
+            public void SkipNextArgument()
+            {
+                this.ReadString();
+            }
+
             /// <summary>
-            /// Read next command argument as string.
+            /// Peek next command argument as string.
             /// </summary>
-            public string ReadString()
+            public string PeekString()
             {
                 if (this.currentArgumentIndex >= this.NumArguments)
                     throw new System.ArgumentException($"Trying to read command argument out of bounds (index {this.currentArgumentIndex}, num arguments {this.NumArguments})");
 
                 string arg = this.arguments[this.currentArgumentIndex];
-                this.currentArgumentIndex++;
                 return arg;
+            }
+
+            /// <summary>
+            /// Read next command argument as string.
+            /// </summary>
+            public string ReadString()
+            {
+                string str = this.PeekString();
+                this.currentArgumentIndex++;
+                return str;
             }
 
             /// <summary>
@@ -209,6 +223,19 @@ namespace UGameCore
                     return defaultValue;
 
                 return this.ReadString();
+            }
+
+            T? ReadNullableUsingFunction<T>(System.Func<ProcessCommandContext, T> func)
+                where T : struct
+            {
+                string str = this.PeekString();
+                if (string.IsNullOrEmpty(str))
+                {
+                    this.SkipNextArgument();
+                    return default;
+                }
+
+                return func(this);
             }
 
             /// <summary>
@@ -230,11 +257,34 @@ namespace UGameCore
             }
 
             /// <summary>
-            /// Read next command argument as Vector3.
+            /// Read next command argument as Vector3, by reading 3 floats.
             /// </summary>
-            public Vector3 ReadVector3()
+            public Vector3 ReadVector3As3Floats()
             {
                 return new Vector3(this.ReadFloat(), this.ReadFloat(), this.ReadFloat());
+            }
+
+            public Vector3 ReadVector3()
+            {
+                string str = this.ReadString();
+
+                string[] parts = str.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length != 3)
+                    throw new System.ArgumentException($"Expected 3 floats for Vector3 argument, found {parts.Length}");
+
+                Vector3 v = default;
+                for (int i = 0; i < 3; i++)
+                    v[i] = float.Parse(parts[i], System.Globalization.CultureInfo.InvariantCulture);
+
+                return v;
+            }
+
+            public Vector3? ReadNullableVector3() => this.ReadNullableUsingFunction(static c => c.ReadVector3());
+
+            public Vector3? ReadNullableVector3OrDefault(Vector3? defaultValue = default)
+            {
+                return this.HasNextArgument() ? this.ReadNullableVector3() : defaultValue;
             }
 
             /// <summary>
@@ -245,6 +295,30 @@ namespace UGameCore
             {
                 string str = this.ReadString();
                 return System.Enum.Parse<T>(str, true);
+
+            public T? ReadNullableEnum<T>()
+                where T : struct, System.Enum
+                => this.ReadNullableUsingFunction(static c => c.ReadEnum<T>());
+
+            public T ReadGeneric<T>()
+            {
+                string str = this.ReadString();
+                return (T)System.Convert.ChangeType(str, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            public T ReadGenericOrDefault<T>(T defaultValue = default)
+            {
+                return this.HasNextArgument() ? this.ReadGeneric<T>() : defaultValue;
+            }
+
+            public T? ReadNullableGeneric<T>()
+                where T : struct
+                => this.ReadNullableUsingFunction(static c => c.ReadGeneric<T>());
+
+            public T? ReadNullableGenericOrDefault<T>(T? defaultValue = default)
+                where T : struct
+            {
+                return this.HasNextArgument() ? this.ReadNullableGeneric<T>() : defaultValue;
             }
         }
 
