@@ -107,7 +107,7 @@ namespace UGameCore
 			m_commandManager.RegisterCommand(new CommandManager.CommandInfo
 			{
 				command = configVar.FinalSerializationName,
-				description = configVar.Description + " " + configVar.GetAdditionalDescription(),
+				description = $"{configVar.Description}\r\nDefault value: {configVar.DescribeValue(configVar.DefaultValue)}\r\n{configVar.GetAdditionalDescription()}",
 				maxNumArguments = 1,
                 commandHandler = this.ProcessCommand,
 				autoCompletionHandler = this.ProcessCommandAutoCompletion,
@@ -146,12 +146,13 @@ namespace UGameCore
         ProcessCommandResult ProcessCommand(ProcessCommandContext context)
         {
 			ConfigVar configVar = m_configVars[context.commandOnly];
+            CommandInfo commandInfo = m_commandManager.RegisteredCommandsDict[context.commandOnly];
 
 			bool hasValue = context.HasNextArgument();
 			string valueStr = context.ReadStringOrDefault(null);
 
 			if (!hasValue)
-				return ProcessCommandResult.SuccessResponse(configVar.DescribeValue(configVar.GetValue()) + "\r\nDescription: " + configVar.Description + " " + configVar.GetAdditionalDescription());
+				return ProcessCommandResult.SuccessResponse(configVar.DescribeValue(configVar.GetValue()) + "\r\n\r\n" + commandInfo.description);
 			
 			this.SetConfigVarValueWithConfigUpdate(configVar, configVar.LoadValueFromString(valueStr));
 

@@ -23,7 +23,7 @@ namespace UGameCore
         {
             string response;
 
-            if (context.NumArguments <= 1)
+            if (context.NumArguments <= 1) // display help for all commands
             {
                 var commands = this.commandManager.RegisteredCommandsDict.ToArray();
                 commands.SortBy(_ => _.Key);
@@ -35,6 +35,8 @@ namespace UGameCore
 
                 return ProcessCommandResult.SuccessResponse(response);
             }
+
+            // display help for specified command
 
             string cmd = context.ReadString();
 
