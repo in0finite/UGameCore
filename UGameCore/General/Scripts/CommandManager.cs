@@ -247,13 +247,16 @@ namespace UGameCore
                 return int.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            static float ParseFloat(string str)
+                => float.Parse(str, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+
             /// <summary>
             /// Read next command argument as float.
             /// </summary>
             public float ReadFloat()
             {
                 string str = this.ReadString();
-                return float.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
+                return ParseFloat(str);
             }
 
             /// <summary>
@@ -275,7 +278,7 @@ namespace UGameCore
 
                 Vector3 v = default;
                 for (int i = 0; i < 3; i++)
-                    v[i] = float.Parse(parts[i], System.Globalization.CultureInfo.InvariantCulture);
+                    v[i] = ParseFloat(parts[i]);
 
                 return v;
             }
