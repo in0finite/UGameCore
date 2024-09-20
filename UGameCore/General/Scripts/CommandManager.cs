@@ -767,7 +767,7 @@ namespace UGameCore
             }
 
             if (commandInfo.exactNumArguments.HasValue && arguments.Length - 1 != commandInfo.exactNumArguments.Value)
-                return ProcessCommandResult.Error($"Command requires exactly {commandInfo.exactNumArguments.Value} arguments");
+                return ProcessCommandResult.Error($"Command requires {commandInfo.exactNumArguments.Value} arguments");
 
             if (commandInfo.minNumArguments.HasValue && arguments.Length - 1 < commandInfo.minNumArguments.Value)
                 return ProcessCommandResult.Error($"Command requires at least {commandInfo.minNumArguments.Value} arguments");
