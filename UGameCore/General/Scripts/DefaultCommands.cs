@@ -26,7 +26,7 @@ namespace UGameCore
 			string command = context.command;
 			string[] words = CommandManager.SplitCommandIntoArguments (command);
 			int numWords = words.Length ;
-			string restOfTheCommand = CommandManager.GetRestOfTheCommand (command, 0);
+			string restOfTheCommand = context.GetRestOfTheCommand();
 
 			string response = "";
 

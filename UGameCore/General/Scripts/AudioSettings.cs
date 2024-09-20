@@ -12,6 +12,7 @@ namespace UGameCore
             this.VolumeConfigVar = new()
             {
                 SerializationName = "audio_volume",
+                Aliases = new string[] { "volume" },
                 Description = "Global audio volume",
                 MinValue = 0f,
                 MaxValue = 1f,

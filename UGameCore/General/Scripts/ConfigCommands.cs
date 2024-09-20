@@ -3,6 +3,7 @@ using UnityEngine;
 using UGameCore.Utilities;
 using static UGameCore.CommandManager;
 using System.Text;
+using System.Linq;
 
 namespace UGameCore
 {
@@ -22,11 +23,11 @@ namespace UGameCore
             this.commandManager.RegisterCommandsFromTypeMethods(this);
         }
 
-        [CommandMethod("config_dump", "List all config properties")]
+        [CommandMethod("config_dump", "List all known config properties")]
         ProcessCommandResult Dump(ProcessCommandContext context)
         {
             var sb = new StringBuilder();
-            foreach (string key in m_configProvider.GetKeys())
+            foreach (string key in m_configProvider.GetKnownKeys().OrderBy(_ => _, StringComparer.Ordinal)) // don't ignore case when sorting
             {
                 sb.Append(key);
                 sb.Append(" = ");
