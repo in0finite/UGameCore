@@ -93,15 +93,7 @@ namespace UGameCore
             string newCmd = context.ReadString();
             string existingCmd = context.ReadString();
 
-            if (!this.commandManager.HasCommand(existingCmd))
-                return ProcessCommandResult.UnknownCommand(existingCmd);
-
-            this.commandManager.RegisterCommand(newCmd, context =>
-            {
-                context.arguments[0] = existingCmd;
-                context.command = this.commandManager.CombineArguments(context.arguments);
-                return this.commandManager.ProcessCommand(context);
-            });
+            this.commandManager.RegisterCommandAlias(existingCmd, newCmd);
 
             return ProcessCommandResult.Success;
         }

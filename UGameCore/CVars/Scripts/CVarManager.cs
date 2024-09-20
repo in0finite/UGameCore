@@ -14,10 +14,12 @@ namespace UGameCore
 		IConfigProvider m_configProvider;
 		CommandManager m_commandManager;
 
-        private readonly Dictionary<string, ConfigVar>	m_configVars = new(System.StringComparer.OrdinalIgnoreCase);
+        readonly Dictionary<string, ConfigVar>	m_configVars = new(System.StringComparer.OrdinalIgnoreCase);
 		public	IReadOnlyDictionary<string, ConfigVar>	ConfigVars => m_configVars;
 
-		public bool scanMyself = true;
+        readonly Dictionary<string, string> m_configVarAliases = new(System.StringComparer.OrdinalIgnoreCase);
+
+        public bool scanMyself = true;
 		public List<GameObject> objectsToScan = new();
 
 
@@ -29,7 +31,18 @@ namespace UGameCore
             this.LoadConfigVars();
 		}
 
-		public void ChangeCVars(ConfigVar[] cvarsToChange, ConfigVarValue[] newValues)
+		public ConfigVar GetConfigVarByNameOrAlias(string nameOrAlias)
+		{
+			if (m_configVars.TryGetValue(nameOrAlias, out ConfigVar configVar))
+				return configVar;
+
+            if (m_configVarAliases.TryGetValue(nameOrAlias, out string n))
+                return m_configVars[n];
+
+			throw new System.ArgumentException($"{nameof(ConfigVar)} not found by name or alias: {nameOrAlias}");
+        }
+
+        public void ChangeCVars(ConfigVar[] cvarsToChange, ConfigVarValue[] newValues)
 		{
 			if (cvarsToChange.Length != newValues.Length)
 				throw new System.ArgumentException();
@@ -102,18 +115,26 @@ namespace UGameCore
 
 		public void RegisterConfigVar(ConfigVar configVar)
 		{
-            this.ValidateConfigVarName(configVar.FinalSerializationName);
+			string serializationName = configVar.FinalSerializationName;
+
+            this.ValidateConfigVarName(serializationName);
 
 			m_commandManager.RegisterCommand(new CommandManager.CommandInfo
 			{
-				command = configVar.FinalSerializationName,
+				command = serializationName,
 				description = $"{configVar.Description}\r\nDefault value: {configVar.DescribeValue(configVar.DefaultValue)}\r\n{configVar.GetAdditionalDescription()}",
 				maxNumArguments = 1,
                 commandHandler = this.ProcessCommand,
 				autoCompletionHandler = this.ProcessCommandAutoCompletion,
             });
 
-            m_configVars.Add(configVar.FinalSerializationName, configVar);
+            m_configVars.Add(serializationName, configVar);
+
+            foreach (string alias in configVar.Aliases)
+            {
+                m_commandManager.RegisterCommandAlias(serializationName, alias);
+				m_configVarAliases.Add(alias, serializationName);
+            }
         }
 
         void ValidateConfigVarName(string serializationName)
@@ -145,7 +166,7 @@ namespace UGameCore
 
         ProcessCommandResult ProcessCommand(ProcessCommandContext context)
         {
-			ConfigVar configVar = m_configVars[context.commandOnly];
+			ConfigVar configVar = this.GetConfigVarByNameOrAlias(context.commandOnly);
             CommandInfo commandInfo = m_commandManager.RegisteredCommandsDict[context.commandOnly];
 
 			bool hasValue = context.HasNextArgument();
@@ -165,7 +186,7 @@ namespace UGameCore
 			if (context.NumArguments > 1)
 				return ProcessCommandResult.AutoCompletion(null, null);
 
-            ConfigVar configVar = m_configVars[context.commandOnly];
+            ConfigVar configVar = this.GetConfigVarByNameOrAlias(context.commandOnly);
 
             string valueStr = configVar.SaveValueToString(configVar.GetValue());
 

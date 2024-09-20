@@ -35,6 +35,7 @@ namespace UGameCore
         public class CommandMethodAttribute : System.Attribute
         {
             public string command;
+            public string[] commandAliases = System.Array.Empty<string>();
             public string description;
             public string syntax;
             public sbyte maxNumArguments = -1;
@@ -176,7 +177,13 @@ namespace UGameCore
             /// </summary>
             public int NumArguments => this.arguments.Length;
 
-            public int currentArgumentIndex = 1;
+            int currentArgumentIndex = 1;
+
+
+            public ProcessCommandContext Clone()
+            {
+                return (ProcessCommandContext)this.MemberwiseClone();
+            }
 
             public bool HasNextArgument()
             {
@@ -186,6 +193,11 @@ namespace UGameCore
             public void SkipNextArgument()
             {
                 this.ReadString();
+            }
+
+            public string GetRestOfTheCommand(int argumentIndex = 1, string separator = " ")
+            {
+                return string.Join(separator, this.arguments, argumentIndex, this.arguments.Length - argumentIndex);
             }
 
             /// <summary>
@@ -335,6 +347,13 @@ namespace UGameCore
             this.ForbiddenCommands.UnionWith(m_forbiddenCommandsList);
         }
 
+        public CommandInfo GetCommandOrThrow(string command)
+        {
+            return m_registeredCommands.TryGetValue(command, out CommandInfo commandInfo)
+                ? commandInfo
+                : throw new System.ArgumentException($"Command not found: {command}");
+        }
+
         public bool HasCommand(string command)
         {
             return m_registeredCommands.ContainsKey(command);
@@ -382,6 +401,16 @@ namespace UGameCore
             this.RegisterCommand(commandInfo);
         }
 
+        public void RegisterCommandAlias(string existingCommand, string alias)
+        {
+            CommandInfo commandInfo = this.GetCommandOrThrow(existingCommand);
+
+            commandInfo.command = alias;
+            commandInfo.description = $"(Alias for '{existingCommand}') {commandInfo.description}";
+
+            this.RegisterCommand(commandInfo);
+        }
+
         public void RegisterCommandsFromTypeMethods(object instanceObject)
         {
             this.RegisterCommandsFromTypeMethods(instanceObject, instanceObject.GetType());
@@ -423,7 +452,13 @@ namespace UGameCore
                         commandHandler = CreateCommandHandler(method, instanceObject),
                     };
 
-                    F.RunExceptionSafe(() => this.RegisterCommand(commandInfo));
+                    F.RunExceptionSafeArg2(this, commandInfo, static (arg1, arg2) => arg1.RegisterCommand(arg2));
+
+                    // register aliases
+                    foreach (string alias in attr.commandAliases)
+                    {
+                        F.RunExceptionSafeArg3(this, attr, alias, static (arg1, arg2, arg3) => arg1.RegisterCommandAlias(arg2.command, arg3));
+                    }
                 }
             }
 
@@ -656,19 +691,6 @@ namespace UGameCore
             }
 
             return sb.ToString();
-        }
-
-        public static string GetRestOfTheCommand(string command, int argumentIndex)
-        {
-            if (argumentIndex < 0)
-                return "";
-
-            string[] args = SplitCommandIntoArguments(command);
-
-            if (argumentIndex > args.Length - 2)
-                return "";
-
-            return string.Join(" ", args, argumentIndex + 1, args.Length - argumentIndex - 1);
         }
 
         public static Vector3 ParseVector3(string[] arguments, int startIndex)
