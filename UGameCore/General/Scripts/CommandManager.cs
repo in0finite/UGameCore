@@ -944,5 +944,42 @@ namespace UGameCore
 
             return ProcessCommandResult.AutoCompletion(exactCompletion, possibleCompletions);
         }
+
+        public ProcessCommandResult ProcessCommandsFromFile(ProcessCommandContext context, string relativeFileName)
+        {
+            // make sure that other files can not be modified - restrict to ".cfg" file extension
+            if (!relativeFileName.EndsWith(".cfg", System.StringComparison.OrdinalIgnoreCase))
+                throw new System.ArgumentException($"File name must end with '.cfg'");
+
+            // prevent malicious file names
+            if (relativeFileName.ContainsAnyChar("/\\", System.StringComparison.OrdinalIgnoreCase))
+                throw new System.ArgumentException($"Invalid file name: {relativeFileName}");
+
+            string dir = Application.persistentDataPath;
+
+            string fullPath = System.IO.Path.Join(dir, relativeFileName);
+
+            string commands = System.IO.File.ReadAllText(fullPath);
+
+            context = context.Clone();
+            context.command = commands;
+            return this.ProcessMultiLineCommands(context);
+        }
+
+        public ProcessCommandResult ProcessMultiLineCommands(ProcessCommandContext context)
+        {
+            string[] lines = context.command.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
+            var resultRef = new Ref<ProcessCommandResult>(ProcessCommandResult.Success);
+            context = context.Clone();
+
+            foreach (string line in lines)
+            {
+                context.command = line;
+                F.RunExceptionSafeArg3(
+                    this, context, resultRef, static (arg1, arg2, arg3) => arg3.value = arg1.ProcessCommand(arg2));
+            }
+
+            return resultRef.value;
+        }
     }
 }

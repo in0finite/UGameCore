@@ -105,5 +105,12 @@ namespace UGameCore
                 response += context.ReadString() + "\n";
             return ProcessCommandResult.SuccessResponse(response);
         }
+
+        [CommandMethod("exec", "Execute commands from a file", syntax = "(string relativeFileName)", exactNumArguments = 1)]
+        ProcessCommandResult ExecCmd(ProcessCommandContext context)
+        {
+            string relativeFileName = context.ReadString();
+            return this.commandManager.ProcessCommandsFromFile(context, relativeFileName);
+        }
     }
 }
