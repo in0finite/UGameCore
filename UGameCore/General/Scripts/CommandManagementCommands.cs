@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using UGameCore.Utilities;
 using UnityEngine;
@@ -87,7 +86,7 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("alias", "Creates alias for a command", syntax = "(string newCommand, string existingCommand)")]
+        [CommandMethod("alias", "Creates alias for a command", syntax = "(string newCommand, string existingCommand)", exactNumArguments = 2)]
         ProcessCommandResult AliasCmd(ProcessCommandContext context)
         {
             string newCmd = context.ReadString();

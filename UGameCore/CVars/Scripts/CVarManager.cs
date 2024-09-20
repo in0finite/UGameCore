@@ -86,14 +86,14 @@ namespace UGameCore
 			var context = new IConfigVarRegistrator.Context();
             foreach (IConfigVarRegistrator registrator in registrators)
             {
-				F.RunExceptionSafe(() => registrator.Register(context));
+				F.RunExceptionSafeArg2(registrator, context, static (arg1, arg2) => arg1.Register(arg2));
             }
 
             m_configVars.Clear();
 
 			foreach (ConfigVar configVar in context.ConfigVars)
 			{
-				F.RunExceptionSafe(() => this.RegisterConfigVar(configVar));
+				F.RunExceptionSafeArg2(this, configVar, static (arg1, arg2) => arg1.RegisterConfigVar(arg2));
             }
 
 			// assign config var values from config
@@ -109,7 +109,7 @@ namespace UGameCore
 				if (valueStr == null && !configVar.ApplyDefaultValueWhenNotPresentInConfig)
 					continue;
 
-                F.RunExceptionSafe(() => configVar.SetValue(valueStr == null ? configVar.DefaultValue : configVar.LoadValueFromString(valueStr)));
+                F.RunExceptionSafeArg2(configVar, valueStr, static (arg1, arg2) => arg1.SetValue(arg2 == null ? arg1.DefaultValue : arg1.LoadValueFromString(arg2)));
             }
 		}
 
@@ -142,7 +142,7 @@ namespace UGameCore
 			if (string.IsNullOrWhiteSpace(serializationName))
 				throw new System.ArgumentException("Config var name can not be empty");
 
-			if (serializationName.Any(c => !char.IsLetterOrDigit(c) && c != '_' && c != '-' && c != '.'))
+			if (serializationName.Any(static c => !char.IsLetterOrDigit(c) && c != '_' && c != '-' && c != '.'))
 				throw new System.ArgumentException($"Config var names can only have letters or digits: {serializationName}");
         }
 
