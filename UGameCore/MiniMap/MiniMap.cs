@@ -87,6 +87,11 @@ namespace UGameCore.MiniMap
             this.MapImage.texture = texture;
         }
 
+        public MiniMapObject CreateWithoutRegistering(GameObject go)
+        {
+            return go.AddComponent<MiniMapObject>();
+        }
+
         public MiniMapObject Create(GameObject go, bool needsTexture, bool needsText)
         {
             MiniMapObject miniMapObject = go.AddComponent<MiniMapObject>();
@@ -149,10 +154,11 @@ namespace UGameCore.MiniMap
 
             foreach (MiniMapObject miniMapObject in m_MiniMapObjects)
             {
-                if (null == miniMapObject)
+                if (ShouldRemoveMiniMapObject(miniMapObject))
                 {
                     hasDeadObjects = true;
-                    this.ReleaseUIComponents(miniMapObject);
+                    if (!object.ReferenceEquals(miniMapObject, null))
+                        this.ReleaseUIComponents(miniMapObject);
                     continue;
                 }
 
@@ -160,9 +166,14 @@ namespace UGameCore.MiniMap
             }
 
             if (hasDeadObjects)
-                m_MiniMapObjects.RemoveDeadObjects();
+                m_MiniMapObjects.RemoveAll(ShouldRemoveMiniMapObject);
 
             m_repositionAllObjects = false;
+        }
+
+        static bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
+        {
+            return null == miniMapObject || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner);
         }
 
         void RentUIComponents(MiniMapObject miniMapObject, bool needsTexture, bool needsText)

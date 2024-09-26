@@ -12,7 +12,7 @@ namespace UGameCore.MiniMap
 
         internal Transform CachedTransform;
 
-        internal bool IsRegistered = false;
+        public bool IsRegistered { get; internal set; } = false;
 
         public bool IsDirty { get; private set; } = true;
         internal PositionAndRotation? LastPositionAndRotation;
@@ -31,11 +31,17 @@ namespace UGameCore.MiniMap
 
         public bool AlwaysRotateTowardsCamera = false;
 
+        public Component LifeOwner;
+        public bool HasLifeOwner = false;
+
+
+        void Awake()
+        {
+            this.CachedTransform = this.transform;
+        }
 
         void Start()
         {
-            this.CachedTransform = this.transform;
-
             if (m_MiniMap != null && !this.IsRegistered)
             {
                 m_MiniMap.RegisterObject(this, true, true);
