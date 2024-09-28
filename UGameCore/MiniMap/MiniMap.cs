@@ -4,6 +4,7 @@ using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 using static UGameCore.CommandManager;
+using static UGameCore.MiniMap.MiniMapObject;
 
 namespace UGameCore.MiniMap
 {
@@ -16,10 +17,15 @@ namespace UGameCore.MiniMap
         public RawImage MapImage;
         public Image BackgroundPanelImage;
 
-        public GameObject ImagePrefab;
+        public GameObject TexturePrefab;
+        public GameObject SpritePrefab;
         public GameObject TextPrefab;
 
         Canvas Canvas;
+
+        readonly List<RawImage> m_PooledRawImages = new();
+        readonly List<Image> m_PooledImages = new();
+        readonly List<TextMeshProUGUI> m_PooledTexts = new();
 
         readonly List<MiniMapObject> m_MiniMapObjects = new();
         public IReadOnlyList<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
@@ -33,12 +39,9 @@ namespace UGameCore.MiniMap
         public bool NegateXOffset = false;
         public bool NegateZOffset = false;
 
-        public Vector3 RotationOffset = Vector3.zero;
-
         bool m_repositionAllObjects = false;
         Vector2 m_MapImageSize = Vector2.zero;
-        //Vector2 m_WorldSizeInverted = Vector2.zero;
-        Quaternion m_rotationOffsetQuaternion = Quaternion.identity;
+        Vector2 m_WorldSizeInverted2D = Vector2.zero;
 
         RectTransformData m_OriginalMapImageData;
         public RectTransformData BigModeRectTransformData = new RectTransformData().WithDefault();
@@ -78,7 +81,7 @@ namespace UGameCore.MiniMap
         public void SetVisible(bool visible)
         {
             this.IsVisible = visible;
-            this.RootTransform.gameObject.SetActive(this.IsVisible && this.VisibilityType != MapVisibilityType.None);
+            this.UpdateGameObjectVisibility();
             m_repositionAllObjects = true;
         }
 
@@ -92,25 +95,34 @@ namespace UGameCore.MiniMap
             return go.AddComponent<MiniMapObject>();
         }
 
-        public MiniMapObject Create(GameObject go, bool needsTexture, bool needsText)
+        public MiniMapObject Create(GameObject go, bool needsTexture, bool needsSprite, bool needsText)
         {
             MiniMapObject miniMapObject = go.AddComponent<MiniMapObject>();
-            this.RegisterObject(miniMapObject, needsTexture, needsText);
+            this.RegisterObject(miniMapObject, needsTexture, needsSprite, needsText);
             return miniMapObject;
         }
 
         public MiniMapObject CreateWithTexture(GameObject go, Texture2D texture, RectTransformData rectTransformData)
         {
-            MiniMapObject miniMapObject = this.Create(go, true, false);
+            MiniMapObject miniMapObject = this.Create(go, true, false, false);
             miniMapObject.TextureImage.texture = texture;
             rectTransformData.Apply(miniMapObject.TextureImage.rectTransform);
             miniMapObject.MarkDirty();
             return miniMapObject;
         }
 
+        public MiniMapObject CreateWithSprite(GameObject go, Sprite sprite, RectTransformData rectTransformData)
+        {
+            MiniMapObject miniMapObject = this.Create(go, false, true, false);
+            miniMapObject.SpriteImage.sprite = sprite;
+            rectTransformData.Apply(miniMapObject.SpriteImage.rectTransform);
+            miniMapObject.MarkDirty();
+            return miniMapObject;
+        }
+
         public MiniMapObject CreateWithText(GameObject go, string text, Color textColor, RectTransformData rectTransformData)
         {
-            MiniMapObject miniMapObject = this.Create(go, false, true);
+            MiniMapObject miniMapObject = this.Create(go, false, false, true);
             miniMapObject.TextComponent.text = text;
             miniMapObject.TextComponent.color = textColor;
             rectTransformData.Apply(miniMapObject.TextComponent.rectTransform);
@@ -118,132 +130,266 @@ namespace UGameCore.MiniMap
             return miniMapObject;
         }
 
-        public void RegisterObject(MiniMapObject miniMapObject, bool needsTexture, bool needsText)
+        public void RegisterObject(MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText)
         {
+            if (null == miniMapObject)
+                throw new System.ArgumentNullException();
+
             if (miniMapObject.IsRegistered)
                 throw new System.InvalidOperationException("Already registered");
 
             m_MiniMapObjects.Add(miniMapObject);
             miniMapObject.MiniMap = this;
             miniMapObject.IsRegistered = true;
-            this.RentUIComponents(miniMapObject, needsTexture, needsText);
+            miniMapObject.IsDirty = true;
+            miniMapObject.HasLastMatrix = false;
+            this.RentUIComponents(miniMapObject, needsTexture, needsSprite, needsText);
         }
 
         public void UnregisterObject(MiniMapObject miniMapObject)
         {
+            if (null == miniMapObject)
+                throw new System.ArgumentNullException();
+
             if (!miniMapObject.IsRegistered)
-                throw new System.InvalidOperationException($"Specified object is not registered");
+                throw new System.InvalidOperationException($"MiniMap object is not registered");
 
-            int index = m_MiniMapObjects.IndexOf(miniMapObject);
-            if (index < 0)
-                throw new System.InvalidOperationException($"Specified object not found among registered objects");
+            if (miniMapObject.MiniMap != this)
+                throw new System.InvalidOperationException($"MiniMap object does not belong to this MiniMap");
 
-            m_MiniMapObjects[index] = null;
+            // need to remove it here, otherwise duplicates could be added by calling RegisterObject() => UnregisterObject() => RegisterObject()
+            m_MiniMapObjects.Remove(miniMapObject);
+
             miniMapObject.IsRegistered = false;
             miniMapObject.MiniMap = null;
+            miniMapObject.HasLastMatrix = false;
+            miniMapObject.IsDirty = true;
+            miniMapObject.HasLifeOwner = false;
+            miniMapObject.LifeOwner = null;
+
             this.ReleaseUIComponents(miniMapObject);
+        }
+
+        public bool TryUnregisterObject(MiniMapObject miniMapObject)
+        {
+            if (!miniMapObject.IsRegistered)
+                return false;
+
+            if (miniMapObject.MiniMap != this)
+                return false;
+
+            this.UnregisterObject(miniMapObject);
+
+            return true;
         }
 
         void Update()
         {
             m_MapImageSize = this.MapImage.rectTransform.rect.size;
-            //m_WorldSizeInverted = (Vector2.one / this.WorldSize).ZeroIfNotFinite();
-            m_rotationOffsetQuaternion = Quaternion.Euler(this.RotationOffset);
+            m_WorldSizeInverted2D = (Vector2.one / this.WorldSize.ToVec2XZ()).ZeroIfNotFinite();
+            //m_rotationOffsetQuaternion = Quaternion.Euler(this.RotationOffset);
 
-            bool hasDeadObjects = false;
+            bool hasObjectsToRemove = false;
+
+            UnityEngine.Profiling.Profiler.BeginSample("Update objects");
 
             foreach (MiniMapObject miniMapObject in m_MiniMapObjects)
             {
                 if (ShouldRemoveMiniMapObject(miniMapObject))
                 {
-                    hasDeadObjects = true;
+                    hasObjectsToRemove = true;
                     if (!object.ReferenceEquals(miniMapObject, null))
                         this.ReleaseUIComponents(miniMapObject);
                     continue;
                 }
 
-                this.UpdateTransform(miniMapObject);
+                this.UpdateUIElements(miniMapObject);
             }
 
-            if (hasDeadObjects)
+            UnityEngine.Profiling.Profiler.EndSample();
+
+            UnityEngine.Profiling.Profiler.BeginSample("Remove objects");
+
+            if (hasObjectsToRemove)
                 m_MiniMapObjects.RemoveAll(ShouldRemoveMiniMapObject);
+
+            UnityEngine.Profiling.Profiler.EndSample();
 
             m_repositionAllObjects = false;
         }
 
         static bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
         {
-            return null == miniMapObject || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner);
+            return null == miniMapObject || !miniMapObject.IsRegistered || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner);
         }
 
-        void RentUIComponents(MiniMapObject miniMapObject, bool needsTexture, bool needsText)
+        void RentUIComponents(MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText)
         {
-            if (needsTexture && miniMapObject.TextureImage == null)
+            UnityEngine.Profiling.Profiler.BeginSample("Rent UI");
+
+            if (needsTexture)
             {
-                miniMapObject.TextureImage = Instantiate(this.ImagePrefab, this.RootTransform).GetComponentOrThrow<RawImage>();
-                miniMapObject.TextureImage.name = miniMapObject.name;
+                RentUIComponent(ref miniMapObject.TextureProperties, m_PooledRawImages, miniMapObject, this.TexturePrefab);
+                RawImage rawImageOriginal = this.TexturePrefab.GetComponentOrThrow<RawImage>();
+                RawImage rawImage = miniMapObject.TextureImage;
+                rawImage.texture = rawImageOriginal.texture;
+                rawImage.uvRect = rawImageOriginal.uvRect;
             }
 
-            if (needsText && miniMapObject.TextComponent == null)
+            if (needsSprite)
             {
-                miniMapObject.TextComponent = Instantiate(this.TextPrefab, this.RootTransform).GetComponentOrThrow<TextMeshProUGUI>();
-                miniMapObject.TextComponent.name = miniMapObject.name;
+                RentUIComponent(ref miniMapObject.SpriteProperties, m_PooledImages, miniMapObject, this.SpritePrefab);
+                Image imageOriginal = this.SpritePrefab.GetComponentOrThrow<Image>();
+                Image image = miniMapObject.SpriteImage;
+                image.sprite = imageOriginal.sprite;
+                image.material = imageOriginal.material;
+                image.type = imageOriginal.type;
+                image.fillMethod = imageOriginal.fillMethod;
+                image.fillOrigin = imageOriginal.fillOrigin;
+                image.fillAmount = imageOriginal.fillAmount;
+                image.fillCenter = imageOriginal.fillCenter;
+                image.fillClockwise = imageOriginal.fillClockwise;
             }
+
+            if (needsText)
+            {
+                RentUIComponent(ref miniMapObject.TextProperties, m_PooledTexts, miniMapObject, this.TextPrefab);
+                TextMeshProUGUI textOriginal = this.TextPrefab.GetComponentOrThrow<TextMeshProUGUI>();
+                TextMeshProUGUI text = miniMapObject.TextComponent;
+                text.color = textOriginal.color;
+                text.text = string.Empty;
+                text.richText = textOriginal.richText;
+                text.fontSize = textOriginal.fontSize;
+                text.textWrappingMode = textOriginal.textWrappingMode;
+                text.overflowMode = textOriginal.overflowMode;
+            }
+
+            UnityEngine.Profiling.Profiler.EndSample();
+        }
+
+        void RentUIComponent<T>(ref UIElementProperties<T> elementProperties, List<T> poolList, MiniMapObject miniMapObject, GameObject prefab)
+            where T : Graphic
+        {
+            if (elementProperties.Graphic == null)
+            {
+                if (poolList.Count > 0)
+                    elementProperties.Graphic = poolList.RemoveFromEndUntilAliveObject();
+
+                if (elementProperties.Graphic == null)
+                    elementProperties.Graphic = Instantiate(prefab, this.RootTransform).GetComponentOrThrow<T>();
+            }
+
+            elementProperties.GraphicCached = new CachedUnityComponent<T>(elementProperties.Graphic);
+            elementProperties.Graphic.name = miniMapObject.name;
+            RectTransformData.Default.Apply(elementProperties.Graphic.rectTransform);
+            elementProperties.Graphic.rectTransform.SetAsLastSibling(); // bring to front
+
+            T graphicOriginal = prefab.GetComponentOrThrow<T>();
+            elementProperties.Graphic.color = graphicOriginal.color;
+            elementProperties.Graphic.material = graphicOriginal.material;
+            elementProperties.Graphic.raycastTarget = graphicOriginal.raycastTarget;
+            elementProperties.Graphic.raycastPadding = graphicOriginal.raycastPadding;
+
+            elementProperties.GraphicCached.CachedGameObject.SetActiveCached(true);
         }
 
         void ReleaseUIComponents(MiniMapObject miniMapObject)
         {
-            if (miniMapObject.TextureImage != null)
-            {
-                miniMapObject.TextureImage.gameObject.DestroyEvenInEditMode();
-            }
+            UnityEngine.Profiling.Profiler.BeginSample("Release UI");
 
-            if (miniMapObject.TextComponent != null)
-            {
-                miniMapObject.TextComponent.gameObject.DestroyEvenInEditMode();
-            }
+            ReleaseUIComponent(ref miniMapObject.TextureProperties, m_PooledRawImages);
+            ReleaseUIComponent(ref miniMapObject.SpriteProperties, m_PooledImages);
+            ReleaseUIComponent(ref miniMapObject.TextProperties, m_PooledTexts);
 
-            miniMapObject.TextureImage = null;
-            miniMapObject.TextComponent = null;
+            UnityEngine.Profiling.Profiler.EndSample();
         }
 
-        void UpdateTransform(MiniMapObject miniMapObject)
+        static void ReleaseUIComponent<T>(ref UIElementProperties<T> elementProperties, List<T> poolList)
+            where T : Graphic
+        {
+            if (elementProperties.Graphic != null)
+            {
+                elementProperties.Graphic.gameObject.SetActive(false);
+                elementProperties.Graphic.name = "pooled"; // so we can see in Hierarchy
+                poolList.Add(elementProperties.Graphic);
+            }
+
+            elementProperties.GraphicCached = default;
+            elementProperties.Graphic = null;
+            elementProperties = default;
+        }
+
+        void UpdateUIElements(MiniMapObject miniMapObject)
         {
             PositionAndRotation matrix = miniMapObject.CachedTransform.GetPositionAndRotation();
-            if (!m_repositionAllObjects
-                && miniMapObject.LastPositionAndRotation.HasValue
-                && matrix.Equals(miniMapObject.LastPositionAndRotation.Value))
-                return;
 
-            miniMapObject.LastPositionAndRotation = matrix;
+            bool transformChanged = m_repositionAllObjects
+                || miniMapObject.IsDirty
+                || !miniMapObject.HasLastMatrix
+                || !matrix.Equals(miniMapObject.LastMatrix);
 
-            Vector3 miniMapPos = this.WorldToMiniMapPos(matrix.Position);
-            Quaternion miniMapRot = miniMapObject.AlwaysRotateTowardsCamera
-                ? Quaternion.identity
-                : this.WorldToMiniMapRotation(matrix.Rotation);
+            PositionAndRotation miniMapMatrix;
 
-            if (miniMapObject.TextureImage != null)
+            if (transformChanged)
             {
-                RectTransform tr = miniMapObject.TextureImage.rectTransform; // RectTransform is cached
-                tr.anchoredPosition = miniMapPos;
-                if (miniMapObject.AlwaysRotateTowardsCamera)
-                    tr.rotation = miniMapRot;
-                else
-                    tr.localRotation = miniMapRot;
+                miniMapObject.HasLastMatrix = true;
+                miniMapObject.LastMatrix = matrix;
+
+                miniMapMatrix.Position = this.WorldToMiniMapPos(matrix.Position);
+                miniMapMatrix.Rotation = this.WorldToMiniMapRotation(matrix.Rotation);
+            }
+            else
+            {
+                miniMapMatrix = PositionAndRotation.Identity;
             }
 
-            if (miniMapObject.TextComponent != null)
+            UpdateUIElement(ref miniMapObject.TextureProperties, transformChanged, ref miniMapMatrix);
+            UpdateUIElement(ref miniMapObject.SpriteProperties, transformChanged, ref miniMapMatrix);
+            UpdateUIElement(ref miniMapObject.TextProperties, transformChanged, ref miniMapMatrix);
+
+            miniMapObject.IsDirty = false;
+        }
+
+        void UpdateUIElement<T>(
+            ref UIElementProperties<T> elementProperties, bool transformChanged, ref PositionAndRotation miniMapMatrix)
+            where T : Graphic
+        {
+            if (!elementProperties.HasGraphic)
+                return;
+
+            bool isActive = !elementProperties.IsHidden 
+                && (elementProperties.AllowedMapVisibilityTypes.IsNullOrEmpty() || elementProperties.AllowedMapVisibilityTypes.ContainsNonAlloc(this.VisibilityType));
+            
+            elementProperties.GraphicCached.CachedGameObject.SetActiveCached(isActive);
+
+            if (!isActive)
+                return;
+
+            RectTransform tr = elementProperties.Graphic.rectTransform; // RectTransform is cached
+
+            if (elementProperties.HasWorldSpaceSize)
             {
-                RectTransform tr = miniMapObject.TextComponent.rectTransform; // RectTransform is cached
-                tr.anchoredPosition = miniMapPos;
-                if (miniMapObject.AlwaysRotateTowardsCamera)
-                    tr.rotation = miniMapRot;
+                tr.sizeDelta = this.WorldToMiniMapSize(elementProperties.WorldSpaceSize);
+            }
+
+            if (transformChanged)
+            {
+                Vector2 anchoredPosition = miniMapMatrix.Position.ToVec2XY() + elementProperties.OffsetOnMiniMap;
+
+                if (elementProperties.AlwaysRotateTowardsCamera)
+                {
+                    tr.anchoredPosition = anchoredPosition;
+                    tr.rotation = Quaternion.identity;
+                }
                 else
-                    tr.localRotation = miniMapRot;
+                {
+                    // faster path, only 1 call to native code
+                    tr.SetLocalPositionAndRotation(anchoredPosition, miniMapMatrix.Rotation);
+                }
             }
         }
 
-        Vector3 WorldToMiniMapPos(Vector3 worldPos)
+        public Vector3 WorldToMiniMapPos(Vector3 worldPos)
         {
             Vector3 offsetWorld = worldPos - this.WorldCenter;
 
@@ -254,7 +400,7 @@ namespace UGameCore.MiniMap
 
             //offsetWorld = m_rotationOffsetQuaternion.TransformDirection(offsetWorld.WithY(0f));
 
-            Vector2 perc = offsetWorld.Divide(this.WorldSize).ToVec2WithXAndZ();
+            Vector2 perc = offsetWorld.ToVec2XZ() * m_WorldSizeInverted2D;
 
             if (this.InvertXPos)
                 perc.x = -perc.x;
@@ -272,13 +418,21 @@ namespace UGameCore.MiniMap
             return m_MapImageSize * perc;
         }
 
-        Quaternion WorldToMiniMapRotation(Quaternion rotation)
+        public Quaternion WorldToMiniMapRotation(Quaternion rotation)
         {
+            // TODO: optimize, too slow, try with Quaternion.LookRotation()
+
             // take the Yaw (Y axis) rotation only, and turn it into Roll (Z axis) rotation, because UI elements are rotated with Z component
 
             Vector3 eulerAngles = rotation.eulerAngles;
 
             return Quaternion.AngleAxis(-eulerAngles.y, Vector3.forward);
+        }
+
+        public Vector2 WorldToMiniMapSize(Vector2 size)
+        {
+            Vector2 perc = size * m_WorldSizeInverted2D;
+            return m_MapImageSize * perc;
         }
 
         public Vector3 UVToWorldPosition(Vector2 perc)
@@ -300,9 +454,26 @@ namespace UGameCore.MiniMap
             return worldPos;
         }
 
+        public void BringToFrontInLayer(RectTransform rectTransform)
+        {
+            rectTransform.SetAsLastSibling();
+        }
+
+        public void BringToBackInLayer(RectTransform rectTransform)
+        {
+            rectTransform.SetSiblingIndex(3.Min(this.RootTransform.childCount - 1));
+        }
+
         void OnValidate()
         {
             m_repositionAllObjects = true;
+        }
+
+        bool UpdateGameObjectVisibility()
+        {
+            bool visible = this.IsVisible && this.VisibilityType != MapVisibilityType.None;
+            this.RootTransform.gameObject.SetActive(visible);
+            return visible;
         }
 
         public void SetMapVisibilityType(MapVisibilityType type, bool bForce = false)
@@ -330,7 +501,10 @@ namespace UGameCore.MiniMap
                     throw new System.ArgumentException($"Unknown {nameof(MapVisibilityType)}");
             }
 
-            this.RootTransform.gameObject.SetActive(this.IsVisible && this.VisibilityType != MapVisibilityType.None);
+            bool newIsVisible = this.UpdateGameObjectVisibility();
+
+            if (newIsVisible)
+                this.RootTransform.SetAsLastSibling(); // bring to front
         }
 
         public void ToggleMapVisibilityType()

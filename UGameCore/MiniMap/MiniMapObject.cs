@@ -2,37 +2,61 @@ using TMPro;
 using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using static UGameCore.MiniMap.MiniMap;
 
 namespace UGameCore.MiniMap
 {
     public class MiniMapObject : MonoBehaviour
     {
-        [SerializeField] MiniMap m_MiniMap;
-        public MiniMap MiniMap { get => m_MiniMap; internal set => m_MiniMap = value; }
+        [SerializeField] MiniMap m_MiniMapToRegisterOnStart;
+        public MiniMap MiniMap { get; internal set; }
 
         internal Transform CachedTransform;
 
         public bool IsRegistered { get; internal set; } = false;
 
-        public bool IsDirty { get; private set; } = true;
-        internal PositionAndRotation? LastPositionAndRotation;
+        public bool IsDirty { get; internal set; } = true;
 
-        //public Texture2D Texture;
-        //public Vector2 TextureSize = Vector2.zero;
-        //public Vector2 TexturePivot = Vector2.one * 0.5f;
+        internal bool HasLastMatrix = false;
+        internal PositionAndRotation LastMatrix;
 
-        //public string Text = string.Empty;
-        //public Color TextColor = Color.white;
+        [System.Serializable]
+        public struct UIElementProperties<T>
+            where T : Graphic
+        {
+            public T Graphic { readonly get; internal set; }
+            public CachedUnityComponent<T> GraphicCached; // make it field so it's faster to access
+            public readonly bool HasGraphic => this.GraphicCached.IsAliveCached;
 
-        public RawImage TextureImage { get; internal set; }
-        public TextMeshProUGUI TextComponent { get; internal set; }
+            public bool IsHidden;
+            public bool AlwaysRotateTowardsCamera;
 
-        //public string UIName = string.Empty;
+            public MapVisibilityType[] AllowedMapVisibilityTypes;
+            static readonly MapVisibilityType[] s_mapBigVisibility = new MapVisibilityType[] { MapVisibilityType.Big };
+            public void SetOnlyVisibleOnBigMap() => this.AllowedMapVisibilityTypes = s_mapBigVisibility;
 
-        public bool AlwaysRotateTowardsCamera = false;
+            public Vector2 OffsetOnMiniMap;
+
+            public bool HasWorldSpaceSize;
+            public Vector2 WorldSpaceSize;
+        }
+
+        public UIElementProperties<RawImage> TextureProperties;
+        public UIElementProperties<Image> SpriteProperties;
+        public UIElementProperties<TextMeshProUGUI> TextProperties;
+
+        public RawImage TextureImage => this.TextureProperties.Graphic;
+        public bool HasTextureImage => this.TextureProperties.HasGraphic;
+
+        public Image SpriteImage => this.SpriteProperties.Graphic;
+        public bool HasSpriteImage => this.SpriteProperties.HasGraphic;
+
+        public TextMeshProUGUI TextComponent => this.TextProperties.Graphic;
+        public bool HasTextComponent => this.TextProperties.HasGraphic;
 
         public Component LifeOwner;
         public bool HasLifeOwner = false;
+
 
 
         void Awake()
@@ -42,9 +66,9 @@ namespace UGameCore.MiniMap
 
         void Start()
         {
-            if (m_MiniMap != null && !this.IsRegistered)
+            if (m_MiniMapToRegisterOnStart != null && !this.IsRegistered)
             {
-                m_MiniMap.RegisterObject(this, true, true);
+                m_MiniMapToRegisterOnStart.RegisterObject(this, true, true, true);
             }
         }
 
@@ -56,6 +80,17 @@ namespace UGameCore.MiniMap
         void OnValidate()
         {
             this.MarkDirty();
+        }
+
+        public bool TryUnregister()
+        {
+            if (!this.IsRegistered)
+                return false;
+
+            if (null == this.MiniMap)
+                return false;
+
+            return this.MiniMap.TryUnregisterObject(this);
         }
     }
 }
