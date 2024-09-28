@@ -35,7 +35,6 @@ RectTransform:
   m_Children:
   - {fileID: 5853165390772516776}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -136,8 +135,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f741df640a1e4e94b67cb3a59e66843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layoutObject: {fileID: 0}
   extraWidth: 4
   extraHeight: 4
+  overridePriority: 0
+  priority: 1
 --- !u!114 &3998548169738093459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +184,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7323674437779669681}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -228,6 +229,6 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: New Text wegrgerger heth thrthrthrthyjhr New Text wegrgerger heth thrth
