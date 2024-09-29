@@ -27,8 +27,13 @@ namespace UGameCore.MiniMap
         readonly List<Image> m_PooledImages = new();
         readonly List<TextMeshProUGUI> m_PooledTexts = new();
 
+        public int NumPooledObjects => m_PooledRawImages.Count + m_PooledImages.Count + m_PooledTexts.Count;
+
         readonly List<MiniMapObject> m_MiniMapObjects = new();
         public IReadOnlyList<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
+
+        public long NumRegistrations { get; private set; } = 0;
+        public long NumCreatedObjects { get; private set; } = 0;
 
         public Vector3 WorldCenter = Vector3.zero;
         public Vector3 WorldSize = Vector3.zero;
@@ -107,6 +112,7 @@ namespace UGameCore.MiniMap
 
         public MiniMapObject CreateWithoutRegistering(GameObject go)
         {
+            this.NumCreatedObjects++;
             return go.AddComponent<MiniMapObject>();
         }
 
@@ -161,6 +167,7 @@ namespace UGameCore.MiniMap
             miniMapObject.IsDirty = true;
             miniMapObject.HasLastMatrix = false;
             this.RentUIComponents(miniMapObject, needsTexture, needsSprite, needsText, sortingLayer);
+            this.NumRegistrations++;
         }
 
         public void UnregisterObject(MiniMapObject miniMapObject)
@@ -175,7 +182,11 @@ namespace UGameCore.MiniMap
                 throw new System.InvalidOperationException($"MiniMap object does not belong to this MiniMap");
 
             // need to remove it here, otherwise duplicates could be added by calling RegisterObject() => UnregisterObject() => RegisterObject()
-            m_MiniMapObjects.Remove(miniMapObject);
+            int index = m_MiniMapObjects.IndexOf(miniMapObject);
+            if (index < 0)
+                throw new ShouldNotHappenException("Failed to find MiniMap object even though he is registered");
+
+            m_MiniMapObjects[index] = null;
 
             miniMapObject.IsRegistered = false;
             miniMapObject.MiniMap = null;
@@ -204,7 +215,6 @@ namespace UGameCore.MiniMap
         {
             m_MapImageSize = this.MapImage.rectTransform.rect.size;
             m_WorldSizeInverted2D = (Vector2.one / this.WorldSize.ToVec2XZ()).ZeroIfNotFinite();
-            //m_rotationOffsetQuaternion = Quaternion.Euler(this.RotationOffset);
 
             bool hasObjectsToRemove = false;
 
