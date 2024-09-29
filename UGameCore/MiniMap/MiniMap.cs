@@ -65,6 +65,18 @@ namespace UGameCore.MiniMap
 
         public bool IsVisible { get; private set; } = false;
 
+        public enum MapSortingLayer
+        {
+            First = 0,
+            Regular = 5,
+            PostRegular1 = 6,
+            Last = 9,
+        }
+
+        internal readonly RectTransform[] SortingLayerParents = new RectTransform[(int)MapSortingLayer.Last + 1];
+
+        public GameObject SortingLayerParentPrefab;
+
 
 
         void Start()
@@ -76,6 +88,9 @@ namespace UGameCore.MiniMap
             this.SetMapVisibilityType(this.DefaultMapVisibilityType, bForce: true);
             this.SetVisible(false);
             this.CommandManager.RegisterCommandsFromTypeMethods(this);
+
+            for (int i = 0; i < this.SortingLayerParents.Length; i++)
+                this.GetOrCreateSortingLayerParent((MapSortingLayer)i);
         }
 
         public void SetVisible(bool visible)
@@ -95,42 +110,44 @@ namespace UGameCore.MiniMap
             return go.AddComponent<MiniMapObject>();
         }
 
-        public MiniMapObject Create(GameObject go, bool needsTexture, bool needsSprite, bool needsText)
+        public MiniMapObject Create(
+            GameObject go, bool needsTexture, bool needsSprite, bool needsText, MapSortingLayer sortingLayer)
         {
-            MiniMapObject miniMapObject = go.AddComponent<MiniMapObject>();
-            this.RegisterObject(miniMapObject, needsTexture, needsSprite, needsText);
+            MiniMapObject miniMapObject = this.CreateWithoutRegistering(go);
+            this.RegisterObject(miniMapObject, needsTexture, needsSprite, needsText, sortingLayer);
             return miniMapObject;
         }
 
-        public MiniMapObject CreateWithTexture(GameObject go, Texture2D texture, RectTransformData rectTransformData)
+        public MiniMapObject CreateWithTexture(
+            GameObject go, Texture2D texture, RectTransformData rectTransformData, MapSortingLayer sortingLayer = MapSortingLayer.Regular)
         {
-            MiniMapObject miniMapObject = this.Create(go, true, false, false);
+            MiniMapObject miniMapObject = this.Create(go, true, false, false, sortingLayer);
             miniMapObject.TextureImage.texture = texture;
             rectTransformData.Apply(miniMapObject.TextureImage.rectTransform);
-            miniMapObject.MarkDirty();
             return miniMapObject;
         }
 
-        public MiniMapObject CreateWithSprite(GameObject go, Sprite sprite, RectTransformData rectTransformData)
+        public MiniMapObject CreateWithSprite(
+            GameObject go, Sprite sprite, RectTransformData rectTransformData, MapSortingLayer sortingLayer = MapSortingLayer.Regular)
         {
-            MiniMapObject miniMapObject = this.Create(go, false, true, false);
+            MiniMapObject miniMapObject = this.Create(go, false, true, false, sortingLayer);
             miniMapObject.SpriteImage.sprite = sprite;
             rectTransformData.Apply(miniMapObject.SpriteImage.rectTransform);
-            miniMapObject.MarkDirty();
             return miniMapObject;
         }
 
-        public MiniMapObject CreateWithText(GameObject go, string text, Color textColor, RectTransformData rectTransformData)
+        public MiniMapObject CreateWithText(
+            GameObject go, string text, Color textColor, RectTransformData rectTransformData, MapSortingLayer sortingLayer = MapSortingLayer.Regular)
         {
-            MiniMapObject miniMapObject = this.Create(go, false, false, true);
+            MiniMapObject miniMapObject = this.Create(go, false, false, true, sortingLayer);
             miniMapObject.TextComponent.text = text;
             miniMapObject.TextComponent.color = textColor;
             rectTransformData.Apply(miniMapObject.TextComponent.rectTransform);
-            miniMapObject.MarkDirty();
             return miniMapObject;
         }
 
-        public void RegisterObject(MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText)
+        public void RegisterObject(
+            MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText, MapSortingLayer sortingLayer = MapSortingLayer.Regular)
         {
             if (null == miniMapObject)
                 throw new System.ArgumentNullException();
@@ -143,7 +160,7 @@ namespace UGameCore.MiniMap
             miniMapObject.IsRegistered = true;
             miniMapObject.IsDirty = true;
             miniMapObject.HasLastMatrix = false;
-            this.RentUIComponents(miniMapObject, needsTexture, needsSprite, needsText);
+            this.RentUIComponents(miniMapObject, needsTexture, needsSprite, needsText, sortingLayer);
         }
 
         public void UnregisterObject(MiniMapObject miniMapObject)
@@ -223,13 +240,14 @@ namespace UGameCore.MiniMap
             return null == miniMapObject || !miniMapObject.IsRegistered || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner);
         }
 
-        void RentUIComponents(MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText)
+        void RentUIComponents(
+            MiniMapObject miniMapObject, bool needsTexture, bool needsSprite, bool needsText, MapSortingLayer sortingLayer)
         {
             UnityEngine.Profiling.Profiler.BeginSample("Rent UI");
 
             if (needsTexture)
             {
-                RentUIComponent(ref miniMapObject.TextureProperties, m_PooledRawImages, miniMapObject, this.TexturePrefab);
+                RentUIComponent(ref miniMapObject.TextureProperties, m_PooledRawImages, miniMapObject, this.TexturePrefab, sortingLayer);
                 RawImage rawImageOriginal = this.TexturePrefab.GetComponentOrThrow<RawImage>();
                 RawImage rawImage = miniMapObject.TextureImage;
                 rawImage.texture = rawImageOriginal.texture;
@@ -238,7 +256,7 @@ namespace UGameCore.MiniMap
 
             if (needsSprite)
             {
-                RentUIComponent(ref miniMapObject.SpriteProperties, m_PooledImages, miniMapObject, this.SpritePrefab);
+                RentUIComponent(ref miniMapObject.SpriteProperties, m_PooledImages, miniMapObject, this.SpritePrefab, sortingLayer);
                 Image imageOriginal = this.SpritePrefab.GetComponentOrThrow<Image>();
                 Image image = miniMapObject.SpriteImage;
                 image.sprite = imageOriginal.sprite;
@@ -253,7 +271,7 @@ namespace UGameCore.MiniMap
 
             if (needsText)
             {
-                RentUIComponent(ref miniMapObject.TextProperties, m_PooledTexts, miniMapObject, this.TextPrefab);
+                RentUIComponent(ref miniMapObject.TextProperties, m_PooledTexts, miniMapObject, this.TextPrefab, sortingLayer);
                 TextMeshProUGUI textOriginal = this.TextPrefab.GetComponentOrThrow<TextMeshProUGUI>();
                 TextMeshProUGUI text = miniMapObject.TextComponent;
                 text.color = textOriginal.color;
@@ -267,20 +285,24 @@ namespace UGameCore.MiniMap
             UnityEngine.Profiling.Profiler.EndSample();
         }
 
-        void RentUIComponent<T>(ref UIElementProperties<T> elementProperties, List<T> poolList, MiniMapObject miniMapObject, GameObject prefab)
+        void RentUIComponent<T>(
+            ref UIElementProperties<T> elementProperties, List<T> poolList, MiniMapObject miniMapObject, GameObject prefab, MapSortingLayer sortingLayer)
             where T : Graphic
         {
+            RectTransform parent = this.SortingLayerParents[(int)sortingLayer];
+
             if (elementProperties.Graphic == null)
             {
                 if (poolList.Count > 0)
                     elementProperties.Graphic = poolList.RemoveFromEndUntilAliveObject();
 
                 if (elementProperties.Graphic == null)
-                    elementProperties.Graphic = Instantiate(prefab, this.RootTransform).GetComponentOrThrow<T>();
+                    elementProperties.Graphic = Instantiate(prefab, parent).GetComponentOrThrow<T>();
             }
 
             elementProperties.GraphicCached = new CachedUnityComponent<T>(elementProperties.Graphic);
             elementProperties.Graphic.name = miniMapObject.name;
+            elementProperties.Graphic.rectTransform.SetParent(parent, true);
             RectTransformData.Default.Apply(elementProperties.Graphic.rectTransform);
             elementProperties.Graphic.rectTransform.SetAsLastSibling(); // bring to front
 
@@ -454,14 +476,19 @@ namespace UGameCore.MiniMap
             return worldPos;
         }
 
-        public void BringToFrontInLayer(RectTransform rectTransform)
+        RectTransform GetOrCreateSortingLayerParent(MapSortingLayer sortingLayer)
         {
-            rectTransform.SetAsLastSibling();
-        }
+            RectTransform parent = this.SortingLayerParents[(int)sortingLayer];
+            if (parent != null)
+                return parent;
 
-        public void BringToBackInLayer(RectTransform rectTransform)
-        {
-            rectTransform.SetSiblingIndex(3.Min(this.RootTransform.childCount - 1));
+            GameObject go = Instantiate(this.SortingLayerParentPrefab, this.RootTransform);
+            go.name = $"Sorting layer {sortingLayer}";
+            parent = go.GetComponentOrThrow<RectTransform>();
+
+            this.SortingLayerParents[(int)sortingLayer] = parent;
+
+            return parent;
         }
 
         void OnValidate()

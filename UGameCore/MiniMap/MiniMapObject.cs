@@ -39,6 +39,23 @@ namespace UGameCore.MiniMap
 
             public bool HasWorldSpaceSize;
             public Vector2 WorldSpaceSize;
+
+            public readonly void BringToFrontInLayer()
+            {
+                this.Graphic.rectTransform.SetAsLastSibling();
+            }
+
+            public readonly void BringToBackInLayer()
+            {
+                this.Graphic.rectTransform.SetAsFirstSibling();
+            }
+
+            public readonly void SetSortingLayer(MapSortingLayer sortingLayer)
+            {
+                RectTransform parent = this.MiniMapObject.MiniMap.SortingLayerParents[(int)sortingLayer];
+                this.Graphic.rectTransform.SetParent(parent, true);
+                this.MiniMapObject.MarkDirty();
+            }
         }
 
         public UIElementProperties<RawImage> TextureProperties;
