@@ -457,13 +457,15 @@ namespace UGameCore.MiniMap
 
         public Quaternion WorldToMiniMapRotation(Quaternion rotation)
         {
-            // TODO: optimize, too slow, try with Quaternion.LookRotation()
-
             // take the Yaw (Y axis) rotation only, and turn it into Roll (Z axis) rotation, because UI elements are rotated with Z component
 
             Vector3 eulerAngles = rotation.eulerAngles;
-
             return Quaternion.AngleAxis(-eulerAngles.y, Vector3.forward);
+
+            // this approach seems to be faster, but not sure if it's fully accurate without normalizing vector
+            //Vector3 rotationForward = rotation.GetForward();
+            //Vector3 up = new Vector3(rotationForward.x, rotationForward.z, 0f);
+            //return Quaternion.LookRotation(Vector3.forward, up);
         }
 
         public Vector2 WorldToMiniMapSize(Vector2 size)
