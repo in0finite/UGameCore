@@ -25,9 +25,9 @@ namespace UGameCore.MiniMap
             where T : Graphic
         {
             public MiniMapObject MiniMapObject { get; internal set; }
-            public T Graphic { readonly get; internal set; }
-            public CachedUnityComponent<T> GraphicCached; // make it field so it's faster to access
-            public readonly bool HasGraphic => this.GraphicCached.IsAliveCached;
+            public T Graphic { get; internal set; }
+            internal CachedGameObject CachedGameObject;
+            public bool HasGraphic { get; internal set; }
 
             public bool IsHidden { get; internal set; }
             public void SetHidden(bool hidden)

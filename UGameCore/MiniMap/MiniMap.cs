@@ -312,7 +312,8 @@ namespace UGameCore.MiniMap
 
             elementProperties.MiniMapObject = miniMapObject;
 
-            elementProperties.GraphicCached = new CachedUnityComponent<T>(elementProperties.Graphic);
+            elementProperties.HasGraphic = true;
+            elementProperties.CachedGameObject = new CachedGameObject(elementProperties.Graphic);
             elementProperties.Graphic.name = miniMapObject.name;
             elementProperties.Graphic.rectTransform.SetParent(parent, true);
             RectTransformData.Default.Apply(elementProperties.Graphic.rectTransform);
@@ -324,7 +325,7 @@ namespace UGameCore.MiniMap
             elementProperties.Graphic.raycastTarget = graphicOriginal.raycastTarget;
             elementProperties.Graphic.raycastPadding = graphicOriginal.raycastPadding;
 
-            elementProperties.GraphicCached.CachedGameObject.SetActiveCached(true);
+            elementProperties.CachedGameObject.SetActiveCached(true);
         }
 
         void ReleaseUIComponents(MiniMapObject miniMapObject)
@@ -349,7 +350,8 @@ namespace UGameCore.MiniMap
             }
 
             elementProperties.MiniMapObject = null;
-            elementProperties.GraphicCached = default;
+            elementProperties.CachedGameObject = default;
+            elementProperties.HasGraphic = false;
             elementProperties.Graphic = null;
             elementProperties = default;
         }
@@ -395,7 +397,7 @@ namespace UGameCore.MiniMap
             bool isActive = !elementProperties.IsHidden 
                 && (elementProperties.AllowedMapVisibilityTypes.IsNullOrEmpty() || elementProperties.AllowedMapVisibilityTypes.ContainsNonAlloc(this.VisibilityType));
             
-            elementProperties.GraphicCached.CachedGameObject.SetActiveCached(isActive);
+            elementProperties.CachedGameObject.SetActiveCached(isActive);
 
             if (!isActive)
                 return;
