@@ -24,11 +24,21 @@ namespace UGameCore.MiniMap
         public struct UIElementProperties<T>
             where T : Graphic
         {
+            public MiniMapObject MiniMapObject { get; internal set; }
             public T Graphic { readonly get; internal set; }
             public CachedUnityComponent<T> GraphicCached; // make it field so it's faster to access
             public readonly bool HasGraphic => this.GraphicCached.IsAliveCached;
 
-            public bool IsHidden;
+            public bool IsHidden { get; internal set; }
+            public void SetHidden(bool hidden)
+            {
+                if (hidden == this.IsHidden)
+                    return;
+
+                this.IsHidden = hidden;
+                this.MiniMapObject.MarkDirty();
+            }
+
             public bool AlwaysRotateTowardsCamera;
 
             public MapVisibilityType[] AllowedMapVisibilityTypes;

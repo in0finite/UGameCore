@@ -310,6 +310,8 @@ namespace UGameCore.MiniMap
                     elementProperties.Graphic = Instantiate(prefab, parent).GetComponentOrThrow<T>();
             }
 
+            elementProperties.MiniMapObject = miniMapObject;
+
             elementProperties.GraphicCached = new CachedUnityComponent<T>(elementProperties.Graphic);
             elementProperties.Graphic.name = miniMapObject.name;
             elementProperties.Graphic.rectTransform.SetParent(parent, true);
@@ -346,6 +348,7 @@ namespace UGameCore.MiniMap
                 poolList.Add(elementProperties.Graphic);
             }
 
+            elementProperties.MiniMapObject = null;
             elementProperties.GraphicCached = default;
             elementProperties.Graphic = null;
             elementProperties = default;
