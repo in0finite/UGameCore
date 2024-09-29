@@ -119,5 +119,11 @@ namespace UGameCore.MiniMap
 
             return this.MiniMap.TryUnregisterObject(this);
         }
+
+        public void SetLifeOwner(Component component)
+        {
+            this.LifeOwner = component;
+            this.HasLifeOwner = component != null;
+        }
     }
 }
