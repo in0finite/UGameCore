@@ -108,6 +108,12 @@ namespace UGameCore.MiniMap
             }
         }
 
+        void OnDestroy()
+        {
+            // if MiniMap is disabled, it doesn't unregister destroyed objects, so we will unregister from here
+            this.TryUnregister();
+        }
+
         public void MarkDirty()
         {
             this.IsDirty = true;
