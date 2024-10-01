@@ -29,7 +29,7 @@ namespace UGameCore.MiniMap
         readonly ComponentPoolList<Image> m_PooledImages = new() { ActivateWhenRenting = false, SetParentWhenGettingFromPool = false };
         readonly ComponentPoolList<TextMeshProUGUI> m_PooledTexts = new() { ActivateWhenRenting = false, SetParentWhenGettingFromPool = false };
 
-        public int NumPooledObjects => m_PooledRawImages.NumPooledObjects + m_PooledImages.NumPooledObjects + m_PooledTexts.NumPooledObjects;
+        public int NumPooledUIElements => m_PooledRawImages.NumPooledObjects + m_PooledImages.NumPooledObjects + m_PooledTexts.NumPooledObjects;
 
         readonly HashSetAndList<MiniMapObject> m_MiniMapObjects = new();
         public IReadOnlyCollection<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
@@ -67,13 +67,16 @@ namespace UGameCore.MiniMap
             None,
         }
 
-        public readonly int NumMapVisibilityTypes = System.Enum.GetValues(typeof(MapVisibilityType)).Length;
+        public static readonly int NumMapVisibilityTypes = System.Enum.GetValues(typeof(MapVisibilityType)).Length;
 
         public MapVisibilityType VisibilityType { get; private set; } = MapVisibilityType.None;
 
         public MapVisibilityType DefaultMapVisibilityType = MapVisibilityType.Small;
 
         public bool IsVisible { get; private set; } = false;
+
+        public bool HasVisibilityOwner { get; private set; } = false;
+        public GameObject VisibilityOwner { get; private set; }
 
         public enum MapSortingLayer
         {
@@ -117,6 +120,12 @@ namespace UGameCore.MiniMap
             this.IsVisible = visible;
             this.UpdateGameObjectVisibility();
             m_repositionAllObjects = true;
+        }
+
+        public void SetVisibilityOwner(GameObject go)
+        {
+            this.HasVisibilityOwner = go != null;
+            this.VisibilityOwner = go;
         }
 
         public void SetBackgroundTexture(Texture2D texture)
@@ -240,6 +249,12 @@ namespace UGameCore.MiniMap
 
         void UpdateInternal()
         {
+            if (this.HasVisibilityOwner && this.VisibilityOwner == null)
+            {
+                this.SetVisible(false);
+                return;
+            }
+
             m_timeNow = this.GameTimeProvider.Time;
             m_MapImageSize = this.MapImage.rectTransform.rect.size;
             m_WorldSizeInverted2D = (Vector2.one / this.WorldSize.ToVec2XZ()).ZeroIfNotFinite();
@@ -602,7 +617,7 @@ namespace UGameCore.MiniMap
 
         public void ToggleMapVisibilityType()
         {
-            this.SetMapVisibilityType((MapVisibilityType)((int)(this.VisibilityType + 1) % this.NumMapVisibilityTypes));
+            this.SetMapVisibilityType((MapVisibilityType)((int)(this.VisibilityType + 1) % NumMapVisibilityTypes));
         }
 
         [CommandMethod("minimap_toggle_visibility_mode", "Toggle visibility mode of MiniMap", exactNumArguments = 0)]
