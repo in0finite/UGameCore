@@ -25,14 +25,15 @@ namespace UGameCore.MiniMap
 
         Canvas Canvas;
 
-        readonly List<RawImage> m_PooledRawImages = new();
-        readonly List<Image> m_PooledImages = new();
-        readonly List<TextMeshProUGUI> m_PooledTexts = new();
+        readonly ComponentPoolList<RawImage> m_PooledRawImages = new() { ActivateWhenRenting = false, SetParentWhenGettingFromPool = false };
+        readonly ComponentPoolList<Image> m_PooledImages = new() { ActivateWhenRenting = false, SetParentWhenGettingFromPool = false };
+        readonly ComponentPoolList<TextMeshProUGUI> m_PooledTexts = new() { ActivateWhenRenting = false, SetParentWhenGettingFromPool = false };
 
-        public int NumPooledObjects => m_PooledRawImages.Count + m_PooledImages.Count + m_PooledTexts.Count;
+        public int NumPooledObjects => m_PooledRawImages.NumPooledObjects + m_PooledImages.NumPooledObjects + m_PooledTexts.NumPooledObjects;
 
         readonly HashSetAndList<MiniMapObject> m_MiniMapObjects = new();
         public IReadOnlyCollection<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
+        public int NumMiniMapObjects => m_MiniMapObjects.Count;
 
         public long NumRegistrations { get; private set; } = 0;
         public long NumUnregistrations { get; private set; } = 0;
@@ -94,14 +95,21 @@ namespace UGameCore.MiniMap
             this.EnsureSerializableReferencesAssigned();
             this.GameTimeProvider = this.GameManager.ServiceProvider.GetRequiredService<IGameTimeProvider>();
             this.Canvas = this.RootTransform.GetComponentInParentOrThrow<Canvas>();
+
+            m_PooledRawImages.PrefabGameObject = this.TexturePrefab;
+            m_PooledImages.PrefabGameObject = this.SpritePrefab;
+            m_PooledTexts.PrefabGameObject = this.TextPrefab;
+
             m_OriginalMapImageData = new RectTransformData(this.RootTransform);
             m_BackgroundPanelImageOriginalColor = this.BackgroundPanelImage.color;
+
             this.SetMapVisibilityType(this.DefaultMapVisibilityType, bForce: true);
             this.SetVisible(false);
-            this.CommandManager.RegisterCommandsFromTypeMethods(this);
-
+            
             for (int i = 0; i < this.SortingLayerParents.Length; i++)
                 this.GetOrCreateSortingLayerParent((MapSortingLayer)i);
+
+            this.CommandManager.RegisterCommandsFromTypeMethods(this);
         }
 
         public void SetVisible(bool visible)
@@ -336,17 +344,15 @@ namespace UGameCore.MiniMap
         }
 
         void RentUIComponent<T>(
-            ref UIElementProperties<T> elementProperties, List<T> poolList, MiniMapObject miniMapObject, GameObject prefab, MapSortingLayer sortingLayer)
+            ref UIElementProperties<T> elementProperties, ComponentPoolList<T> poolList, MiniMapObject miniMapObject, GameObject prefab, MapSortingLayer sortingLayer)
             where T : Graphic
         {
             RectTransform parent = this.SortingLayerParents[(int)sortingLayer];
 
             if (elementProperties.Graphic == null)
             {
-                elementProperties.Graphic = poolList.RemoveFromEndUntilAliveObject();
-
-                if (elementProperties.Graphic == null)
-                    elementProperties.Graphic = Instantiate(prefab, parent).GetComponentOrThrow<T>();
+                poolList.ParentTransform = parent;
+                elementProperties.Graphic = poolList.GetOrCreate();
             }
 
             elementProperties.MiniMapObject = miniMapObject;
@@ -358,6 +364,7 @@ namespace UGameCore.MiniMap
             RectTransformData.Default.Apply(elementProperties.Graphic.rectTransform);
             elementProperties.Graphic.rectTransform.SetAsLastSibling(); // bring to front
 
+            // restore default Graphic properties
             T graphicOriginal = prefab.GetComponentOrThrow<T>();
             elementProperties.Graphic.color = graphicOriginal.color;
             elementProperties.Graphic.material = graphicOriginal.material;
@@ -378,14 +385,14 @@ namespace UGameCore.MiniMap
             UnityEngine.Profiling.Profiler.EndSample();
         }
 
-        static void ReleaseUIComponent<T>(ref UIElementProperties<T> elementProperties, List<T> poolList)
+        static void ReleaseUIComponent<T>(ref UIElementProperties<T> elementProperties, ComponentPoolList<T> poolList)
             where T : Graphic
         {
             if (elementProperties.Graphic != null)
             {
                 elementProperties.Graphic.gameObject.SetActive(false);
                 elementProperties.Graphic.name = "pooled"; // so we can see in Hierarchy
-                poolList.Add(elementProperties.Graphic);
+                poolList.ReturnToPool(elementProperties.Graphic);
             }
 
             elementProperties.MiniMapObject = null;
