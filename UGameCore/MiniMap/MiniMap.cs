@@ -77,6 +77,7 @@ namespace UGameCore.MiniMap
         public enum MapSortingLayer
         {
             First = 0,
+            PreRegular1 = 4,
             Regular = 5,
             PostRegular1 = 6,
             Last = 9,
@@ -587,6 +588,9 @@ namespace UGameCore.MiniMap
 
             if (newIsVisible)
                 this.RootTransform.SetAsLastSibling(); // bring to front
+
+            // need to update all UI elements here, because for 1 frame, they are left in their previous positions
+            this.UpdateInternal();
         }
 
         public void ToggleMapVisibilityType()
