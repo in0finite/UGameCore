@@ -17,6 +17,9 @@ namespace UGameCore.MiniMap
 
         public bool IsDirty { get; internal set; } = true;
 
+        public double TimeWhenRegistered { get; internal set; } = double.NegativeInfinity;
+        public float LifeDuration = 0f;
+
         internal bool HasLastMatrix = false;
         internal PositionAndRotation LastMatrix;
 

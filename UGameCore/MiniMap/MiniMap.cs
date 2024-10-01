@@ -50,6 +50,7 @@ namespace UGameCore.MiniMap
         bool m_repositionAllObjects = false;
         Vector2 m_MapImageSize = Vector2.zero;
         Vector2 m_WorldSizeInverted2D = Vector2.zero;
+        double m_timeNow = double.NegativeInfinity;
 
         RectTransformData m_OriginalMapImageData;
         public RectTransformData BigModeRectTransformData = new RectTransformData().WithDefault();
@@ -90,6 +91,7 @@ namespace UGameCore.MiniMap
         void Start()
         {
             this.EnsureSerializableReferencesAssigned();
+            this.GameTimeProvider = this.GameManager.ServiceProvider.GetRequiredService<IGameTimeProvider>();
             this.Canvas = this.RootTransform.GetComponentInParentOrThrow<Canvas>();
             m_OriginalMapImageData = new RectTransformData(this.RootTransform);
             m_BackgroundPanelImageOriginalColor = this.BackgroundPanelImage.color;
@@ -169,6 +171,7 @@ namespace UGameCore.MiniMap
             miniMapObject.IsRegistered = true;
             miniMapObject.IsDirty = true;
             miniMapObject.HasLastMatrix = false;
+            miniMapObject.TimeWhenRegistered = this.GameTimeProvider.Time;
             this.RentUIComponents(miniMapObject, needsTexture, needsSprite, needsText, sortingLayer);
             this.NumRegistrations++;
         }
@@ -198,6 +201,8 @@ namespace UGameCore.MiniMap
             miniMapObject.MiniMap = null;
             miniMapObject.HasLastMatrix = false;
             miniMapObject.IsDirty = true;
+            miniMapObject.TimeWhenRegistered = double.NegativeInfinity;
+            miniMapObject.LifeDuration = 0f;
             miniMapObject.HasLifeOwner = false;
             miniMapObject.LifeOwner = null;
 
