@@ -9,9 +9,11 @@ using static UGameCore.MiniMap.MiniMapObject;
 namespace UGameCore.MiniMap
 {
     [DefaultExecutionOrder(70)]
-    public class MiniMap : MonoBehaviour
+    public class MiniMap : MonoBehaviour, IStatsCollectable
     {
+        public GameManager GameManager;
         public CommandManager CommandManager;
+        public IGameTimeProvider GameTimeProvider { get; private set; }
 
         public RectTransform RootTransform;
         public RawImage MapImage;
@@ -29,10 +31,11 @@ namespace UGameCore.MiniMap
 
         public int NumPooledObjects => m_PooledRawImages.Count + m_PooledImages.Count + m_PooledTexts.Count;
 
-        readonly List<MiniMapObject> m_MiniMapObjects = new();
-        public IReadOnlyList<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
+        readonly HashSetAndList<MiniMapObject> m_MiniMapObjects = new();
+        public IReadOnlyCollection<MiniMapObject> MiniMapObjects => m_MiniMapObjects;
 
         public long NumRegistrations { get; private set; } = 0;
+        public long NumUnregistrations { get; private set; } = 0;
         public long NumCreatedObjects { get; private set; } = 0;
 
         public Vector3 WorldCenter = Vector3.zero;
@@ -182,12 +185,15 @@ namespace UGameCore.MiniMap
                 throw new System.InvalidOperationException($"MiniMap object does not belong to this MiniMap");
 
             // need to remove it here, otherwise duplicates could be added by calling RegisterObject() => UnregisterObject() => RegisterObject()
-            int index = m_MiniMapObjects.IndexOf(miniMapObject);
-            if (index < 0)
-                throw new ShouldNotHappenException("Failed to find MiniMap object even though he is registered");
+            bool bRemoved = m_MiniMapObjects.Remove(miniMapObject);
+            if (!bRemoved)
+                throw new ShouldNotHappenException("Failed to remove MiniMap object even though he is registered");
 
-            m_MiniMapObjects[index] = null;
+            this.UnregisterObjectInternal(miniMapObject);
+        }
 
+        void UnregisterObjectInternal(MiniMapObject miniMapObject)
+        {
             miniMapObject.IsRegistered = false;
             miniMapObject.MiniMap = null;
             miniMapObject.HasLastMatrix = false;
@@ -196,6 +202,8 @@ namespace UGameCore.MiniMap
             miniMapObject.LifeOwner = null;
 
             this.ReleaseUIComponents(miniMapObject);
+
+            this.NumUnregistrations++;
         }
 
         public bool TryUnregisterObject(MiniMapObject miniMapObject)
@@ -213,6 +221,12 @@ namespace UGameCore.MiniMap
 
         void Update()
         {
+            this.UpdateInternal();
+        }
+
+        void UpdateInternal()
+        {
+            m_timeNow = this.GameTimeProvider.Time;
             m_MapImageSize = this.MapImage.rectTransform.rect.size;
             m_WorldSizeInverted2D = (Vector2.one / this.WorldSize.ToVec2XZ()).ZeroIfNotFinite();
 
@@ -220,13 +234,25 @@ namespace UGameCore.MiniMap
 
             UnityEngine.Profiling.Profiler.BeginSample("Update objects");
 
-            foreach (MiniMapObject miniMapObject in m_MiniMapObjects)
+            for (int i = 0; i < m_MiniMapObjects.ListCount; i++)
             {
-                if (ShouldRemoveMiniMapObject(miniMapObject))
+                if (!m_MiniMapObjects.GetAtIndex(i, out MiniMapObject miniMapObject))
                 {
                     hasObjectsToRemove = true;
-                    if (!object.ReferenceEquals(miniMapObject, null))
-                        this.ReleaseUIComponents(miniMapObject);
+                    continue;
+                }
+
+                if (this.ShouldRemoveMiniMapObject(miniMapObject))
+                {
+                    hasObjectsToRemove = true;
+                    m_MiniMapObjects.Remove(miniMapObject);
+
+                    // unregister even if object is dead, because he still holds UI elements, and also other stuff needs to be cleared
+                    if (this.IsRegisteredWithMe(miniMapObject))
+                    {
+                        this.UnregisterObjectInternal(miniMapObject);
+                    }
+
                     continue;
                 }
 
@@ -238,16 +264,24 @@ namespace UGameCore.MiniMap
             UnityEngine.Profiling.Profiler.BeginSample("Remove objects");
 
             if (hasObjectsToRemove)
-                m_MiniMapObjects.RemoveAll(ShouldRemoveMiniMapObject);
+                m_MiniMapObjects.ConsolidateList();
 
             UnityEngine.Profiling.Profiler.EndSample();
 
             m_repositionAllObjects = false;
         }
 
-        static bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
+        bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
         {
-            return null == miniMapObject || !miniMapObject.IsRegistered || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner);
+            return null == miniMapObject 
+                || !miniMapObject.IsRegistered 
+                || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner)
+                || (miniMapObject.LifeDuration > 0f && !m_timeNow.BetweenInclusive(miniMapObject.TimeWhenRegistered, miniMapObject.TimeWhenRegistered + miniMapObject.LifeDuration));
+        }
+
+        bool IsRegisteredWithMe(MiniMapObject miniMapObject)
+        {
+            return miniMapObject.IsRegistered && miniMapObject.MiniMap == this;
         }
 
         void RentUIComponents(
@@ -303,8 +337,7 @@ namespace UGameCore.MiniMap
 
             if (elementProperties.Graphic == null)
             {
-                if (poolList.Count > 0)
-                    elementProperties.Graphic = poolList.RemoveFromEndUntilAliveObject();
+                elementProperties.Graphic = poolList.RemoveFromEndUntilAliveObject();
 
                 if (elementProperties.Graphic == null)
                     elementProperties.Graphic = Instantiate(prefab, parent).GetComponentOrThrow<T>();

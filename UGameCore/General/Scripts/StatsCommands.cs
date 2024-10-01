@@ -34,7 +34,7 @@ namespace UGameCore
             return collectables;
         }
 
-        [CommandMethod("stats", "Displays statistics", syntax = "(string category)")]
+        [CommandMethod("stats", "Displays statistics", syntax = "(string category)", maxNumArguments = 1)]
         ProcessCommandResult StatsCmd(ProcessCommandContext context)
         {
             string category = context.ReadStringOrDefault(null);
@@ -59,7 +59,7 @@ namespace UGameCore
                     continue;
 
                 sb.Append("Category: ");
-                sb.AppendLine(pair.Key.ToUpperInvariant());
+                sb.AppendLine(pair.Key);
                 sb.AppendLine();
                 sb.Append(sbForCategory);
                 sb.AppendLine();

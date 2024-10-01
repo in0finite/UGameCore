@@ -50,6 +50,12 @@ namespace UGameCore.MiniMap
             public bool HasWorldSpaceSize;
             public Vector2 WorldSpaceSize;
 
+
+            public readonly void SetRectTransformData(RectTransformData rectTransformData)
+            {
+                rectTransformData.Apply(this.Graphic.rectTransform);
+            }
+
             public readonly void BringToFrontInLayer()
             {
                 this.Graphic.rectTransform.SetAsLastSibling();
