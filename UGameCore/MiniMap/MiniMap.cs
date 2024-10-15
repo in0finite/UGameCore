@@ -131,6 +131,7 @@ namespace UGameCore.MiniMap
         public void SetBackgroundTexture(Texture2D texture)
         {
             this.MapImage.texture = texture;
+            this.MapImage.enabled = texture != null; // have to disable it, otherwise it will render white color
         }
 
         public MiniMapObject CreateWithoutRegistering(GameObject go)
