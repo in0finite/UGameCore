@@ -6,6 +6,7 @@ namespace UGameCore.UI.Windows
 {
     public class MessageBox : MonoBehaviour
     {
+        public Window window;
         public Button closeButton;
 
         public string CloseButtonText

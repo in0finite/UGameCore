@@ -189,7 +189,24 @@ namespace UGameCore.UI.Windows
 			return buttonGameObject;
 		}
 
-		void Start ()
+        public void SetContentText(string text)
+        {
+            if (null == this.content)
+                return;
+
+			int childCount = this.content.childCount;
+			if (childCount == 0)
+				return;
+
+            Transform child = this.content.GetChild(childCount - 1);
+            Text textComponent = child.GetComponentInChildren<Text>();
+			if (null == textComponent)
+				return;
+
+            textComponent.text = text;
+        }
+
+        void Start ()
 		{
 			this.gameObject.AddComponent<UIEventsPickup>().onPointerDown += (obj) =>
 			{
