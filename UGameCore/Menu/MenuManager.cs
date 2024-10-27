@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UGameCore.Net;
+using UGameCore.Utilities;
 
 namespace UGameCore.Menu
 {

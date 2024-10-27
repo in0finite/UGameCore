@@ -175,18 +175,6 @@ namespace UGameCore
 			return go;
 		}
 
-		public	static	RectTransform	GetRectTransform( this Component component ) {
-
-			return component.transform as RectTransform;
-
-		}
-
-		public	static	RectTransform	GetRectTransform( this GameObject go ) {
-
-			return go.transform as RectTransform;
-
-		}
-
 		public static Vector2 GetScaleFactorFromCanvas(this RectTransform rectTransform)
 		{
 			var canvas = rectTransform.GetComponentInParent<Canvas>();
