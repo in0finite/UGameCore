@@ -34,6 +34,8 @@ namespace UGameCore.UI
         public bool ShowOnLeftClick = false;
         public bool ShowOnRightClick = true;
 
+        public Vector2 PositionOffset = Vector2.zero;
+
 
         void Awake()
         {
@@ -50,7 +52,6 @@ namespace UGameCore.UI
             if (!bShow)
                 return;
 
-            Debug.Log("open from element");
             this.ContextMenuContainer.OpenContextMenu(this);
         }
     }

@@ -46,7 +46,6 @@ namespace UGameCore.UI
 
             if (ShouldCloseSoon && timeNow - TimeWhenClicked >= TimeToCloseAfterClicked)
             {
-                Debug.Log("close from update");
                 CloseContextMenu();
             }
 
@@ -82,8 +81,6 @@ namespace UGameCore.UI
         {
             CloseContextMenu();
 
-            Debug.Log("OpenContextMenu");
-
             TimeWhenOpened = Time.unscaledTimeAsDouble;
 
             ActiveElement = contextMenuElement;
@@ -100,7 +97,6 @@ namespace UGameCore.UI
                 button.gameObject.GetOrAddComponent<UIEventsPickup>().onLeftPointerClick =
                     ev =>
                     {
-                        Debug.Log("invoking for " + entry.Text);
                         CloseContextMenu();
                         entry.OnClicked?.Invoke();
                     };
@@ -111,9 +107,10 @@ namespace UGameCore.UI
             // set position of ContextMenu
             Vector2 mousePos = Input.mousePosition.ToVec2XY();
             Vector2 screenSize = GUIUtils.ScreenSize;
+            Vector2 anchorPos = (mousePos + contextMenuElement.PositionOffset) / screenSize;
             RectTransform rectTransform = CurrentElement.GetRectTransform();
-            rectTransform.anchorMin = mousePos / screenSize;
-            rectTransform.anchorMax = mousePos / screenSize;
+            rectTransform.anchorMin = anchorPos;
+            rectTransform.anchorMax = anchorPos;
             rectTransform.anchoredPosition = Vector2.zero;
 
             rectTransform.BringToFront();
