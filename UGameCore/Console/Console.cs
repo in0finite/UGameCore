@@ -53,8 +53,10 @@ namespace UGameCore.Console
 
         private bool m_forceUIUpdateNextFrame = false;
 
-        private float m_scrollToValue = 0f;
-		public float[] scrollBarUpdateDelays = new float[] { 0.05f, 0.1f };
+        bool m_isInDelayedScroll = false;
+        private float m_delayedScrollToValue = 0f;
+        double m_timeWhenRequestedScroll = double.NegativeInfinity;
+        public float scrollBarUpdateDelay = 0.1f;
 
         [Tooltip("Auto open/close console when open key is pressed")]
         public bool autoOpenConsole = true;
@@ -263,22 +265,21 @@ namespace UGameCore.Console
 
 		}
 
-		private		void	ScrollToPredefined() {
+		private		void	ScrollTo(float value) {
 
 			if (this.consoleUI.logMessagesScrollView != null) {
-				this.consoleUI.logMessagesScrollView.verticalScrollbar.value = m_scrollToValue;
+				this.consoleUI.logMessagesScrollView.verticalScrollbar.value = value;
 			}
 
 		}
 
         private void ScrollToDelayed(float value)
         {
-            if (this.consoleUI.logMessagesScrollView != null)
-            {
-				m_scrollToValue = value;
-				foreach (float delay in this.scrollBarUpdateDelays)
-					this.Invoke(nameof(this.ScrollToPredefined), delay);
-            }
+            this.ScrollTo(value);
+
+            m_isInDelayedScroll = true;
+            m_timeWhenRequestedScroll = Time.unscaledTimeAsDouble;
+            m_delayedScrollToValue = value;
         }
 
         private		void	SubmittedText( string textToProcess ) {
@@ -467,6 +468,13 @@ namespace UGameCore.Console
 				//this.ScrollToEnd();
             }
 
+            double timeNow = Time.unscaledTimeAsDouble;
+
+            if (m_isInDelayedScroll && timeNow - m_timeWhenRequestedScroll >= this.scrollBarUpdateDelay)
+            {
+                m_isInDelayedScroll = false;
+                this.ScrollTo(m_delayedScrollToValue);
+            }
         }
 
         void UpdateOpenClose()
