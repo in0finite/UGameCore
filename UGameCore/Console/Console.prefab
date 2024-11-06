@@ -53,8 +53,8 @@ MonoBehaviour:
   autoOpenConsole: 1
   openKey: 96
   openKeyMobileAndConsole: 319
-  maxNumLogMessages: 100
-  maxNumPooledLogMessages: 100
+  maxNumLogMessages: 200
+  maxNumPooledLogMessages: 200
   numLinesToDisplayForLogMessage: 3
   maxCharsInLogMessage: 250
   maxCharsInDetailsMessage: 4000
