@@ -299,6 +299,27 @@ namespace UGameCore
             }
 
             /// <summary>
+            /// Read next command argument as bool.
+            /// </summary>
+            public bool ReadBool()
+            {
+                string str = this.ReadString();
+
+                if (bool.TryParse(str, out bool boolValue))
+                    return boolValue;
+
+                if (int.TryParse(str, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int intValue))
+                {
+                    if (intValue == 0)
+                        return false;
+                    if (intValue == 1)
+                        return true;
+                }
+
+                throw new System.ArgumentException($"Invalid boolean value: {str}. Use 1|0 or true|false.");
+            }
+
+            /// <summary>
             /// Read next command argument as Enum.
             /// </summary>
             public T ReadEnum<T>()
