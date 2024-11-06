@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using static UGameCore.CommandManager;
 using UGameCore.Utilities;
+using System.IO;
 
 namespace UGameCore
 {
@@ -65,6 +66,19 @@ namespace UGameCore
         {
             var operation = Resources.UnloadUnusedAssets();
             operation.completed += (op) => UnityEngine.Debug.Log("Assets unload complete");
+            return ProcessCommandResult.Success;
+        }
+
+        [CommandMethod("log_file_open", "Open log file")]
+        ProcessCommandResult LogFileOpenCmd(ProcessCommandContext context)
+        {
+            string filePath = F.GetLogFilePath();
+            
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"File not found: {filePath}");
+
+            Application.OpenURL(filePath);
+
             return ProcessCommandResult.Success;
         }
 
