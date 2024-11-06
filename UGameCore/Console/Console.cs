@@ -152,6 +152,7 @@ namespace UGameCore.Console
 				}
 			}
 
+            this.ScrollTo(0f);
 		}
 
 		public		void	RegisterStats( System.Func<string> getStatMethod ) {
@@ -273,6 +274,13 @@ namespace UGameCore.Console
 
 		}
 
+        float GetScrollValue()
+        {
+            return this.consoleUI.logMessagesScrollView != null
+                ? this.consoleUI.logMessagesScrollView.verticalScrollbar.value
+                : 0f;
+        }
+
         private void ScrollToDelayed(float value)
         {
             this.ScrollTo(value);
@@ -287,6 +295,9 @@ namespace UGameCore.Console
 			// log this text, process command
 
 			Debug.Log ( "> " + textToProcess );
+
+            this.ScrollTo(0f);
+            this.ScrollToDelayed(0f);
 
 			if (!textToProcess.IsNullOrWhiteSpace())
             {
@@ -565,7 +576,10 @@ namespace UGameCore.Console
 
             Profiler.EndSample();
 
-            this.ScrollToDelayed(0f);
+            // only scroll to end if scrollbar is currently at end
+            // note: for some reason, sometimes the scroll value is not 0 even if we are et end, so this will not work
+            if (this.GetScrollValue() <= 0f) // this can be negative when Console is disabled
+                this.ScrollToDelayed(0f);
 
 			s_logMessagesBufferList.Clear();
         }

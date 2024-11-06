@@ -31,7 +31,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -50,8 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ac2ecf97d70d447fab568a27ea9aea6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollBarUpdateDelays:
-  - 0.1
+  scrollBarUpdateDelay: 0.1
   autoOpenConsole: 1
   openKey: 96
   openKeyMobileAndConsole: 319
