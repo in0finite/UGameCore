@@ -39,7 +39,9 @@ namespace UGameCore.MiniMap
                     return;
 
                 this.IsHidden = hidden;
-                this.MiniMapObject.MarkDirty();
+
+                if (this.MiniMapObject != null)
+                    this.MiniMapObject.MarkDirty();
             }
 
             public bool AlwaysRotateTowardsCamera;
@@ -139,6 +141,13 @@ namespace UGameCore.MiniMap
         {
             this.LifeOwner = component;
             this.HasLifeOwner = component != null;
+        }
+
+        public void SetUIElementsHidden(bool bHidden)
+        {
+            TextureProperties.SetHidden(bHidden);
+            SpriteProperties.SetHidden(bHidden);
+            TextProperties.SetHidden(bHidden);
         }
     }
 }

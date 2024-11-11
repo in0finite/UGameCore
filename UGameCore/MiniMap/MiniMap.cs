@@ -81,6 +81,7 @@ namespace UGameCore.MiniMap
         public enum MapSortingLayer
         {
             First = 0,
+            Second = 1,
             PreRegular1 = 4,
             Regular = 5,
             PostRegular1 = 6,
