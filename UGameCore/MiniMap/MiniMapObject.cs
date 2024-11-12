@@ -3,9 +3,87 @@ using UGameCore.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 using static UGameCore.MiniMap.MiniMap;
+using static UGameCore.MiniMap.MiniMapObject;
 
 namespace UGameCore.MiniMap
 {
+    [System.Serializable]
+    public class MiniMapObjectUIElementInspectorParams<T>
+        where T : Graphic
+    {
+        public bool Create = false;
+        public UIElementProperties<T> UIElementProperties;
+        public RectTransformData RectTransformData = RectTransformData.Default;
+        public Color Color = Color.white;
+    }
+
+    [System.Serializable]
+    public class MiniMapObjectInspectorParams
+    {
+        public MiniMapObjectUIElementInspectorParams<RawImage> TextureProperties = new();
+        public MiniMapObjectUIElementInspectorParams<Image> SpriteProperties = new();
+        public MiniMapObjectUIElementInspectorParams<TextMeshProUGUI> TextProperties = new();
+
+        //public bool CreateTexture;
+        //public bool CreateSprite;
+        //public bool CreateText;
+
+        //public UIElementProperties<RawImage> TextureProperties;
+        //public UIElementProperties<Image> SpriteProperties;
+        //public UIElementProperties<TextMeshProUGUI> TextProperties;
+
+        public Texture2D Texture;
+        public Sprite Sprite;
+        public string Text;
+
+        //public RectTransformData TextureRectTransformData = RectTransformData.Default;
+        //public RectTransformData SpriteRectTransformData = RectTransformData.Default;
+        //public RectTransformData TextRectTransformData = RectTransformData.Default;
+
+        public MapSortingLayer SortingLayer;
+
+
+        public void Register(MiniMap miniMap, MiniMapObject miniMapObject)
+        {
+            // has to be assigned before registration, because registration will override some fields
+            miniMapObject.TextureProperties = TextureProperties.UIElementProperties;
+            miniMapObject.SpriteProperties = SpriteProperties.UIElementProperties;
+            miniMapObject.TextProperties = TextProperties.UIElementProperties;
+
+            miniMap.RegisterObject(
+                miniMapObject, TextureProperties.Create, SpriteProperties.Create, TextProperties.Create, SortingLayer);
+
+            if (TextureProperties.Create)
+            {
+                miniMapObject.TextureImage.texture = Texture;
+                SetupUIElement(ref miniMapObject.TextureProperties, TextureProperties);
+            }
+
+            if (SpriteProperties.Create)
+            {
+                miniMapObject.SpriteImage.sprite = Sprite;
+                SetupUIElement(ref miniMapObject.SpriteProperties, SpriteProperties);
+            }
+
+            if (TextProperties.Create)
+            {
+                miniMapObject.TextComponent.text = Text;
+                SetupUIElement(ref miniMapObject.TextProperties, TextProperties);
+            }
+        }
+
+        void SetupUIElement<T>(
+            ref UIElementProperties<T> uiElementProperties, MiniMapObjectUIElementInspectorParams<T> uiElementInspectorParams)
+            where T : Graphic
+        {
+            if (uiElementInspectorParams.Create)
+            {
+                uiElementInspectorParams.RectTransformData.Apply(uiElementProperties.Graphic.rectTransform);
+                uiElementProperties.Graphic.color = uiElementInspectorParams.Color;
+            }
+        }
+    }
+
     public class MiniMapObject : MonoBehaviour
     {
         [SerializeField] MiniMap m_MiniMapToRegisterOnStart;
