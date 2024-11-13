@@ -24,23 +24,13 @@ namespace UGameCore.MiniMap
         public MiniMapObjectUIElementInspectorParams<Image> SpriteProperties = new();
         public MiniMapObjectUIElementInspectorParams<TextMeshProUGUI> TextProperties = new();
 
-        //public bool CreateTexture;
-        //public bool CreateSprite;
-        //public bool CreateText;
-
-        //public UIElementProperties<RawImage> TextureProperties;
-        //public UIElementProperties<Image> SpriteProperties;
-        //public UIElementProperties<TextMeshProUGUI> TextProperties;
-
         public Texture2D Texture;
         public Sprite Sprite;
         public string Text;
 
-        //public RectTransformData TextureRectTransformData = RectTransformData.Default;
-        //public RectTransformData SpriteRectTransformData = RectTransformData.Default;
-        //public RectTransformData TextRectTransformData = RectTransformData.Default;
-
-        public MapSortingLayer SortingLayer;
+        public MapSortingLayer SortingLayer = MapSortingLayer.Regular;
+        public float LifeDuration = 0f;
+        public bool SelfDestroyWhenUnregistered = false;
 
 
         public void Register(MiniMap miniMap, MiniMapObject miniMapObject)
@@ -52,6 +42,9 @@ namespace UGameCore.MiniMap
 
             miniMap.RegisterObject(
                 miniMapObject, TextureProperties.Create, SpriteProperties.Create, TextProperties.Create, SortingLayer);
+
+            miniMapObject.LifeDuration = LifeDuration;
+            miniMapObject.SelfDestroyWhenUnregistered = SelfDestroyWhenUnregistered;
 
             if (TextureProperties.Create)
             {
@@ -97,6 +90,8 @@ namespace UGameCore.MiniMap
 
         public double TimeWhenRegistered { get; internal set; } = double.NegativeInfinity;
         public float LifeDuration = 0f;
+
+        public bool SelfDestroyWhenUnregistered = false;
 
         internal bool HasLastMatrix = false;
         internal PositionAndRotation LastMatrix;

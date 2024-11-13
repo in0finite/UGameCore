@@ -217,16 +217,27 @@ namespace UGameCore.MiniMap
 
         void UnregisterObjectInternal(MiniMapObject miniMapObject)
         {
+            // note: this function can be called while MiniMapObject is dead
+            
+            bool bTempShouldSelfDestroy = miniMapObject.SelfDestroyWhenUnregistered
+                && miniMapObject != null; // here we need to check if he is alive
+
+            // reset variables so that MiniMapObject can be re-used
+
             miniMapObject.IsRegistered = false;
             miniMapObject.MiniMap = null;
             miniMapObject.HasLastMatrix = false;
             miniMapObject.IsDirty = true;
             miniMapObject.TimeWhenRegistered = double.NegativeInfinity;
             miniMapObject.LifeDuration = 0f;
+            miniMapObject.SelfDestroyWhenUnregistered = false;
             miniMapObject.HasLifeOwner = false;
             miniMapObject.LifeOwner = null;
 
             this.ReleaseUIComponents(miniMapObject);
+
+            if (bTempShouldSelfDestroy) 
+                miniMapObject.gameObject.DestroyEvenInEditMode();
 
             this.NumUnregistrations++;
         }
