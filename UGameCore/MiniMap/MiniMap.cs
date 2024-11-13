@@ -72,6 +72,7 @@ namespace UGameCore.MiniMap
         public MapVisibilityType VisibilityType { get; private set; } = MapVisibilityType.None;
 
         public MapVisibilityType DefaultMapVisibilityType = MapVisibilityType.Small;
+        public bool AllowTogglingToNoneVisibility = false;
 
         public bool IsVisible { get; private set; } = false;
 
@@ -640,7 +641,13 @@ namespace UGameCore.MiniMap
 
         public void ToggleMapVisibilityType()
         {
-            this.SetMapVisibilityType((MapVisibilityType)((int)(this.VisibilityType + 1) % NumMapVisibilityTypes));
+            MapVisibilityType newVisibilityType = this.VisibilityType;
+            newVisibilityType = (MapVisibilityType)((int)(newVisibilityType + 1) % NumMapVisibilityTypes);
+            
+            if (!AllowTogglingToNoneVisibility && newVisibilityType == MapVisibilityType.None)
+                newVisibilityType = (MapVisibilityType)((int)(newVisibilityType + 1) % NumMapVisibilityTypes);
+
+            this.SetMapVisibilityType(newVisibilityType);
         }
 
         [CommandMethod("minimap_toggle_visibility_mode", "Toggle visibility mode of MiniMap", exactNumArguments = 0)]
