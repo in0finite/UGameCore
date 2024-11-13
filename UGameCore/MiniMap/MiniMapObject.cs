@@ -128,6 +128,9 @@ namespace UGameCore.MiniMap
             public bool HasWorldSpaceSize;
             public Vector2 WorldSpaceSize;
 
+            public float ColorAlphaMaxDuration;
+            public AnimationCurve ColorAlphaCurve;
+
 
             public readonly void SetRectTransformData(RectTransformData rectTransformData)
             {
@@ -214,6 +217,15 @@ namespace UGameCore.MiniMap
         {
             this.LifeOwner = component;
             this.HasLifeOwner = component != null;
+        }
+
+        public void SetTimeWhenRegistered(double time)
+        {
+            time.ThrowIfNan();
+            if (time == this.TimeWhenRegistered)
+                return;
+            this.TimeWhenRegistered = time;
+            this.MarkDirty();
         }
 
         public void SetUIElementsHidden(bool bHidden)

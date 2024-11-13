@@ -498,6 +498,16 @@ namespace UGameCore.MiniMap
                     tr.SetLocalPositionAndRotation(anchoredPosition, miniMapMatrix.Rotation);
                 }
             }
+
+            if (elementProperties.ColorAlphaMaxDuration > 0f && elementProperties.ColorAlphaCurve != null)
+            {
+                float elapsedTimeSinceRegistration = (float)(m_timeNow - elementProperties.MiniMapObject.TimeWhenRegistered);
+                float elapsedPerc = elapsedTimeSinceRegistration / elementProperties.ColorAlphaMaxDuration;
+                elapsedPerc = elapsedPerc.ZeroIfNotFinite().Clamp01();
+                float curveValue = elementProperties.ColorAlphaCurve.Evaluate(elapsedPerc);
+                curveValue = curveValue.Clamp01();
+                elementProperties.Graphic.SetColorAlpha(curveValue);
+            }
         }
 
         public Vector3 WorldToMiniMapPos(Vector3 worldPos)
