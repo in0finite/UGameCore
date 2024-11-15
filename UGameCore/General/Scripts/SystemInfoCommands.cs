@@ -34,6 +34,7 @@ namespace UGameCore
         {
             var sb = new StringBuilder();
             sb.AppendLine($"App version: {Application.version}");
+            sb.AppendLine($"Build GUID: {Application.buildGUID}");
             sb.AppendLine($"Unity version: {Application.unityVersion}");
             sb.AppendLine($"Company name: {Application.companyName}");
             sb.AppendLine($"Product name: {Application.productName}");
