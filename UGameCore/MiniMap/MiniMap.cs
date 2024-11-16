@@ -60,6 +60,9 @@ namespace UGameCore.MiniMap
         Color m_BackgroundPanelImageOriginalColor;
         public Color BackgroundPanelImageColorBig = Color.black.WithAlpha(0.75f);
 
+        Vector2 LastScreenSize = Vector2.zero;
+        float LastCanvasScaleFactor = 1f;
+
         public enum MapVisibilityType
         {
             Small = 0,
@@ -269,6 +272,8 @@ namespace UGameCore.MiniMap
                 return;
             }
 
+            UpdateForScreenSize();
+
             m_timeNow = this.GameTimeProvider.Time;
             m_MapImageSize = this.MapImage.rectTransform.rect.size;
             m_WorldSizeInverted2D = (Vector2.one / this.WorldSize.ToVec2XZ()).ZeroIfNotFinite();
@@ -312,6 +317,17 @@ namespace UGameCore.MiniMap
             UnityEngine.Profiling.Profiler.EndSample();
 
             m_repositionAllObjects = false;
+        }
+
+        void UpdateForScreenSize()
+        {
+            Vector2 screenSize = GUIUtils.ScreenRect.size;
+            float canvasScaleFactor = this.Canvas.scaleFactor;
+            if (!LastScreenSize.EqualsBitwise(screenSize) || LastCanvasScaleFactor != canvasScaleFactor)
+            {
+                m_repositionAllObjects = true;
+                SetTransformBasedOnScreenSize();
+            }
         }
 
         bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
@@ -612,12 +628,13 @@ namespace UGameCore.MiniMap
 
             this.VisibilityType = type;
             m_repositionAllObjects = true;
+            LastScreenSize = GUIUtils.ScreenRect.size;
+            LastCanvasScaleFactor = this.Canvas.scaleFactor;
 
             switch (type)
             {
                 case MapVisibilityType.Big:
-                    this.BigModeRectTransformData.Apply(this.RootTransform);
-                    this.RootTransform.sizeDelta = GUIUtils.ScreenRect.size.MinComponent() * this.BigMapSizePerc / this.Canvas.scaleFactor.OneIfZero() * Vector2.one;
+                    this.SetTransformBasedOnScreenSize();
                     this.BackgroundPanelImage.color = this.BackgroundPanelImageColorBig;
                     break;
                 case MapVisibilityType.Small:
@@ -655,6 +672,21 @@ namespace UGameCore.MiniMap
         {
             this.ToggleMapVisibilityType();
             return ProcessCommandResult.SuccessResponse(this.VisibilityType.ToString());
+        }
+
+        void SetTransformBasedOnScreenSize()
+        {
+            Vector2 screenSize = GUIUtils.ScreenRect.size;
+            float canvasScaleFactor = this.Canvas.scaleFactor;
+
+            if (this.VisibilityType == MapVisibilityType.Big)
+            {
+                this.BigModeRectTransformData.Apply(this.RootTransform);
+                this.RootTransform.sizeDelta = screenSize.MinComponent() * this.BigMapSizePerc / canvasScaleFactor.OneIfZero() * Vector2.one;
+            }
+
+            LastScreenSize = screenSize;
+            LastCanvasScaleFactor = canvasScaleFactor;
         }
     }
 }
