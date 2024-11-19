@@ -12,6 +12,11 @@ namespace UGameCore
 
         public Component owner;
 
+        /// <summary>
+        /// If specified, spectated object will be redirected to this <see cref="Spectatable"/>.
+        /// </summary>
+        public Spectatable redirectedSpectatable;
+
         public Func<Spectator.Context, PositionAndRotation> GetPositionAndRotation { get; set; }
         public Func<Spectator.Context, bool> RequiresCrosshair { get; set; } = (ctx) => false;
         public Func<Spectator.Context, float?> GetFieldOfView { get; set; } = (ctx) => null;

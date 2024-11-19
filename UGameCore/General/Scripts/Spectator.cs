@@ -141,6 +141,13 @@ namespace UGameCore
             CurrentlySpectatedObject = obj;
 			CurrentlySpectatedObjectAsSpectatable = obj != null ? obj.GetComponent<Spectatable>() : null;
 
+			// redirect if specified
+			while (CurrentlySpectatedObjectAsSpectatable != null && CurrentlySpectatedObjectAsSpectatable.redirectedSpectatable != null)
+			{
+				CurrentlySpectatedObjectAsSpectatable = CurrentlySpectatedObjectAsSpectatable.redirectedSpectatable;
+				CurrentlySpectatedObject = CurrentlySpectatedObjectAsSpectatable.transform;
+            }
+
 			NotifySpectatedObjectChanged(oldObject, oldObjectAsSpectatable);
         }
 
