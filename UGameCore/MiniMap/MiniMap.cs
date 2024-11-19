@@ -259,8 +259,10 @@ namespace UGameCore.MiniMap
             return true;
         }
 
-        void Update()
+        void LateUpdate()
         {
+            // use LateUpdate(), because MiniMap objects can be updated in Update(), and we want to pickup their
+            // properties as late as possible
             this.UpdateInternal();
         }
 
