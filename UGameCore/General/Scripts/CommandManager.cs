@@ -255,6 +255,15 @@ namespace UGameCore
                 return int.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            /// <summary>
+            /// Read next command argument as ulong.
+            /// </summary>
+            public ulong ReadUlong()
+            {
+                string str = this.ReadString();
+                return ulong.Parse(str, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
             static float ParseFloat(string str)
                 => float.Parse(str, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
 
