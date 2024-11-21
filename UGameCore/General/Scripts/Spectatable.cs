@@ -1,4 +1,3 @@
-using System;
 using UGameCore.Utilities;
 using UnityEngine;
 
@@ -17,21 +16,9 @@ namespace UGameCore
         /// </summary>
         public Spectatable redirectedSpectatable;
 
-        public Func<Spectator.Context, PositionAndRotation> GetPositionAndRotation { get; set; }
-        public Func<Spectator.Context, bool> RequiresCrosshair { get; set; } = (ctx) => false;
-        public Func<Spectator.Context, float?> GetFieldOfView { get; set; } = (ctx) => null;
-        public Func<Spectator.Context, bool> RequiresScopeImage { get; set; } = (ctx) => false;
-        public Action<Spectator.SpectatedObjectChangedEvent> OnStartedSpectating { get; set; }
-        public Action<Spectator.SpectatedObjectChangedEvent> OnStoppedSpectating { get; set; }
-        public Action<Spectator.Context> OnSpectatingModeChanged { get; set; }
 
 
-        Spectatable()
-        {
-            this.GetPositionAndRotation = this.GetPositionAndRotationDefault;
-        }
-
-        public PositionAndRotation GetPositionAndRotationDefault(Spectator.Context context)
+        protected PositionAndRotation GetPositionAndRotationDefault(Spectator.Context context)
         {
             this.transform.GetPositionAndRotation(out Vector3 pos, out Quaternion rot);
 
@@ -43,5 +30,26 @@ namespace UGameCore
 
             return new PositionAndRotation(pos, rot);
         }
+
+        protected internal virtual void OnStoppedSpectating(Spectator.SpectatedObjectChangedEvent ev)
+        {
+        }
+
+        protected internal virtual void OnStartedSpectating(Spectator.SpectatedObjectChangedEvent ev)
+        {
+        }
+
+        protected internal virtual void OnSpectatingModeChanged(Spectator.Context context)
+        {
+        }
+
+        public virtual PositionAndRotation GetPositionAndRotation(Spectator.Context context)
+            => GetPositionAndRotationDefault(context);
+
+        public virtual bool RequiresCrosshair(Spectator.Context context) => false;
+
+        public virtual bool RequiresScopeImage(Spectator.Context context) => false;
+
+        public virtual float? GetFieldOfView(Spectator.Context context) => null;
     }
 }

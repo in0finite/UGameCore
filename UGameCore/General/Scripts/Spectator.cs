@@ -174,10 +174,10 @@ namespace UGameCore
 
 			if (oldObjectAsSpectatable != null
 				&& oldObjectAsSpectatable != CurrentlySpectatedObjectAsSpectatable) // make sure it has not became active in the meantime
-                oldObjectAsSpectatable.OnStoppedSpectating?.Invoke(ev);
+                oldObjectAsSpectatable.OnStoppedSpectating(ev);
 
             if (CurrentlySpectatedObjectAsSpectatable != null)
-                CurrentlySpectatedObjectAsSpectatable.OnStartedSpectating?.Invoke(ev);
+                CurrentlySpectatedObjectAsSpectatable.OnStartedSpectating(ev);
         }
 
         public void SetSpectateMode(int newSpectateMode)
@@ -195,7 +195,7 @@ namespace UGameCore
 			});
 
             if (this.CurrentlySpectatedObjectAsSpectatable != null)
-                this.CurrentlySpectatedObjectAsSpectatable.OnSpectatingModeChanged?.Invoke(this.CreateContext());
+                this.CurrentlySpectatedObjectAsSpectatable.OnSpectatingModeChanged(this.CreateContext());
         }
     }
 }
