@@ -142,13 +142,26 @@ namespace UGameCore
 			CurrentlySpectatedObjectAsSpectatable = obj != null ? obj.GetComponent<Spectatable>() : null;
 
 			// redirect if specified
-			while (CurrentlySpectatedObjectAsSpectatable != null && CurrentlySpectatedObjectAsSpectatable.redirectedSpectatable != null)
+			if (CurrentlySpectatedObjectAsSpectatable != null)
 			{
-				CurrentlySpectatedObjectAsSpectatable = CurrentlySpectatedObjectAsSpectatable.redirectedSpectatable;
-				CurrentlySpectatedObject = CurrentlySpectatedObjectAsSpectatable.transform;
+                Spectatable redirected = FindFinalRedirectedSpectatable(CurrentlySpectatedObjectAsSpectatable);
+				if (redirected != CurrentlySpectatedObjectAsSpectatable)
+                    CurrentlySpectatedObject = redirected.transform;
+				CurrentlySpectatedObjectAsSpectatable = redirected;
             }
 
 			NotifySpectatedObjectChanged(oldObject, oldObjectAsSpectatable);
+        }
+
+		public static Spectatable FindFinalRedirectedSpectatable(Spectatable spectatable)
+		{
+			if (null == spectatable)
+				throw new System.ArgumentNullException();
+
+            while (spectatable.redirectedSpectatable != null)
+				spectatable = spectatable.redirectedSpectatable;
+            
+			return spectatable;
         }
 
         Context CreateContext()
