@@ -1,28 +1,32 @@
-﻿using UnityEngine;
+﻿using UGameCore.Utilities;
+using UnityEngine;
 
-namespace UGameCore.Chat {
-
+namespace UGameCore.Chat
+{
 	/// <summary>
 	/// Used to populate scroll view content with chat messages.
 	/// </summary>
-	public class ChatArea : MonoBehaviour {
-		
-		public	Utilities.PopulateScrollViewWithEvents populator = null;
+	public class ChatArea : MonoBehaviour
+	{
+		public PopulateScrollViewWithEvents populator;
 
 
-		void Start () {
-
-			if (null == this.populator)
-				return;
-
-			NetworkEventsDispatcher.onClientDisconnected += () => this.populator.RemoveAllEventsFromUI() ;
-			NetworkEventsDispatcher.onServerStopped += () => this.populator.RemoveAllEventsFromUI ();
-			ChatManager.onChatMessage += (ChatMessage chatMsg) => this.populator.EventHappened(
-				"<color=blue>" + chatMsg.sender + "</color> : " + chatMsg.msg) ;
-			
+		void Start()
+		{
+			this.EnsureSerializableReferencesAssigned();
 		}
 
+        public void AddChatMessage(string message, bool bEscape)
+        {
+            if (bEscape)
+                message = this.EscapeString(message);
 
-	}
+            this.populator.EventHappened(message);
+        }
 
+        string EscapeString(string str)
+        {
+            return UIExtensions.EscapeStringForTMP(str);
+        }
+    }
 }
