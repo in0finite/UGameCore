@@ -9,17 +9,23 @@ namespace UGameCore.Chat
 	public class ChatArea : MonoBehaviour
 	{
 		public PopulateScrollViewWithEvents populator;
+        public bool LogToConsole = true;
 
 
-		void Start()
+        void Start()
 		{
 			this.EnsureSerializableReferencesAssigned();
 		}
 
         public void AddChatMessage(string message, bool bEscape)
         {
+            message ??= string.Empty;
+
             if (bEscape)
                 message = this.EscapeString(message);
+
+            if (this.LogToConsole)
+                Debug.Log(message, this);
 
             this.populator.EventHappened(message);
         }
