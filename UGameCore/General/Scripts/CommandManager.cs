@@ -277,6 +277,14 @@ namespace UGameCore
             }
 
             /// <summary>
+            /// Read next command argument as Vector2, by reading 2 floats.
+            /// </summary>
+            public Vector2 ReadVector2As2Floats()
+            {
+                return new Vector2(this.ReadFloat(), this.ReadFloat());
+            }
+
+            /// <summary>
             /// Read next command argument as Vector3, by reading 3 floats.
             /// </summary>
             public Vector3 ReadVector3As3Floats()
