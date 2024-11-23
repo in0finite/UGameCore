@@ -36,6 +36,7 @@ namespace UGameCore
         {
             public string command;
             public string[] commandAliases = System.Array.Empty<string>();
+            public string commandAlias;
             public string description;
             public string syntax;
             public sbyte maxNumArguments = -1;
@@ -493,7 +494,10 @@ namespace UGameCore
                     F.RunExceptionSafeArg2(this, commandInfo, static (arg1, arg2) => arg1.RegisterCommand(arg2));
 
                     // register aliases
-                    foreach (string alias in attr.commandAliases)
+                    string[] commandAliases = attr.commandAlias.IsNullOrEmpty()
+                        ? attr.commandAliases
+                        : new string[] { attr.commandAlias }.AppendToArray(attr.commandAliases);
+                    foreach (string alias in commandAliases)
                     {
                         F.RunExceptionSafeArg3(this, attr, alias, static (arg1, arg2, arg3) => arg1.RegisterCommandAlias(arg2.command, arg3));
                     }
