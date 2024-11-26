@@ -28,6 +28,17 @@ namespace UGameCore
         /// </summary>
         public readonly HashSet<string> ForbiddenCommands = new(System.StringComparer.OrdinalIgnoreCase);
 
+        static readonly Dictionary<char, char> UnescapedCharsMapping = new()
+        {
+            { 't', '\t' },
+            { 'r', '\r' },
+            { 'n', '\n' },
+            { '0', '\0' },
+            { '\\', '\\' },
+            { '\"', '\"' },
+            { '\'', '\'' },
+        };
+
         /// <summary>
         /// Annotate a method with this attribute to register it as a command.
         /// </summary>
@@ -702,25 +713,22 @@ namespace UGameCore
 
                 if (!thisCharIsUnescaped && ch == '\\')
                 {
+                    // special char indicating that next char should be unescaped
                     lastCharWasUnescapeChar = true;
-                    list[i] = (char)0; // do not include this char in final string
+                    list[i] = (char)0; // do not include this special char in final string
                     continue;
                 }
 
                 if (thisCharIsUnescaped)
                 {
-                    if (ch == 't')
-                        list[i] = '\t';
-                    else if (ch == 'n')
-                        list[i] = '\n';
-                    else if (ch == 'r')
-                        list[i] = '\r';
-                    else if (ch == '0')
-                        list[i] = '\0';
+                    if (UnescapedCharsMapping.TryGetValue(ch, out char unescapedChar))
+                        list[i] = unescapedChar;
+                    else
+                        list[i] = (char)0;
                 }
             }
 
-            list.RemoveAll(ch => ch == 0); // remove all unescaped chars
+            list.RemoveAll(ch => ch == 0); // remove all special chars
 
             return new string(list.ListAsSpan());
         }
@@ -805,13 +813,18 @@ namespace UGameCore
 
         public ProcessCommandResult ProcessCommand(ProcessCommandContext context)
         {
-            if (string.IsNullOrWhiteSpace(context.command))
-                return ProcessCommandResult.UnknownCommand(null);
+            string[] arguments = SplitSingleCommandIntoArguments(context.command);
+            return ProcessCommandInternal(context, arguments);
+        }
+
+        ProcessCommandResult ProcessCommandInternal(ProcessCommandContext context, string[] arguments)
+        {
+            if (string.IsNullOrEmpty(context.command))
+                return ProcessCommandResult.InvalidCommand;
 
             if (context.command.Length > this.maxNumCharactersInCommand)
                 return ProcessCommandResult.Error("Command too long");
 
-            string[] arguments = SplitSingleCommandIntoArguments(context.command);
             if (0 == arguments.Length)
                 return ProcessCommandResult.InvalidCommand;
 
@@ -1054,7 +1067,7 @@ namespace UGameCore
                 ProcessCommandResult result;
                 try
                 {
-                    result = ProcessCommand(context);
+                    result = ProcessCommandInternal(context, arguments);
                 }
                 catch (System.Exception ex)
                 {
