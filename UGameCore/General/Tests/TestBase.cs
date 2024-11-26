@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 namespace UGameCore.Tests
@@ -17,6 +18,13 @@ namespace UGameCore.Tests
                     $"Make sure there is only 1 object of this type in the scene.");
 
             return objects[0];
+        }
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            // force reloading of scene
+            LoadSceneOnceAttribute.LoadedScene = false;
         }
     }
 }
