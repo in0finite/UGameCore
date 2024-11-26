@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UGameCore.Tests
 {
@@ -199,6 +200,84 @@ namespace UGameCore.Tests
             string command, string expectedResponse0, string expectedResponse1)
         {
             ProcessMultipleCommands(command, expectedResponse0, expectedResponse1);
+        }
+
+        public void AutoComplete(
+            string command, string expectedResponse, string[] possibleOptions)
+        {
+            CommandManager commandManager = GetSingleObject<CommandManager>();
+
+            var possibleCompletions = new List<string>();
+
+            commandManager.AutoCompleteCommand(
+                new CommandManager.ProcessCommandContext { command = command, hasServerPermissions = true },
+                out string outExactCompletion,
+                possibleCompletions);
+
+            Assert.AreEqual(expectedResponse, outExactCompletion);
+            Assert.AreEqual(possibleCompletions, possibleOptions?.ToList());
+        }
+
+        [Test, LoadSceneOnce]
+
+        [TestCase("echo; echo", null)]
+        [TestCase("echo; ech", "echo; echo")]
+        [TestCase("echo; ec", "echo; echo")]
+        [TestCase("123; ech", "123; echo")]
+
+        // with handler
+        [TestCase("123; help echo", null)]
+        [TestCase("123; help ech", "123; help echo")]
+        [TestCase("123; help ec", "123; help echo")]
+
+        [TestCase("123; 456; abc; ech", "123; 456; abc; echo")] // 4 commands
+
+        [TestCase("123; 456; abc; help ech", "123; 456; abc; help echo")] // 4 commands with handler
+
+        [TestCase("123; help \"ech\"", "123; help echo")] // quotes
+
+        // non-existent commands
+        [TestCase("123; non-existent", null)]
+        [TestCase("123; help non-existent", null)]
+
+        // multiple possible options
+        [TestCase("123; ex", null, new string[] { "exit", "exec" })]
+        [TestCase("123; help ex", null, new string[] { "exit", "exec" })]
+
+        public void AutoCompleteMultipleCommands(
+            string command, string expectedResponse, string[] possibleOptions = null)
+        {
+            AutoComplete(command, expectedResponse, possibleOptions ?? Array.Empty<string>());
+        }
+
+        [Test, LoadSceneOnce]
+
+        [TestCase("echo", null)]
+        [TestCase("ech", "echo")]
+        [TestCase("ec", "echo")]
+
+        [TestCase("echo; ", null)]
+        [TestCase("  echo  ;  ", null)]
+        [TestCase("  echo  ", null)]
+        [TestCase("  \"echo\"  ", null)]
+
+        // with handler
+        [TestCase("help echo", null)]
+        [TestCase("help ech", "help echo")]
+        [TestCase("help ec", "help echo")]
+
+        // non-existent commands
+        [TestCase("non-existent", null)]
+        [TestCase("help non-existent", null)]
+
+        // multiple possible options
+        [TestCase("ex", null, new string[] { "exit", "exec" })]
+        [TestCase("help ex", null, new string[] { "exit", "exec" })]
+
+        public void AutoCompleteSingleCommand(
+            string command, string expectedResponse, string[] possibleOptions = null)
+        {
+            AutoComplete(command, expectedResponse, possibleOptions ?? Array.Empty<string>());
         }
     }
 }

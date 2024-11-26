@@ -768,6 +768,16 @@ namespace UGameCore
             return sb.ToString();
         }
 
+        public string CombineCommands(List<string[]> commandsWithArguments)
+        {
+            return CombineCommands(commandsWithArguments.Select(_ => CombineArguments(_)).ToArray());
+        }
+
+        public string CombineCommands(string[] commands)
+        {
+            return string.Join("; ", commands);
+        }
+
         public static Vector3 ParseVector3(string[] arguments, int startIndex)
         {
             if (startIndex + 2 >= arguments.Length)
@@ -877,7 +887,11 @@ namespace UGameCore
             if (string.IsNullOrWhiteSpace(context.command))
                 return;
 
-            string[] arguments = SplitSingleCommandIntoArguments(context.command);
+            List<string[]> commandsWithArguments = SplitMultipleCommandsIntoArguments(context.command);
+            if (commandsWithArguments.Count == 0)
+                return;
+
+            string[] arguments = commandsWithArguments.Last();
             if (0 == arguments.Length)
                 return;
 
@@ -901,7 +915,10 @@ namespace UGameCore
                 // input could be equal to one of commands
                 // ask the command handler to do auto-completion
                 this.AutoCompleteUsingCommandHandler(context, out outExactCompletion, outPossibleCompletions);
+                return;
             }
+
+            InsertPreviousCommandsIntoAutoCompletionResult(commandsWithArguments, ref outExactCompletion, outPossibleCompletions);
         }
 
         void AutoCompleteUsingCommandHandler(
@@ -909,7 +926,13 @@ namespace UGameCore
         {
             outExactCompletion = null;
 
-            var arguments = SplitSingleCommandIntoArguments(context.command);
+            List<string[]> commandsWithArguments = SplitMultipleCommandsIntoArguments(context.command);
+            if (commandsWithArguments.Count == 0)
+                return;
+
+            string[] arguments = commandsWithArguments.Last();
+            if (0 == arguments.Length)
+                return;
 
             if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
                 return;
@@ -920,11 +943,32 @@ namespace UGameCore
             context.commandOnly = commandInfo.command;
             context.arguments = arguments;
 
-            var result = commandInfo.autoCompletionHandler(context);
+            ProcessCommandResult result = commandInfo.autoCompletionHandler(context);
 
             outExactCompletion = result.response;
             if (result.autoCompletions != null)
                 outPossibleCompletions.AddRange(result.autoCompletions);
+
+            InsertPreviousCommandsIntoAutoCompletionResult(commandsWithArguments, ref outExactCompletion, outPossibleCompletions);
+        }
+
+        void InsertPreviousCommandsIntoAutoCompletionResult(
+            List<string[]> commandsWithArguments,
+            ref string outExactCompletion,
+            List<string> outPossibleCompletions)
+        {
+            List<string[]> previousCommands = commandsWithArguments.Take(commandsWithArguments.Count - 1).ToList();
+            string previousCommand = CombineCommands(previousCommands);
+
+            if (string.IsNullOrEmpty(previousCommand))
+                return;
+
+            if (outExactCompletion != null)
+            {
+                outExactCompletion = CombineCommands(new string[] { previousCommand, outExactCompletion });
+            }
+
+            // possible completions should not have previous commands inserted into them
         }
 
         static void DoAutoCompletion(
