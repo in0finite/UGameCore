@@ -325,15 +325,10 @@ namespace UGameCore.Console
             if (null == context)
                 return;
 
-            var result = this.commandManager.ProcessCommand(context);
+            CommandManager.ProcessCommandResult[] results = this.commandManager.ProcessMultipleCommands(context);
 
-            if (result.response != null)
-            {
-                if (result.IsSuccess)
-                    Debug.Log(result.response, this);
-                else
-                    Debug.LogError(result.response, this);
-            }
+            foreach (CommandManager.ProcessCommandResult result in results)
+                this.commandManager.LogCommandResult(result, this);
         }
 
         void AutoComplete()

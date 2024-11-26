@@ -24,11 +24,10 @@ namespace UGameCore
             return ProcessCommandResult.Success;
         }
 
-        [CommandMethod("echo", "Prints text to Console")]
+        [CommandMethod("echo", "Returns given text")]
         ProcessCommandResult EchoCmd(ProcessCommandContext context)
         {
-            UnityEngine.Debug.Log(context.GetRestOfTheCommand());
-            return ProcessCommandResult.Success;
+            return ProcessCommandResult.SuccessResponse(context.GetRestOfTheCommand());
         }
 
         [CommandMethod("uptime", "Returns uptime of application")]

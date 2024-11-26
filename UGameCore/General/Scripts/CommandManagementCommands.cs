@@ -106,11 +106,17 @@ namespace UGameCore
             return ProcessCommandResult.SuccessResponse(response);
         }
 
-        [CommandMethod("exec", "Execute commands from a file", syntax = "(string relativeFileName)", exactNumArguments = 1)]
+        [CommandMethod("exec", "Execute commands from a file", syntax = "(string fileName)", exactNumArguments = 1)]
         ProcessCommandResult ExecCmd(ProcessCommandContext context)
         {
-            string relativeFileName = context.ReadString();
-            return this.commandManager.ProcessCommandsFromFile(context, relativeFileName);
+            string fileName = context.ReadString();
+            ProcessCommandResult[] results = this.commandManager.ProcessCommandsFromFile(context, fileName);
+
+            // there's no simple way to merge results into 1, so log all of them separately, then return successful result
+            foreach (ProcessCommandResult result in results)
+                this.commandManager.LogCommandResult(result, this);
+
+            return ProcessCommandResult.Success;
         }
     }
 }

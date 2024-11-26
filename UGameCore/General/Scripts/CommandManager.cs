@@ -115,13 +115,14 @@ namespace UGameCore
         /// <summary>
         /// Result of a command processing.
         /// </summary>
-        public class ProcessCommandResult
+        public struct ProcessCommandResult
         {
             public int exitCode;
             public string response;
+            public System.Exception exception;
             public List<string> autoCompletions;
 
-            public bool IsSuccess => this.exitCode == 0;
+            public readonly bool IsSuccess => this.exitCode == 0;
 
             public static ProcessCommandResult UnknownCommand(string cmd) => Error($"Unknown command: {cmd}");
             public static ProcessCommandResult InvalidCommand => Error("Invalid command");
@@ -131,6 +132,8 @@ namespace UGameCore
             public static ProcessCommandResult LimitInterval(float interval) => Error($"This command can only be used on an interval of {interval} seconds");
             public static ProcessCommandResult Error(string errorMessage)
                 => new ProcessCommandResult { exitCode = 1, response = errorMessage };
+            public static ProcessCommandResult Exception(System.Exception ex)
+                => new ProcessCommandResult { exitCode = 1, exception = ex };
             public static ProcessCommandResult Success => SuccessResponse(null);
             public static ProcessCommandResult SuccessResponse(string response)
                 => new ProcessCommandResult() { exitCode = 0, response = response };
@@ -555,16 +558,9 @@ namespace UGameCore
                 throw new System.ArgumentException($"Type of parameter must be ({nameof(ProcessCommandContext)}), method: {type.Name}.{method.Name}()");
         }
 
-        public static string[] SplitCommandIntoArguments(string command)
+        public static List<string[]> SplitMultipleCommandsIntoArguments(string command)
         {
-            // examples:
-            // abcd"abc"abc
-            // abcd" abcd" abcd
-            // abcd "abcd"abcd
-            // abcd "a  |
-            // abcd ""
-            // abcd " "
-
+            var commands = new List<string[]>();
             var arguments = new List<string>();
 
             // trim is fine here, because arguments can not have whitespaces at start/end without using quotes
@@ -574,12 +570,30 @@ namespace UGameCore
             char startingQuoteChar = (char)0;
             bool lastCharWasEscape = false;
 
+
+            void EndCurrentArgument(int i, bool bAllowEmptyArg)
+            {
+                string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
+                if (argument.Length > 0 || bAllowEmptyArg)
+                    arguments.Add(argument);
+                argumentStartIndex = i;
+            }
+
+            void EndCurrentCommand()
+            {
+                if (arguments.Count > 0)
+                    commands.Add(arguments.ToArray());
+                arguments.Clear();
+            }
+
+
             for (int i = 0; i < command.Length; i++)
             {
                 char ch = command[i];
 
                 bool thisCharIsEscaped = lastCharWasEscape;
                 lastCharWasEscape = false;
+                bool isInsideQuotes = startingQuoteChar != 0;
 
                 if (!thisCharIsEscaped && ch == '\\')
                 {
@@ -587,87 +601,90 @@ namespace UGameCore
                     continue;
                 }
 
-                if (char.IsWhiteSpace(ch))
+                // split logic based on whether in quotes or not
+
+                if (isInsideQuotes)
                 {
-                    if (startingQuoteChar == 0) // not inside quotes
+                    // check if we need to close quotes
+                    if (IsQuote(ch) && !thisCharIsEscaped && ch == startingQuoteChar)
                     {
-                        // cut argument here
-                        string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                        argument = argument.Trim(); // not sure if Trim() is needed here, but keep it just in case
-                        if (argument.Length > 0) // only add it if not empty, because a whitespace outside of quotes should not be an argument
-                            arguments.Add(argument);
-                        argumentStartIndex = i;
-                        continue;
-                    }
-
-                    // inside quotes
-                    // skip this character, he will be part of current argument
-
-                    continue;
-                }
-
-                if ((ch == '\'' || ch == '\"') && !thisCharIsEscaped)
-                {
-                    if (ch == startingQuoteChar) // inside quotes
-                    {
-                        if (i == command.Length - 1 || char.IsWhiteSpace(command[i + 1]))
+                        if (i == command.Length - 1 || IsCommandOrArgumentSeparator(command[i + 1]))
                         {
-                            // whitespace is after this char, end current argument
+                            // separator is after this char, end current argument
 
-                            string argument = command.Substring(argumentStartIndex + 1, i - argumentStartIndex - 1);
-                            arguments.Add(argument); // do not Trim() here, arguments are allowed to have whitespaces at start/end
-                            argumentStartIndex = i;
+                            EndCurrentArgument(i, true); // do not Trim() here, arguments are allowed to have whitespaces at start/end
+
                             startingQuoteChar = (char)0;
 
                             continue;
                         }
-
-                        // no whitespace after this char, treat it as regular char - he will be part of current argument
-
-                        continue;
                     }
-
-                    if (startingQuoteChar == 0) // not inside quotes
-                    {
-                        if (i == 0 || char.IsWhiteSpace(command[i - 1]))
-                        {
-                            // whitespace is before this char, open new argument
-                            startingQuoteChar = ch;
-                            argumentStartIndex = i;
-
-                            continue;
-                        }
-
-                        // no whitespace before this char, treat it as regular char - he will be part of current argument
-
-                        continue;
-                    }
-
-                    // different quote character, skip this character, he will be part of current argument
 
                     continue;
                 }
 
-                // normal character, skip it, he will be part of current argument
+                // --------- not inside quotes ---------
 
-                continue;
+                // check for command separator
+                if (IsCommandSeparator(ch))
+                {
+                    // end current command here
+
+                    EndCurrentArgument(i, false);
+
+                    EndCurrentCommand();
+
+                    continue;
+                }
+
+                if (IsArgumentSeparator(ch))
+                {
+                    // end current argument here
+                    EndCurrentArgument(i, false); // only add it if not empty, because a whitespace outside of quotes should not be an argument
+                    continue;
+                }
+
+                if (IsQuote(ch) && !thisCharIsEscaped)
+                {
+                    if (i == 0 || IsCommandOrArgumentSeparator(command[i - 1]))
+                    {
+                        // separator is before this char, open new argument
+                        startingQuoteChar = ch;
+                        argumentStartIndex = i;
+
+                        continue;
+                    }
+
+                    continue;
+                }
             }
 
             // add the remaining argument
-            string remainingArgument = command.Substring(argumentStartIndex + 1, command.Length - argumentStartIndex - 1);
-            if (remainingArgument.Length > 0)
+
+            // here we only need to trim from end, because argument may have quotes,
+            // but because the command was trimmed at beginning, we don't need to do it
+
+            EndCurrentArgument(command.Length, false);
+
+            EndCurrentCommand();
+
+            foreach (string[] args in commands)
             {
-                // here we only need to trim from end, because argument may have quotes
-                // but because the command was trimmed at beginning, we don't need to do it
-                arguments.Add(remainingArgument);
+                args.ReplaceEach(static arg => UnescapeArgument(arg));
             }
 
-            arguments.ReplaceEach(arg => UnescapeArgument(arg));
+            return commands;
+        }
 
-            // do not remove empty strings, they are valid arguments
-            //arguments.RemoveAll(string.IsNullOrWhiteSpace);
+        public static string[] SplitSingleCommandIntoArguments(string command)
+        {
+            List<string[]> commands = SplitMultipleCommandsIntoArguments(command);
+            if (commands.Count > 1)
+                throw new System.ArgumentException($"Found multiple commands ({commands.Count}) while trying to split arguments of single command");
+            if (commands.Count == 0)
+                throw new System.ArgumentException($"No commands found");
 
-            return arguments.ToArray();
+            return commands[0];
         }
 
         static string UnescapeArgument(string argument)
@@ -703,10 +720,18 @@ namespace UGameCore
                 }
             }
 
-            list.RemoveAll(ch => ch == 0); // remove all unescape chars
+            list.RemoveAll(ch => ch == 0); // remove all unescaped chars
 
-            return new string(list.ToArray());
+            return new string(list.ListAsSpan());
         }
+
+        static bool IsCommandSeparator(char c) => c == ';' || c == '\n';
+
+        static bool IsArgumentSeparator(char c) => char.IsWhiteSpace(c);
+
+        static bool IsCommandOrArgumentSeparator(char c) => IsCommandSeparator(c) || IsArgumentSeparator(c);
+
+        static bool IsQuote(char c) => c == '\'' || c == '\"';
 
         public string CombineArguments(params string[] arguments)
         {
@@ -717,8 +742,8 @@ namespace UGameCore
                 string arg = arguments[i]; // don't trim, arguments are allowed to have whitespaces at start/end
 
                 bool isEmpty = arg.Length == 0;
-                bool hasWhitespace = arg.Any(char.IsWhiteSpace);
-                bool needsQuotes = isEmpty || hasWhitespace;
+                bool hasSeparator = arg.Any(static c => IsCommandOrArgumentSeparator(c));
+                bool needsQuotes = isEmpty || hasSeparator;
 
                 if (needsQuotes)
                     sb.Append('\"');
@@ -786,7 +811,7 @@ namespace UGameCore
             if (context.command.Length > this.maxNumCharactersInCommand)
                 return ProcessCommandResult.Error("Command too long");
 
-            string[] arguments = SplitCommandIntoArguments(context.command);
+            string[] arguments = SplitSingleCommandIntoArguments(context.command);
             if (0 == arguments.Length)
                 return ProcessCommandResult.InvalidCommand;
 
@@ -839,7 +864,7 @@ namespace UGameCore
             if (string.IsNullOrWhiteSpace(context.command))
                 return;
 
-            string[] arguments = SplitCommandIntoArguments(context.command);
+            string[] arguments = SplitSingleCommandIntoArguments(context.command);
             if (0 == arguments.Length)
                 return;
 
@@ -871,7 +896,7 @@ namespace UGameCore
         {
             outExactCompletion = null;
 
-            var arguments = SplitCommandIntoArguments(context.command);
+            var arguments = SplitSingleCommandIntoArguments(context.command);
 
             if (!m_registeredCommands.TryGetValue(arguments[0], out CommandInfo commandInfo))
                 return;
@@ -987,41 +1012,79 @@ namespace UGameCore
             return ProcessCommandResult.AutoCompletion(exactCompletion, possibleCompletions);
         }
 
-        public ProcessCommandResult ProcessCommandsFromFile(ProcessCommandContext context, string relativeFileName)
+        public string GetCommandsFilePath(string relativeFileName)
         {
-            // make sure that other files can not be modified - restrict to ".cfg" file extension
+            // make sure that other files can not be read - restrict to ".cfg" file extension
             if (!relativeFileName.EndsWith(".cfg", System.StringComparison.OrdinalIgnoreCase))
                 throw new System.ArgumentException($"File name must end with '.cfg'");
 
-            // prevent malicious file names
-            if (relativeFileName.ContainsAnyChar("/\\", System.StringComparison.OrdinalIgnoreCase))
-                throw new System.ArgumentException($"Invalid file name: {relativeFileName}");
+            // allow any path, no need to prevent different folders or drives
 
-            string dir = Application.persistentDataPath;
+            //if (relativeFileName.ContainsAnyChar("/\\", System.StringComparison.OrdinalIgnoreCase))
+            //    throw new System.ArgumentException($"Invalid file name: {relativeFileName}");
+
+            string dir = F.IsOnDesktopPlatform ? Application.dataPath : Application.persistentDataPath;
 
             string fullPath = System.IO.Path.Join(dir, relativeFileName);
 
-            string commands = System.IO.File.ReadAllText(fullPath);
-
-            context = context.Clone();
-            context.command = commands;
-            return this.ProcessMultiLineCommands(context);
+            return fullPath;
         }
 
-        public ProcessCommandResult ProcessMultiLineCommands(ProcessCommandContext context)
+        public ProcessCommandResult[] ProcessCommandsFromFile(ProcessCommandContext context, string relativeFileName)
         {
-            string[] lines = context.command.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
-            var resultRef = new Ref<ProcessCommandResult>(ProcessCommandResult.Success);
+            string commandsText = System.IO.File.ReadAllText(GetCommandsFilePath(relativeFileName));
+
+            context = context.Clone();
+            context.command = commandsText;
+            return this.ProcessMultipleCommands(context);
+        }
+
+        public ProcessCommandResult[] ProcessMultipleCommands(ProcessCommandContext context)
+        {
+            List<string[]> commands = SplitMultipleCommandsIntoArguments(context.command);
+            ProcessCommandResult[] results = new ProcessCommandResult[commands.Count];
+
             context = context.Clone();
 
-            foreach (string line in lines)
+            for (int i = 0; i < commands.Count; i++)
             {
-                context.command = line;
-                F.RunExceptionSafeArg3(
-                    this, context, resultRef, static (arg1, arg2, arg3) => arg3.value = arg1.ProcessCommand(arg2));
+                string[] arguments = commands[i];
+                context.command = CombineArguments(arguments);
+
+                ProcessCommandResult result;
+                try
+                {
+                    result = ProcessCommand(context);
+                }
+                catch (System.Exception ex)
+                {
+                    result = ProcessCommandResult.Exception(ex);
+                }
+
+                results[i] = result;
             }
 
-            return resultRef.value;
+            return results;
+        }
+
+        public void LogCommandResult(ProcessCommandResult result, Object contextObject)
+        {
+            if (result.exception != null)
+            {
+                Debug.LogException(result.exception, contextObject);
+                return;
+            }
+
+            if (!result.IsSuccess)
+            {
+                Debug.LogError(result.response, contextObject);
+                return;
+            }
+
+            if (result.response != null) // don't log empty successful response
+            {
+                Debug.Log(result.response, contextObject);
+            }
         }
     }
 }
