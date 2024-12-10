@@ -124,7 +124,9 @@ namespace UGameCore.MiniMap
 
             public MapVisibilityType[] AllowedMapVisibilityTypes;
             static readonly MapVisibilityType[] s_mapBigVisibility = new MapVisibilityType[] { MapVisibilityType.Big };
-            public void SetOnlyVisibleOnBigMap() => this.AllowedMapVisibilityTypes = s_mapBigVisibility;
+            public void SetOnlyVisibleOnBigMapNonAlloc() => this.AllowedMapVisibilityTypes = s_mapBigVisibility;
+            public bool IsOnlyVisibleOnBigMap { set => this.AllowedMapVisibilityTypes = new MapVisibilityType[] { MapVisibilityType.Big }; }
+            public bool IsOnlyVisibleOnSmallMap { set => this.AllowedMapVisibilityTypes = new MapVisibilityType[] { MapVisibilityType.Small }; }
 
             public Vector2 OffsetOnMiniMap;
 
@@ -133,6 +135,7 @@ namespace UGameCore.MiniMap
 
             public float ColorAlphaMaxDuration;
             public AnimationCurve ColorAlphaCurve;
+            public float ColorAlphaMultiplier;
 
 
             public readonly void SetRectTransformData(RectTransformData rectTransformData)
@@ -148,6 +151,11 @@ namespace UGameCore.MiniMap
             public readonly void BringToBackInLayer()
             {
                 this.Graphic.rectTransform.SetAsFirstSibling();
+            }
+
+            public readonly void SetSiblingIndex(int index)
+            {
+                this.Graphic.rectTransform.SetSiblingIndex(index);
             }
 
             public readonly void SetSortingLayer(MapSortingLayer sortingLayer)

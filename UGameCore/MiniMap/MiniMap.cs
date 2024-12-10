@@ -529,7 +529,8 @@ namespace UGameCore.MiniMap
                 elapsedPerc = elapsedPerc.ZeroIfNotFinite().Clamp01();
                 float curveValue = elementProperties.ColorAlphaCurve.Evaluate(elapsedPerc);
                 curveValue = curveValue.Clamp01();
-                elementProperties.Graphic.SetColorAlpha(curveValue);
+                float alpha = elementProperties.ColorAlphaMultiplier > 0f ? curveValue * elementProperties.ColorAlphaMultiplier : curveValue;
+                elementProperties.Graphic.SetColorAlpha(alpha);
             }
         }
 
