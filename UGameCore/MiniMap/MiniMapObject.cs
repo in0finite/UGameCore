@@ -96,6 +96,9 @@ namespace UGameCore.MiniMap
         internal bool HasLastMatrix = false;
         internal PositionAndRotation LastMatrix;
 
+        public bool HasSeparateWorldTransform { get; set; } = false;
+        public PositionAndRotation SeparateWorldTransform { get; set; } = PositionAndRotation.Identity;
+
         [System.Serializable]
         public struct UIElementProperties<T>
             where T : Graphic

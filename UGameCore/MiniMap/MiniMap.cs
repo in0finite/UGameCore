@@ -237,6 +237,8 @@ namespace UGameCore.MiniMap
             miniMapObject.SelfDestroyWhenUnregistered = false;
             miniMapObject.HasLifeOwner = false;
             miniMapObject.LifeOwner = null;
+            miniMapObject.HasSeparateWorldTransform = false;
+            miniMapObject.SeparateWorldTransform = PositionAndRotation.Identity;
 
             this.ReleaseUIComponents(miniMapObject);
 
@@ -451,7 +453,9 @@ namespace UGameCore.MiniMap
 
         void UpdateUIElements(MiniMapObject miniMapObject)
         {
-            PositionAndRotation matrix = miniMapObject.CachedTransform.GetPositionAndRotation();
+            PositionAndRotation matrix = miniMapObject.HasSeparateWorldTransform
+                ? miniMapObject.SeparateWorldTransform
+                : miniMapObject.CachedTransform.GetPositionAndRotation();
 
             bool transformChanged = m_repositionAllObjects
                 || miniMapObject.IsDirty

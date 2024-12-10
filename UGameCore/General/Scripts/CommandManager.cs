@@ -351,6 +351,8 @@ namespace UGameCore
                 throw new System.ArgumentException($"Invalid boolean value: {str}. Use 1|0 or true|false.");
             }
 
+            public bool? ReadNullableBool() => ReadNullableUsingFunction(static c => c.ReadBool());
+
             /// <summary>
             /// Read next command argument as Enum.
             /// </summary>
