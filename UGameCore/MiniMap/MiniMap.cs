@@ -18,6 +18,7 @@ namespace UGameCore.MiniMap
         public RectTransform RootTransform;
         public RawImage MapImage;
         public Image BackgroundPanelImage;
+        public MiniMapDrawer MiniMapDrawer;
 
         public GameObject TexturePrefab;
         public GameObject SpritePrefab;
@@ -122,9 +123,12 @@ namespace UGameCore.MiniMap
 
         public void SetVisible(bool visible)
         {
+            bool bVisibilityChanged = visible != this.IsVisible;
             this.IsVisible = visible;
             this.UpdateGameObjectVisibility();
             m_repositionAllObjects = true;
+            if (bVisibilityChanged && MiniMapDrawer != null)
+                MiniMapDrawer.ClearDrawing();
         }
 
         public void SetVisibilityOwner(GameObject go)
@@ -633,6 +637,7 @@ namespace UGameCore.MiniMap
             if (type == this.VisibilityType && !bForce)
                 return;
 
+            bool bVisibilityTypeChanged = type != this.VisibilityType;
             this.VisibilityType = type;
             m_repositionAllObjects = true;
             LastScreenSize = GUIUtils.ScreenRect.size;
@@ -661,6 +666,9 @@ namespace UGameCore.MiniMap
 
             // need to update all UI elements here, because for 1 frame, they are left in their previous positions
             this.UpdateInternal();
+
+            if (bVisibilityTypeChanged && MiniMapDrawer != null)
+                MiniMapDrawer.ClearDrawing();
         }
 
         public void ToggleMapVisibilityType()

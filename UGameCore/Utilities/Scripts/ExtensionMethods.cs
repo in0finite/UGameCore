@@ -239,30 +239,36 @@ namespace UGameCore
 			
 		}
 
-		public	static	Rect	GetRect( this RectTransform rectTransform ) {
+        public static Rect GetRectFromCorners(Vector3[] corners)
+		{
+            float xMin = float.PositiveInfinity, yMin = float.PositiveInfinity;
+            float xMax = float.NegativeInfinity, yMax = float.NegativeInfinity;
 
-			Vector3[] localCorners = m_fourCornersArray;
-			rectTransform.GetLocalCorners (localCorners);
+            for (int i = 0; i < corners.Length; i++)
+            {
+                Vector3 corner = corners[i];
 
-			float xMin = float.PositiveInfinity, yMin = float.PositiveInfinity;
-			float xMax = float.NegativeInfinity, yMax = float.NegativeInfinity;
+				xMax = xMax.Max(corner.x);
+				xMin = xMin.Min(corner.x);
 
-			for (int i = 0; i < localCorners.Length; i++) {
-				Vector3 corner = localCorners [i];
+				yMax = yMax.Max(corner.y);
+				yMin = yMin.Min(corner.y);
+            }
 
-				if (corner.x < xMin)
-					xMin = corner.x;
-				else if (corner.x > xMax)
-					xMax = corner.x;
+            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
 
-				if (corner.y < yMin)
-					yMin = corner.y;
-				else if (corner.y > yMax)
-					yMax = corner.y;
-			}
-
-			return new Rect (xMin, yMin, xMax - xMin, yMax - yMin);
+        public static Rect GetRect(this RectTransform rectTransform)
+		{
+			rectTransform.GetLocalCorners(m_fourCornersArray);
+			return GetRectFromCorners(m_fourCornersArray);
 		}
+
+		public static Rect GetWorldRect(this RectTransform rectTransform)
+		{
+            rectTransform.GetWorldCorners(m_fourCornersArray);
+            return GetRectFromCorners(m_fourCornersArray);
+        }
 
 		public	static	Vector2	GetParentDimensions( this RectTransform rectTransform ) {
 
