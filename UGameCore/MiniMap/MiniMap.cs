@@ -242,8 +242,7 @@ namespace UGameCore.MiniMap
             miniMapObject.LifeDuration = 0f;
             miniMapObject.SelfDestroyWhenUnregistered = false;
             //miniMapObject.FollowedTransform = default; // leave it, it's assigned on creation
-            miniMapObject.HasLifeOwner = false;
-            miniMapObject.LifeOwner = null;
+            miniMapObject.LifeOwnerExistable = default;
             miniMapObject.WorldTransformation = PositionAndRotation.Identity;
             //miniMapObject.Name = null; // leave it, it's assigned on creation
 
@@ -346,8 +345,8 @@ namespace UGameCore.MiniMap
         {
             return null == miniMapObject 
                 || !miniMapObject.IsRegistered
-                || (miniMapObject.FollowedTransform.Exists && miniMapObject.FollowedTransform.Object == null)
-                || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner)
+                || (miniMapObject.FollowedTransform.Exists && null == miniMapObject.FollowedTransform.Object)
+                || (miniMapObject.LifeOwnerExistable.Exists && null == miniMapObject.LifeOwnerExistable.Object)
                 || (miniMapObject.LifeDuration > 0f && !m_timeNow.BetweenInclusive(miniMapObject.TimeWhenRegistered, miniMapObject.TimeWhenRegistered + miniMapObject.LifeDuration));
         }
 

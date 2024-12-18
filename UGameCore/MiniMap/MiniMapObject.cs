@@ -215,8 +215,7 @@ namespace UGameCore.MiniMap
         public TextMeshProUGUI TextComponent => this.TextProperties.Graphic;
         public bool HasTextComponent => this.TextProperties.HasGraphic;
 
-        public Component LifeOwner;
-        public bool HasLifeOwner = false;
+        internal ExistableUnityObject<Component> LifeOwnerExistable;
 
 
 
@@ -238,8 +237,7 @@ namespace UGameCore.MiniMap
 
         public void SetLifeOwner(Component component)
         {
-            this.LifeOwner = component;
-            this.HasLifeOwner = component != null;
+            LifeOwnerExistable = component;
         }
 
         public void SetTimeWhenRegistered(double time)
