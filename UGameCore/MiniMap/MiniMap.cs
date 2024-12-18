@@ -232,7 +232,7 @@ namespace UGameCore.MiniMap
             bool oldShouldSelfDestroy = miniMapObject.SelfDestroyWhenUnregistered;
             Transform oldFollowedTransform = miniMapObject.FollowedTransform.Object;
 
-            // reset variables so that MiniMapObject can be re-used
+            // reset variables so that MiniMapObject can be registered again
 
             miniMapObject.IsRegistered = false;
             miniMapObject.MiniMap = null;
