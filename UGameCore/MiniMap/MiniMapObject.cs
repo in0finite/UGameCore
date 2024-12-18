@@ -77,12 +77,47 @@ namespace UGameCore.MiniMap
         }
     }
 
-    public class MiniMapObject : MonoBehaviour
+    public class MiniMapObjectComponent : MonoBehaviour
     {
         [SerializeField] MiniMap m_MiniMapToRegisterOnStart;
+        public MiniMapObjectInspectorParams Params;
+        public MiniMapObject MiniMapObject { get; private set; }
+        public bool IsRegistered => MiniMapObject != null && MiniMapObject.IsRegistered;
+
+
+        void Start()
+        {
+            if (m_MiniMapToRegisterOnStart != null && !IsRegistered)
+            {
+                MiniMapObject = m_MiniMapToRegisterOnStart.CreateWithoutRegistering(gameObject);
+                Params.Register(m_MiniMapToRegisterOnStart, MiniMapObject);
+            }
+        }
+
+        void OnDestroy()
+        {
+            // if MiniMap is disabled, it doesn't unregister destroyed objects, so we will unregister from here
+            if (MiniMapObject != null)
+                MiniMapObject.TryUnregister();
+            MiniMapObject = null;
+        }
+
+        void OnValidate()
+        {
+            if (MiniMapObject != null)
+                MiniMapObject.MarkDirty();
+        }
+    }
+
+    public class MiniMapObject
+    {
         public MiniMap MiniMap { get; internal set; }
 
-        internal Transform CachedTransform;
+        /// <summary>
+        /// If specified, <see cref="MiniMapObject"/> will position itself according to this <see cref="Transform"/>,
+        /// otherwise it will follow <see cref="WorldTransformation"/>.
+        /// </summary>
+        public ExistableUnityObject<Transform> FollowedTransform { get; internal set; }
 
         public bool IsRegistered { get; internal set; } = false;
 
@@ -96,8 +131,9 @@ namespace UGameCore.MiniMap
         internal bool HasLastMatrix = false;
         internal PositionAndRotation LastMatrix;
 
-        public bool HasSeparateWorldTransform { get; set; } = false;
-        public PositionAndRotation SeparateWorldTransform { get; set; } = PositionAndRotation.Identity;
+        public PositionAndRotation WorldTransformation { get; set; } = PositionAndRotation.Identity;
+
+        public string Name;
 
         [System.Serializable]
         public struct UIElementProperties<T>
@@ -184,33 +220,9 @@ namespace UGameCore.MiniMap
 
 
 
-        void Awake()
-        {
-            this.CachedTransform = this.transform;
-        }
-
-        void Start()
-        {
-            if (m_MiniMapToRegisterOnStart != null && !this.IsRegistered)
-            {
-                m_MiniMapToRegisterOnStart.RegisterObject(this, true, true, true);
-            }
-        }
-
-        void OnDestroy()
-        {
-            // if MiniMap is disabled, it doesn't unregister destroyed objects, so we will unregister from here
-            this.TryUnregister();
-        }
-
         public void MarkDirty()
         {
             this.IsDirty = true;
-        }
-
-        void OnValidate()
-        {
-            this.MarkDirty();
         }
 
         public bool TryUnregister()
@@ -244,6 +256,14 @@ namespace UGameCore.MiniMap
             TextureProperties.SetHidden(bHidden);
             SpriteProperties.SetHidden(bHidden);
             TextProperties.SetHidden(bHidden);
+        }
+
+        public void DestroyFollowedGameObject()
+        {
+            if (FollowedTransform.Object != null)
+                FollowedTransform.Object.gameObject.DestroyEvenInEditMode();
+
+            //FollowedTransform = default; // don't reset, because then it won't be removed by Minimap
         }
     }
 }

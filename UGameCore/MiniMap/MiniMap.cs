@@ -143,10 +143,14 @@ namespace UGameCore.MiniMap
             this.MapImage.enabled = texture != null; // have to disable it, otherwise it will render white color
         }
 
-        public MiniMapObject CreateWithoutRegistering(GameObject go)
+        public MiniMapObject CreateWithoutRegistering(GameObject followedGo)
         {
             this.NumCreatedObjects++;
-            return go.AddComponent<MiniMapObject>();
+
+            MiniMapObject mm = new();
+            mm.FollowedTransform = new ExistableUnityObject<Transform>(followedGo != null ? followedGo.transform : null);
+            mm.Name = followedGo != null ? followedGo.name : null;
+            return mm;
         }
 
         public MiniMapObject Create(
@@ -225,10 +229,8 @@ namespace UGameCore.MiniMap
 
         void UnregisterObjectInternal(MiniMapObject miniMapObject)
         {
-            // note: this function can be called while MiniMapObject is dead
-            
-            bool bTempShouldSelfDestroy = miniMapObject.SelfDestroyWhenUnregistered
-                && miniMapObject != null; // here we need to check if he is alive
+            bool oldShouldSelfDestroy = miniMapObject.SelfDestroyWhenUnregistered;
+            Transform oldFollowedTransform = miniMapObject.FollowedTransform.Object;
 
             // reset variables so that MiniMapObject can be re-used
 
@@ -239,15 +241,18 @@ namespace UGameCore.MiniMap
             miniMapObject.TimeWhenRegistered = double.NegativeInfinity;
             miniMapObject.LifeDuration = 0f;
             miniMapObject.SelfDestroyWhenUnregistered = false;
+            //miniMapObject.FollowedTransform = default; // leave it, it's assigned on creation
             miniMapObject.HasLifeOwner = false;
             miniMapObject.LifeOwner = null;
-            miniMapObject.HasSeparateWorldTransform = false;
-            miniMapObject.SeparateWorldTransform = PositionAndRotation.Identity;
+            miniMapObject.WorldTransformation = PositionAndRotation.Identity;
+            //miniMapObject.Name = null; // leave it, it's assigned on creation
 
             this.ReleaseUIComponents(miniMapObject);
 
-            if (bTempShouldSelfDestroy) 
-                miniMapObject.gameObject.DestroyEvenInEditMode();
+            if (oldShouldSelfDestroy && oldFollowedTransform != null)
+            {
+                oldFollowedTransform.gameObject.DestroyEvenInEditMode();
+            }
 
             this.NumUnregistrations++;
         }
@@ -303,7 +308,6 @@ namespace UGameCore.MiniMap
                     hasObjectsToRemove = true;
                     m_MiniMapObjects.Remove(miniMapObject);
 
-                    // unregister even if object is dead, because he still holds UI elements, and also other stuff needs to be cleared
                     if (this.IsRegisteredWithMe(miniMapObject))
                     {
                         this.UnregisterObjectInternal(miniMapObject);
@@ -341,7 +345,8 @@ namespace UGameCore.MiniMap
         bool ShouldRemoveMiniMapObject(MiniMapObject miniMapObject)
         {
             return null == miniMapObject 
-                || !miniMapObject.IsRegistered 
+                || !miniMapObject.IsRegistered
+                || (miniMapObject.FollowedTransform.Exists && miniMapObject.FollowedTransform.Object == null)
                 || (miniMapObject.HasLifeOwner && null == miniMapObject.LifeOwner)
                 || (miniMapObject.LifeDuration > 0f && !m_timeNow.BetweenInclusive(miniMapObject.TimeWhenRegistered, miniMapObject.TimeWhenRegistered + miniMapObject.LifeDuration));
         }
@@ -412,7 +417,7 @@ namespace UGameCore.MiniMap
 
             elementProperties.HasGraphic = true;
             elementProperties.CachedGameObject = new CachedGameObject(elementProperties.Graphic);
-            elementProperties.Graphic.name = miniMapObject.name;
+            elementProperties.Graphic.name = miniMapObject.Name;
             elementProperties.Graphic.rectTransform.SetParent(parent, true);
             RectTransformData.Default.Apply(elementProperties.Graphic.rectTransform);
             elementProperties.Graphic.rectTransform.SetAsLastSibling(); // bring to front
@@ -457,9 +462,9 @@ namespace UGameCore.MiniMap
 
         void UpdateUIElements(MiniMapObject miniMapObject)
         {
-            PositionAndRotation matrix = miniMapObject.HasSeparateWorldTransform
-                ? miniMapObject.SeparateWorldTransform
-                : miniMapObject.CachedTransform.GetPositionAndRotation();
+            PositionAndRotation matrix = miniMapObject.FollowedTransform.Exists
+                ? miniMapObject.FollowedTransform.Object.GetPositionAndRotation()
+                : miniMapObject.WorldTransformation;
 
             bool transformChanged = m_repositionAllObjects
                 || miniMapObject.IsDirty
